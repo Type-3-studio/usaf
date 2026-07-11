@@ -1,6 +1,6 @@
 # USAF — Project State & Roadmap
 
-> **Vision:** A modular, scalable security analysis platform that grows from a CLI audit tool into an intelligent, multi-surface security knowledge engine — capable of local audits, fleet-wide monitoring, real-time drift detection, and AI-assisted analysis, all built on clean interfaces and deterministic pipelines.
+> **Vision:** A modular, scalable security audit framework for Ubuntu — capable of local audits, fleet-wide monitoring, real-time drift detection, and compliance reporting, all built on clean interfaces and deterministic pipelines.
 
 ---
 
@@ -44,11 +44,11 @@
 │  │    ✅    │  │    ✅    │  │    ✅    │  │    ✅    │    │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘    │
 │                                                              │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐    │
-│  │Parallel  │  │ Remote   │  │  LLM AI  │  │Timeline  │    │
-│  │  Exec    │  │  Fleet   │  │  (P5)    │  │    DB    │    │
-│  │   ✅    │  │   🔴    │  │   🔴    │  │   🔴    │    │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘    │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐                  │
+│  │Parallel  │  │ Remote   │  │Timeline  │                  │
+│  │  Exec    │  │  Fleet   │  │    DB    │                  │
+│  │   ✅    │  │   🔴    │  │   🔴    │                  │
+│  └──────────┘  └──────────┘  └──────────┘                  │
 │                                                              │
 └──────────────────────────────────────────────────────────────┘
 ```
@@ -267,13 +267,6 @@
 | Agent mode / MQ | LOW | Periodic publishing to NATS/MQTT |
 | Timeline DB | LOW | SQLite history of baseline changes |
 
-### P5: Intelligence & AI
-| Feature | Priority | Notes |
-|---------|----------|-------|
-| LLM analysis (Ollama) | LOW | Executive summaries, priority ranking |
-| Remediation agent | LOW | Autonomous fix with rollback |
-| Anomaly detection (ML) | LOW | Learn normal patterns over time |
-
 ### Filling Empty Placeholders
 | Area | Priority | Notes |
 |------|----------|-------|
@@ -367,7 +360,6 @@ src/usaf/
 | Correlation rules | 4 | 4+ | ✅ |
 | Baseline support | Full | Full + timeline | ◐ |
 | Remote scanning | None | SSH transport | 🔴 |
-| LLM integration | None | Ollama + agent | 🔴 |
 
 ---
 

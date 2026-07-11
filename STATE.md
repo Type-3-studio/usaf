@@ -81,28 +81,50 @@
 | `FilesystemCollector` | ✅ | SUID, world-writable, capabilities, hidden files (P0) |
 | `CertStoreCollector` | ✅ | System CA bundles, certificate inventory (P0) |
 
-#### Checks (25 total)
+#### Checks (47 total)
 | Check | Status | Severity | Evidence |
 |-------|--------|----------|----------|
 | KERN-101 (ASLR) | ✅ | HIGH | RegistryEvidence |
 | KERN-201 (Pointer Restriction) | ✅ | MEDIUM | RegistryEvidence |
 | KERN-301 (Core Dump) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-401 (Module Loading) | ✅ | MEDIUM | RegistryEvidence |
 | SSH-101 (Protocol) | ✅ | HIGH | RegistryEvidence |
 | SSH-102 (Root Login) | ✅ | HIGH | RegistryEvidence |
 | SSH-201 (KEX Algorithms) | ✅ | MEDIUM | RegistryEvidence |
 | USR-101 (Duplicate UID 0) | ✅ | CRITICAL | UserEvidence |
-| USR-201 (Empty Passwords) | ✅ | CRITICAL | UserEvidence |
 | USR-102 (Shadowed Passwords) | ✅ | HIGH | RegistryEvidence |
+| USR-103 (Duplicate UIDs) | ✅ | HIGH | UserEvidence |
+| USR-104 (Disabled Accts w/ Shell) | ✅ | MEDIUM | UserEvidence |
+| USR-105 (Expired Passwords) | ✅ | MEDIUM | UserEvidence / RegistryEvidence |
+| USR-201 (Empty Passwords) | ✅ | CRITICAL | UserEvidence |
+| USR-202 (Password Reuse Policy) | ✅ | MEDIUM | RegistryEvidence |
+| USR-301 (MFA Status) | ✅ | HIGH | RegistryEvidence |
+| USR-401 (Unauthorized Sudo) | ✅ | HIGH | RegistryEvidence |
 | NET-101 (Listening Ports) | ✅ | MEDIUM | NetworkEvidence |
 | NET-201 (Promiscuous Mode) | ✅ | MEDIUM | NetworkEvidence |
-| PRM-101 (SUID Binaries) | ✅ | HIGH | FileEvidence (config allowlist + 60 known-safe packages auto-allowlisted) |
+| NET-301 (Unexpected DNS) | ✅ | MEDIUM | NetworkEvidence / RegistryEvidence |
+| NET-302 (Modified Hosts) | ✅ | MEDIUM | RegistryEvidence |
+| NET-401 (Weak Net Sysctl) | ✅ | MEDIUM | RegistryEvidence |
+| NET-402 (IPv6 Hardening) | ✅ | MEDIUM | RegistryEvidence |
+| NET-501 (DNSSEC Validation) | ✅ | MEDIUM | RegistryEvidence |
+| PKG-101 (Unnecessary Pkgs) | ✅ | MEDIUM | PackageEvidence |
+| PKG-201 (Modified Files) | ✅ | MEDIUM | CommandEvidence |
+| PKG-202 (Broken Signatures) | ✅ | HIGH | RegistryEvidence / CommandEvidence |
+| PKG-301 (Unknown Repos) | ✅ | MEDIUM | RegistryEvidence |
+| PKG-302 (Expired Keys) | ✅ | MEDIUM | RegistryEvidence |
+| PKG-401 (Known CVEs) | ✅ | HIGH | PackageEvidence |
+| PKG-402 (Pending Updates) | ✅ | HIGH | PackageEvidence |
+| PRM-101 (SUID Binaries) | ✅ | HIGH | FileEvidence |
 | PRM-201 (World-Writable) | ✅ | HIGH | FileEvidence |
+| BOOT-101 (Secure Boot) | ✅ | HIGH | RegistryEvidence |
+| BOOT-201 (Kernel Lockdown) | ✅ | MEDIUM | RegistryEvidence |
+| BOOT-301 (EFI Integrity) | ✅ | HIGH | RegistryEvidence / FileEvidence |
+| BOOT-401 (GRUB Password) | ✅ | HIGH | RegistryEvidence |
+| BOOT-501 (Unsigned Kernels) | ✅ | HIGH | FileEvidence |
 | CMP-101 (Ubuntu Support) | ✅ | MEDIUM | RegistryEvidence |
 | COM-101 (Bad Processes) | ✅ | HIGH | ProcessEvidence |
 | CTN-101 (Docker Socket) | ✅ | HIGH | FileEvidence |
 | FOR-101 (Audit Logs) | ✅ | MEDIUM | FileEvidence |
-| KERN-401 (Module Loading) | ✅ | MEDIUM | RegistryEvidence |
-| PKG-101 (Unnecessary Pkgs) | ✅ | MEDIUM | PackageEvidence |
 | PER-201 (Unauth Services) | ✅ | HIGH | FileEvidence |
 | SEC-101 (AppArmor) | ✅ | HIGH | FileEvidence |
 | SVC-101 (Insecure Svcs) | ✅ | HIGH | FileEvidence |
@@ -281,11 +303,11 @@ Each prefix has reserved 100-level blocks for subcategories. This prevents renum
 |--------|-------|------------|---------|
 | **SSH** | 100–999 | 100=Auth, 200=Algorithms, 300=Keys, 400=Logging, 500=Network, 600=Compliance | 3 |
 | **KERN** | 100–999 | 100=Memory, 200=Pointers, 300=Core dumps, 400=Modules/BPF, 500=FS prot, 600=Network | 4 |
-| **USR** | 100–999 | 100=Account integrity, 200=Weak creds, 300=Policy, 400=Privilege, 500=SSH keys, 600=Service accts | 3 |
-| **NET** | 100–999 | 100=Ports, 200=Interfaces, 300=DNS, 400=Kernel net, 500=Wireless, 600=TLS/Certs | 2 |
-| **PKG** | 100–999 | 100=Unnecessary, 200=Integrity, 300=Repos, 400=CVEs, 500=Held | 1 |
+| **USR** | 100–999 | 100=Account integrity, 200=Weak creds, 300=Policy, 400=Privilege, 500=SSH keys, 600=Service accts | 9 |
+| **NET** | 100–999 | 100=Ports, 200=Interfaces, 300=DNS, 400=Kernel net, 500=Wireless, 600=TLS/Certs | 7 |
+| **PKG** | 100–999 | 100=Unnecessary, 200=Integrity, 300=Repos, 400=CVEs, 500=Held | 7 |
 | **FS** | 100–999 | 100=File integrity, 200=Hidden/orphan, 300=Mounts, 400=Symlinks/immutable, 500=Capabilities | 0 |
-| **BOOT** | 100–999 | 100=Secure Boot, 200=Lockdown, 300=EFI, 400=GRUB, 500=Kernel images | 0 |
+| **BOOT** | 100–999 | 100=Secure Boot, 200=Lockdown, 300=EFI, 400=GRUB, 500=Kernel images | 5 |
 | **SVC** | 100–999 | 100=Enabled svcs, 200=Security, 300=Listening, 400=Failed, 500=Modified | 1 |
 | **PER** | 100–999 | 100=Cron/at, 200=Systemd, 300=Shell init, 400=LD injection, 500=Kernel, 600=Network, 700=Package hooks, 800=Login/init | 1 |
 | **CTN** | 100–999 | 100=Socket, 200=Privileges, 300=Security, 400=Images, 500=Runtime, 600=LXC | 1 |
@@ -339,7 +361,7 @@ Each prefix has reserved 100-level blocks for subcategories. This prevents renum
 
 The goal is **~500 checks** organized into **20+ categories**, with a **correlation engine** that connects findings into attack chains. Each phase builds on the previous and is independently shippable.
 
-### Phase 0: Foundation (current sprint)
+### Phase 0: Foundation — ✅ COMPLETE
 
 **Goal:** Renumber all checks to reserved ranges, expand collector coverage to unserved domains.
 
@@ -358,56 +380,56 @@ The goal is **~500 checks** organized into **20+ categories**, with a **correlat
 
 ---
 
-### Phase 1: High-Value Check Wave (~25 checks)
+### Phase 1: High-Value Check Wave (~25 checks) — ✅ COMPLETE
 
 **Goal:** Deliver the highest-value missing checks — Identity, Packages, Network, Boot.
 
-#### Identity & Authentication (6 checks)
-| ID | Name | Depends |
-|----|------|---------|
-| USR-103 | Duplicate UIDs | `users`, `groups` |
-| USR-104 | Disabled accounts with valid shells | `users` |
-| USR-105 | Expired passwords | `users` |
-| USR-202 | Password reuse policy | `users` (shadow fields) |
-| USR-301 | MFA status (pam_u2a, pam_duo) | `pam` |
-| USR-401 | Unauthorized sudo members | `sudo` |
+#### Identity & Authentication (6 checks) — ✅
+| ID | Name | Depends | File |
+|----|------|---------|------|
+| USR-103 | Duplicate UIDs | `users`, `groups` | `checks/users/identity_checks.py` |
+| USR-104 | Disabled accounts with valid shells | `users` | `checks/users/identity_checks.py` |
+| USR-105 | Expired passwords | `users` | `checks/users/identity_checks.py` |
+| USR-202 | Password reuse policy | `pam` | `checks/users/identity_checks.py` |
+| USR-301 | MFA status (pam_u2f, pam_duo) | `pam` | `checks/users/identity_checks.py` |
+| USR-401 | Unauthorized sudo members | `sudo` | `checks/users/identity_checks.py` |
 
-#### Package Integrity (6 checks)
-| ID | Name | Depends |
-|----|------|---------|
-| PKG-201 | Modified package files (dpkg --verify) | `apt` |
-| PKG-202 | Broken package signatures | `apt` |
-| PKG-301 | Unknown repositories | `apt` |
-| PKG-302 | Expired repo signing keys | `apt` |
-| PKG-401 | Packages with known CVEs | `apt` |
-| PKG-402 | Pending security updates | `apt` |
+#### Package Integrity (6 checks) — ✅
+| ID | Name | Depends | File |
+|----|------|---------|------|
+| PKG-201 | Modified package files (dpkg --verify) | none | `checks/packages/integrity_checks.py` |
+| PKG-202 | Broken package signatures | none | `checks/packages/integrity_checks.py` |
+| PKG-301 | Unknown repositories | `apt` | `checks/packages/integrity_checks.py` |
+| PKG-302 | Expired repo signing keys | none | `checks/packages/integrity_checks.py` |
+| PKG-401 | Packages with known CVEs | `apt` | `checks/packages/integrity_checks.py` |
+| PKG-402 | Pending security updates | `apt` | `checks/packages/integrity_checks.py` |
 
-#### Network Security (5 checks)
-| ID | Name | Depends |
-|----|------|---------|
-| NET-301 | Unexpected DNS servers | `dns` |
-| NET-302 | Modified hosts file | `dns` |
-| NET-401 | Weak sysctl networking | `kernel_params` |
-| NET-402 | IPv6 hardening | `kernel_params`, `interfaces` |
-| NET-501 | DNSSEC validation | `dns` |
+#### Network Security (5 checks) — ✅
+| ID | Name | Depends | File |
+|----|------|---------|------|
+| NET-301 | Unexpected DNS servers | `dns` | `checks/network/network_security_checks.py` |
+| NET-302 | Modified hosts file | `dns` | `checks/network/network_security_checks.py` |
+| NET-401 | Weak sysctl networking | `kernel_params` | `checks/network/network_security_checks.py` |
+| NET-402 | IPv6 hardening | `kernel_params` | `checks/network/network_security_checks.py` |
+| NET-501 | DNSSEC validation | `dns` | `checks/network/network_security_checks.py` |
 
-#### Boot Security (5 checks)
-| ID | Name | Depends |
-|----|------|---------|
-| BOOT-101 | Secure Boot status | `boot` |
-| BOOT-201 | Kernel lockdown mode | `boot` |
-| BOOT-301 | EFI integrity | `boot` |
-| BOOT-401 | GRUB password set | `boot` |
-| BOOT-501 | Unsigned kernels | `boot` |
+#### Boot Security (5 checks) — ✅
+| ID | Name | Depends | File |
+|----|------|---------|------|
+| BOOT-101 | Secure Boot status | `boot` | `checks/boot/boot_checks.py` |
+| BOOT-201 | Kernel lockdown mode | `boot` | `checks/boot/boot_checks.py` |
+| BOOT-301 | EFI integrity | `boot` | `checks/boot/boot_checks.py` |
+| BOOT-401 | GRUB password set | `boot` | `checks/boot/boot_checks.py` |
+| BOOT-501 | Unsigned kernels | `boot` | `checks/boot/boot_checks.py` |
 
-#### Phase 1 Cross-Cutting Rules (3 new)
+#### Phase 1 Cross-Cutting Rules (3 new) — ✅
 | Rule ID | What it detects |
 |---------|----------------|
-| CORR-101 | Supply chain attack (unknown repo + unsigned pkg + modified pkg) |
-| CORR-102 | Boot integrity failure (Secure Boot off + unsigned kernel + no GRUB password) |
-| CORR-103 | DNS hijacking (unexpected DNS + modified hosts + no DNSSEC) |
+| CORR-101 (SUPPLY-CHAIN) | Supply chain attack (unknown repo + unsigned pkg + modified pkg) |
+| CORR-102 (BOOT-FAIL) | Boot integrity failure (Secure Boot off + unsigned kernel + no GRUB password) |
+| CORR-103 (DNS-HIJACK) | DNS hijacking (unexpected DNS + modified hosts + no DNSSEC) |
 
-**Exit criteria:** 25 new checks with tests, 3 new correlation rules, all passing CI.
+**Exit criteria:** 25 new checks with tests, 3 new correlation rules, all passing CI. **Status: ✅ COMPLETE**
 
 ---
 
@@ -632,29 +654,29 @@ The correlation engine evolves from simple pattern matching to **attack chain de
 
 ## Target Check Counts by Layer
 
-| Layer | Current | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Phase 6 | Target |
-|-------|---------|---------|---------|---------|---------|---------|--------|
-| SSH | 3 | 3 | 3 | 3 | 3 | 3 | 25 |
-| Kernel | 4 | 4 | 4 | 4 | 4 | 4 | 25 |
-| Users | 3 | 9 | 9 | 9 | 9 | 9 | 20 |
-| Network | 2 | 7 | 7 | 7 | 7 | 7 | 35 |
-| Packages | 1 | 7 | 7 | 7 | 7 | 7 | 25 |
-| Filesystem | 0 | 0 | 10 | 10 | 10 | 10 | 30 |
-| Permissions | 2 | 2 | 2 | 2 | 2 | 2 | 25 |
-| Boot | 0 | 5 | 5 | 5 | 5 | 5 | 15 |
-| Services | 1 | 1 | 8 | 8 | 8 | 8 | 30 |
-| Persistence | 1 | 1 | 1 | 26 | 26 | 26 | 40 |
-| Containers | 1 | 1 | 1 | 1 | 9 | 9 | 25 |
-| Logs & Forensics | 1 | 1 | 1 | 1 | 9 | 9 | 25 |
-| Secrets | 0 | 0 | 0 | 0 | 10 | 10 | 20 |
-| Cloud | 0 | 0 | 0 | 0 | 0 | 6 | 20 |
-| Compliance | 1 | 1 | 1 | 1 | 1 | 11 | 20 |
-| Firewall | 1 | 1 | 1 | 1 | 1 | 1 | 10 |
-| Security (AppArmor/USB) | 2 | 2 | 2 | 2 | 2 | 2 | 10 |
-| Compromise | 1 | 1 | 1 | 1 | 1 | 1 | 15 |
-| Password | 1 | 1 | 1 | 1 | 1 | 1 | 10 |
-| **Total checks** | **25** | **53** | **65** | **91** | **117** | **133** | **~450** |
-| **Correlation rules** | 7 | 10 | 12 | 17 | 21 | 24 | **50+** |
+| Layer | Current | Phase 2 | Phase 3 | Phase 4 | Phase 6 | Target |
+|-------|---------|---------|---------|---------|---------|--------|
+| SSH | 3 | 3 | 3 | 3 | 3 | 25 |
+| Kernel | 4 | 4 | 4 | 4 | 4 | 25 |
+| Users | 9 | 9 | 9 | 9 | 9 | 20 |
+| Network | 7 | 7 | 7 | 7 | 7 | 35 |
+| Packages | 7 | 7 | 7 | 7 | 7 | 25 |
+| Filesystem | 0 | 10 | 10 | 10 | 10 | 30 |
+| Permissions | 2 | 2 | 2 | 2 | 2 | 25 |
+| Boot | 5 | 5 | 5 | 5 | 5 | 15 |
+| Services | 1 | 8 | 8 | 8 | 8 | 30 |
+| Persistence | 1 | 1 | 26 | 26 | 26 | 40 |
+| Containers | 1 | 1 | 1 | 9 | 9 | 25 |
+| Logs & Forensics | 1 | 1 | 1 | 9 | 9 | 25 |
+| Secrets | 0 | 0 | 0 | 10 | 10 | 20 |
+| Cloud | 0 | 0 | 0 | 0 | 6 | 20 |
+| Compliance | 1 | 1 | 1 | 1 | 11 | 20 |
+| Firewall | 1 | 1 | 1 | 1 | 1 | 10 |
+| Security (AppArmor/USB) | 2 | 2 | 2 | 2 | 2 | 10 |
+| Compromise | 1 | 1 | 1 | 1 | 1 | 15 |
+| Password | 1 | 1 | 1 | 1 | 1 | 10 |
+| **Total checks** | **47** | **65** | **91** | **117** | **133** | **~450** |
+| **Correlation rules** | 10 | 12 | 17 | 21 | 24 | **50+** |
 
 ---
 
@@ -681,8 +703,8 @@ The correlation engine evolves from simple pattern matching to **attack chain de
 | TD-017 | PKG-101 flags desktop packages (cups, avahi, whoopsie, xorg) on desktop systems | MEDIUM | ✅ | — |
 | TD-018 | PER-201 doesn't filter snap-managed services → false positives for snap.svc names | MEDIUM | ✅ | — |
 | TD-019 | PER-201 doesn't filter known-legitimate services (e.g., switcheroo-control → "proxy" match) | LOW | ✅ | — |
-| TD-020 | Correlation phase gated on `config.general.cache` instead of own flag (should be `always run`) | LOW | 🔴 | P0 |
-| TD-021 | `__init__.py` doesn't export all 7 correlation rules (3 missing from `__all__`) | LOW | 🔴 | P0 |
+| TD-020 | Correlation phase gated on `config.general.cache` instead of own flag (should be `always run`) | LOW | ✅ | P0 |
+| TD-021 | `__init__.py` doesn't export all 7 correlation rules (3 missing from `__all__`) | LOW | ✅ | P0 |
 | TD-022 | No collector exists for SSH config parsing (`sshd_config`); checks parse via subprocess | MEDIUM | 🔴 | P0 |
 | TD-023 | No collector exists for PAM configuration | MEDIUM | 🔴 | P0 |
 | TD-024 | No collector exists for boot/firmware state | MEDIUM | 🔴 | P0 |
@@ -744,13 +766,13 @@ src/usaf/
 
 ## Metrics & Targets
 
-| Metric | Current | Short-term (P1) | Medium-term (P3) | Long-term (P6) |
+| Metric | Current | Short-term (P2) | Medium-term (P3) | Long-term (P6) |
 |--------|---------|-----------------|-------------------|-----------------|
-| Checks | 25 | 53 | 91 | 133 → **450+** |
+| Checks | 47 | 65 | 91 | 133 → **450+** |
 | Collectors | 22 | 22 | 24 | 28 |
-| Correlation rules | 7 | 10 | 17 | 24 → **50+** |
-| Unit tests | 507 | 800+ | 1,500+ | 3,000+ |
-| Integration tests | 114 | 150+ | 300+ | 500+ |
+| Correlation rules | 10 | 12 | 17 | 24 → **50+** |
+| Unit tests | 490 | 800+ | 1,500+ | 3,000+ |
+| Integration tests | 93 | 150+ | 300+ | 500+ |
 | Test coverage (stmt) | 85% | 88% | 90% | 92%+ |
 | Test coverage (branch) | 82% | 85% | 88% | 90%+ |
 | mypy --strict | 0 errors | 0 errors | 0 errors | 0 errors |

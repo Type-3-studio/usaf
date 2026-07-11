@@ -1,0 +1,34 @@
+id: PER-303
+title: Modified Zsh Initialization Files
+threat: "Zsh initialization files (.zshrc, .zprofile, .zshenv, .zlogin, .zlogout) execute automatically when a user runs zsh. With zsh as the default shell on newer Ubuntu releases, attackers target these files for user-level persistence."
+exploit: "An attacker adds a payload to `~/.zshrc` that executes a reverse shell or malware downloader. When the user opens a terminal (zsh by default on Ubuntu 22.04+), the malicious code runs in the user's security context."
+impact: "Per-session code execution in the default shell environment. The malicious code runs silently each time zsh starts, enabling persistent access and potential credential harvesting."
+fix: "Inspect zsh init files for all users:
+  for homedir in /home/* /root; do
+    for f in .zshrc .zprofile .zshenv .zlogin .zlogout; do
+      cat $homedir/$f 2>/dev/null
+    done
+  done
+  Remove unauthorized modifications and restore from backup."
+breakage: "Users may have legitimate zsh customizations including oh-my-zsh, plugins, and themes. Focus on obfuscated or network-related additions."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.3
+known_exceptions:
+  - "Users with oh-my-zsh or other zsh framework configurations"
+  - "Development environments with automated toolchain setup in .zshrc"
+related_findings:
+  - "PER-301"
+  - "PER-302"
+  - "PER-803"
+severity_override: null
+tags:
+  - "persistence"
+  - "shell-init"
+  - "zsh"
+  - "login-hook"
+mitre_mappings:
+  - "T1546.004"

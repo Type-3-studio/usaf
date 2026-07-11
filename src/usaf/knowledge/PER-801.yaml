@@ -1,0 +1,34 @@
+id: PER-801
+title: rc.local Script Persistence
+threat: "The `/etc/rc.local` script runs at the end of the boot process with root privileges before any user logs in. Attackers can append malicious commands to rc.local for reliable boot-time persistence."
+exploit: "An attacker appends a reverse shell command to `/etc/rc.local`. On every boot, the command executes as root before login, providing persistent access. The rc.local file is a well-known but frequently overlooked persistence vector."
+impact: "Root-level code execution on every system boot. The attacker maintains access even if all user-level persistence mechanisms are removed. Communication with C2 infrastructure is established before defensive tools are fully operational."
+fix: "Inspect rc.local:
+  cat /etc/rc.local
+  Look for unexpected commands, network connections, or payload downloads.
+  Disable if unauthorized:
+  echo '#!/bin/sh\nexit 0' > /etc/rc.local
+  chmod +x /etc/rc.local
+  systemctl enable rc-local"
+breakage: "Some systems legitimately use rc.local for startup scripts, hardware initialization, or legacy application requirements."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Legacy applications that require rc.local for startup"
+  - "Hardware initialization scripts for specialized equipment"
+  - "Cloud instance initialization scripts"
+related_findings:
+  - "PER-802"
+  - "PER-804"
+severity_override: null
+tags:
+  - "persistence"
+  - "rc-local"
+  - "boot"
+  - "startup"
+mitre_mappings:
+  - "T1037.004"

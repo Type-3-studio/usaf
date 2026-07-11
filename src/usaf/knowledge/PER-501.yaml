@@ -1,0 +1,31 @@
+id: PER-501
+title: Unexpected PAM Modules
+threat: "Pluggable Authentication Modules (PAM) control authentication on Linux systems. Attackers can add rogue PAM modules to bypass authentication, log passwords, or grant unauthorized access to any user."
+exploit: "An attacker compiles a PAM module that logs all passwords to a file and adds it to `/etc/pam.d/common-auth` or `/etc/pam.d/sshd`. Every authentication attempt (SSH, sudo, login) silently captures credentials. Alternatively, a backdoor module can authenticate any user with a magic password."
+impact: "Complete compromise of the authentication system. The attacker can capture all user passwords, authenticate as any user with a backdoor password, or bypass authentication entirely. All accounts are at risk."
+fix: "Inspect PAM configuration:
+  cat /etc/pam.d/common-auth /etc/pam.d/common-account /etc/pam.d/common-session
+  cat /etc/pam.d/sshd /etc/pam.d/sudo
+  Check loaded modules:
+  find /lib/security/ /lib/x86_64-linux-gnu/security/ -name '*.so' -newer /usr/share/doc/base-files/
+  Remove unauthorized module references and restore package defaults."
+breakage: "Some packages legitimately add PAM modules (e.g., pam_google_authenticator, pam_radius, pam_ldap). Verify against installed packages."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Legitimate PAM modules from installed packages (pam_google_authenticator, pam_ldap, pam_radius, pam_krb5)"
+  - "Custom PAM configurations for enterprise SSO"
+related_findings:
+  - "PER-502"
+severity_override: null
+tags:
+  - "persistence"
+  - "pam"
+  - "authentication"
+  - "credential-theft"
+mitre_mappings:
+  - "T1556.003"

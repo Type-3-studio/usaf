@@ -1,0 +1,32 @@
+id: PER-204
+title: Systemd Path Units
+threat: "Systemd path units monitor files or directories and trigger services when changes occur. Attackers can create path units that watch sensitive locations and execute malicious code when triggered, providing event-driven persistence."
+exploit: "An attacker creates a path unit that monitors `/etc/shadow` and triggers a service to email a copy when the file is modified by a legitimate password change. The path unit activates on file-write events, providing stealthy execution."
+impact: "Event-driven execution of arbitrary code triggered by filesystem activity. Path units are rarely monitored and can be used to react to administrator actions, exfiltrating data or subverting security controls."
+fix: "Inspect path units:
+  systemctl list-units --type=path --all
+  systemctl cat <path_unit>
+  Disable: systemctl disable --now <path_unit>
+  Remove unit files from /etc/systemd/system/"
+breakage: "Some applications legitimately use path units for configuration reloading or log monitoring."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.5
+known_exceptions:
+  - "Legitimate applications using path units for config file change detection"
+  - "Container orchestration agents that watch for configuration changes"
+related_findings:
+  - "PER-201"
+  - "PER-202"
+  - "PER-203"
+severity_override: null
+tags:
+  - "persistence"
+  - "systemd"
+  - "path-unit"
+  - "trigger"
+mitre_mappings:
+  - "T1543.002"

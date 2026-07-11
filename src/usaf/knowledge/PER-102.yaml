@@ -1,0 +1,30 @@
+id: PER-102
+title: Anacron Job Anomalies
+threat: "Anacron runs jobs that are scheduled but may have been missed due to system downtime. Attackers can abuse anacron to ensure their malicious scripts execute even if the system was off at the scheduled time."
+exploit: "An attacker writes a malicious script and adds an anacron entry in `/etc/anacrontab` specifying a reverse shell command. Since anacron runs daily, the job executes regardless of boot schedule, providing reliable persistence."
+impact: "Guaranteed execution of malicious code regardless of system uptime patterns. Anacron jobs run with root privileges and can execute arbitrary commands daily or weekly."
+fix: "Inspect anacron configuration:
+  cat /etc/anacrontab
+  ls -la /var/spool/anacron/
+  Remove unauthorized entries and verify file integrity."
+breakage: "Legitimate anacron jobs such as logrotate or system maintenance tasks may appear suspicious. Cross-reference with package-installed files."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.4
+known_exceptions:
+  - "System maintenance jobs like logrotate and man-db"
+  - "Custom administrative scripts for periodic cleanup tasks"
+related_findings:
+  - "PER-101"
+  - "PER-103"
+severity_override: null
+tags:
+  - "persistence"
+  - "cron"
+  - "anacron"
+  - "scheduled-task"
+mitre_mappings:
+  - "T1053.003"

@@ -1,0 +1,34 @@
+id: PER-803
+title: Login/Logout Hook Persistence
+threat: "System login/logout hooks defined in `/etc/pam.d/common-session` or via scripts in `/etc/profile.d/` execute on user login and logout events. Attackers can exploit these hooks to execute code each time a user authenticates."
+exploit: "An attacker adds `session required pam_exec.so /usr/lib/malicious/log` to `/etc/pam.d/common-session`. Every user login executes the malicious script, logging credentials or establishing a reverse connection in the user's context."
+impact: "Per-login code execution for every user on the system. This provides reliable persistence and can be used for credential harvesting, with every SSH, console, or sudo authentication triggering the malicious payload."
+fix: "Inspect PAM session configuration:
+  grep -r 'pam_exec.so' /etc/pam.d/
+  cat /etc/pam.d/common-session /etc/pam.d/common-session-noninteractive
+  Look for pam_exec.so invocations running scripts from unexpected paths.
+  Remove unauthorized module references and verify scripts."
+breakage: "Legitimate pam_exec.so usage for session logging, quota enforcement, or auditing."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.6
+known_exceptions:
+  - "Auditing agents that log user sessions via PAM exec"
+  - "Quota enforcement and session limit scripts"
+  - "Enterprise session management middleware"
+related_findings:
+  - "PER-301"
+  - "PER-302"
+  - "PER-303"
+  - "PER-501"
+severity_override: null
+tags:
+  - "persistence"
+  - "login-hook"
+  - "pam"
+  - "session"
+mitre_mappings:
+  - "T1546.004"

@@ -1,0 +1,33 @@
+id: PER-402
+title: LD_PRELOAD via ld.so.preload
+threat: "The `/etc/ld.so.preload` file specifies shared libraries to preload system-wide for all dynamically linked executables. This is the most common LD_PRELOAD rootkit vector and affects every process on the system."
+exploit: "An attacker writes a malicious shared library path to `/etc/ld.so.preload`. Every subsequent process loads the malicious library, which hooks system calls to hide the attacker's files, processes, and network connections from all monitoring tools."
+impact: "System-wide execution of a malicious shared library in every process. The rootkit can intercept all system calls, hide files and processes, log keystrokes, and subvert security tools. Extreme stealth with low detectability."
+fix: "Check and sanitize ld.so.preload:
+  cat /etc/ld.so.preload
+  If present and unauthorized: echo '' > /etc/ld.so.preload
+  Identify and remove the malicious library:
+  strings /path/to/malicious_library.so
+  Restore from backup or reinstall affected packages."
+breakage: "Rare — almost no legitimate software uses /etc/ld.so.preload. Some container runtimes or sandboxing tools may use it."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Sandboxing or container isolation tools that preload monitoring libraries"
+  - "Antivirus or EDR agents that use system-wide library preloading"
+related_findings:
+  - "PER-401"
+  - "PER-403"
+severity_override: null
+tags:
+  - "persistence"
+  - "ld-preload"
+  - "library-injection"
+  - "rootkit"
+  - "system-wide"
+mitre_mappings:
+  - "T1574.006"

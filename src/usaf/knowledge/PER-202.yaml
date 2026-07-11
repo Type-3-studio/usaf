@@ -1,0 +1,33 @@
+id: PER-202
+title: Suspicious Systemd Timer Names
+threat: "Systemd timers are a modern replacement for cron and are frequently abused for persistence. Attackers use innocuous-sounding timer names (e.g., systemd-update-checker.timer) to blend in with legitimate system services."
+exploit: "An attacker drops a malicious timer and matching service unit into `/etc/systemd/system/` with a name mimicking a legitimate system service. The timer triggers the malicious service at a configurable interval, providing persistent execution."
+impact: "Persistent, timed execution of arbitrary code under the guise of a legitimate system service. Systemd timers survive reboots and are not inspected as frequently as cron jobs."
+fix: "Inspect all timers:
+  systemctl list-timers --all
+  systemctl cat <suspicious_timer>
+  systemctl cat <suspicious_service>
+  Disable: systemctl disable --now <timer>
+  Remove unit files and verify with dpkg."
+breakage: "Third-party software that installs custom timers with system-like names may trigger alerts. Always verify the package origin."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.5
+known_exceptions:
+  - "Snap packages that create timers with generic names"
+  - "Cloud-init or orchestration tools that deploy management timers"
+related_findings:
+  - "PER-201"
+  - "PER-203"
+  - "PER-204"
+severity_override: null
+tags:
+  - "persistence"
+  - "systemd"
+  - "timer"
+  - "scheduled-task"
+mitre_mappings:
+  - "T1053.006"

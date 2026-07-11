@@ -1,0 +1,31 @@
+id: PER-401
+title: LD_PRELOAD in Process Environment
+threat: "The LD_PRELOAD environment variable forces the dynamic linker to load specified shared libraries before all others. Attackers use this to hook system calls and hide malicious activity from monitoring tools."
+exploit: "An attacker sets LD_PRELOAD in a process environment to load a rootkit library that intercepts file operations (open, read, write, stat) and hides files matching certain patterns (e.g., /root/.malware). System tools like ls and ps show clean output while the infection persists."
+impact: "Complete filesystem and process hiding. LD_PRELOAD rootkits can hide files, processes, network connections, and kernel modules from detection tools. The system appears clean while under active compromise."
+fix: "Inspect LD_PRELOAD in running processes:
+  grep -l 'LD_PRELOAD' /proc/*/environ 2>/dev/null
+  Check for unexpected shared libraries:
+  ldconfig -p | grep -v '^[[:space:]]'
+  Remove malicious libraries and verify system library integrity."
+breakage: "Legitimate LD_PRELOAD usage in development environments for debugging (e.g., valgrind, electric fence) or compatibility layers."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Development tools (valgrind, gdb, electric fence) that use LD_PRELOAD"
+  - "Performance profiling tools"
+related_findings:
+  - "PER-402"
+  - "PER-403"
+severity_override: null
+tags:
+  - "persistence"
+  - "ld-preload"
+  - "library-injection"
+  - "rootkit"
+mitre_mappings:
+  - "T1574.006"

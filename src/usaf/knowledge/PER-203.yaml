@@ -1,0 +1,32 @@
+id: PER-203
+title: Systemd Service Drop-Ins
+threat: "Systemd drop-in override files modify existing service behavior without altering the original unit file. Attackers can add drop-ins to legitimate services (e.g., sshd, cron) to execute malicious commands before or after the main service runs."
+exploit: "An attacker creates `/etc/systemd/system/sshd.service.d/override.conf` with an ExecStartPre directive that runs a malicious script before SSH starts. The override survives package updates because the original unit file is untouched."
+impact: "Malicious code execution in the context of a trusted system service. Drop-ins are difficult to detect without explicitly checking drop-in directories, and they survive package reinstalls."
+fix: "Inspect drop-in directories:
+  find /etc/systemd/system/ -type d -name '*.d'
+  systemctl cat <service>
+  Remove unauthorized drop-in files:
+  rm /etc/systemd/system/<service>.d/<override>.conf
+  systemctl daemon-reload"
+breakage: "Administrators may intentionally add drop-ins for environment configuration or resource limits. Verify with the responsible team before removing."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.3
+known_exceptions:
+  - "Orchestration tools (Ansible, Puppet) that manage service configuration via drop-ins"
+  - "Resource limit overrides for high-performance services"
+related_findings:
+  - "PER-201"
+  - "PER-202"
+  - "PER-204"
+severity_override: null
+tags:
+  - "persistence"
+  - "systemd"
+  - "service"
+mitre_mappings:
+  - "T1543.002"

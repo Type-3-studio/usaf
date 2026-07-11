@@ -1,0 +1,32 @@
+id: PER-301
+title: Unexpected Profile.d Scripts
+threat: "Scripts in `/etc/profile.d/` execute automatically for all users at login. Attackers can place malicious scripts here to achieve system-wide persistence that triggers whenever any user logs in."
+exploit: "An attacker drops `profile.d/update-checker.sh` containing a reverse shell payload. The script executes every time any user (including root) logs into the system, re-establishing access from any login event."
+impact: "System-wide code execution at every login. Every interactive session triggers the malicious script, making it a reliable persistence mechanism that can also capture credentials entered during login."
+fix: "Inspect /etc/profile.d/:
+  ls -la /etc/profile.d/
+  cat /etc/profile.d/*.sh
+  Remove unauthorized scripts and restore from package if needed:
+  dpkg -S /etc/profile.d/<script>"
+breakage: "Legitimate scripts installed by packages (e.g., gnome-keyring, bash_completion, langpacks) will be present. Cross-reference with dpkg."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.5
+known_exceptions:
+  - "Package-installed scripts (gnome-keyring, bash_completion, apport, langpacks)"
+  - "Organizational login scripts deployed via configuration management"
+related_findings:
+  - "PER-302"
+  - "PER-303"
+  - "PER-803"
+severity_override: null
+tags:
+  - "persistence"
+  - "shell-init"
+  - "login-hook"
+  - "profile"
+mitre_mappings:
+  - "T1546.004"

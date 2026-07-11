@@ -1,0 +1,30 @@
+id: PER-101
+title: Cron Job Anomalies
+threat: "Cron jobs are a common persistence mechanism used by attackers to execute malicious scripts on a schedule or at boot. Unauthorized cron entries in system crontabs or user crontabs can provide regular, stealthy re-execution."
+exploit: "An attacker with low-privilege access adds a cron entry via `crontab -e` or writes directly to `/etc/cron.d/` with a reverse shell command set to run every minute. The job persists across reboots and re-establishes access if the original foothold is lost."
+impact: "Persistent, scheduled execution of arbitrary code. The attacker can maintain access, download additional payloads, or exfiltrate data at regular intervals. Cron jobs often go unnoticed in standard monitoring."
+fix: "Inspect all crontabs:
+  ls -la /etc/cron* /var/spool/cron/
+  cat /etc/crontab /etc/cron.d/*
+  for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l 2>/dev/null; done
+  Remove unauthorized entries and verify file ownership."
+breakage: "Legitimate administrator cron jobs may be flagged. Verify with the system administrator before removing any cron entry."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.3
+known_exceptions:
+  - "Software packages that install cron jobs for updates or maintenance (e.g., unattended-upgrades, certbot)"
+  - "Administrative monitoring scripts added by the operations team"
+related_findings:
+  - "PER-102"
+  - "PER-103"
+severity_override: null
+tags:
+  - "persistence"
+  - "cron"
+  - "scheduled-task"
+mitre_mappings:
+  - "T1053.003"

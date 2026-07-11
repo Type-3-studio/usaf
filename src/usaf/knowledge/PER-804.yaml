@@ -1,0 +1,37 @@
+id: PER-804
+title: Systemd User Unit Persistence
+threat: "Systemd user units run in the user's session context and start when the user logs in, without requiring root privileges. Attackers can leverage user units for persistence that survives at the user session level and bypasses system-wide monitoring."
+exploit: "An attacker places a malicious systemd user service in `~/.config/systemd/user/` and enables it. The service starts every time the user logs in, running with the user's privileges and establishing C2 or executing payloads outside the scope of system-level monitoring."
+impact: "User-level persistence that does not require root privileges. User units are not visible with systemctl without the --user flag, making them an effective stealth mechanism. They survive user logout and login cycles."
+fix: "Inspect systemd user units for all users:
+  for homedir in /home/* /root; do
+    ls -la $homedir/.config/systemd/user/ 2>/dev/null
+    for unit in $homedir/.config/systemd/user/*.service; do
+      cat $unit 2>/dev/null
+    done
+  done
+  Disable unauthorized user services:
+  systemctl --user disable --now <service>"
+breakage: "Users may legitimately install user services for desktop applications, backup tools, or development daemons."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.4
+known_exceptions:
+  - "Desktop environment user services for DE integration"
+  - "User-installed applications that require persistent background processes"
+  - "Development tools (docker, podman) that use user services"
+related_findings:
+  - "PER-201"
+  - "PER-801"
+  - "PER-802"
+severity_override: null
+tags:
+  - "persistence"
+  - "systemd"
+  - "user-unit"
+  - "user-session"
+mitre_mappings:
+  - "T1543.002"

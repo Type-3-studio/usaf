@@ -1,0 +1,32 @@
+id: PER-603
+title: SSH AuthorizedKeysFile Tampering
+threat: "The SSH server configuration directive AuthorizedKeysFile specifies the location of authorized key files. Attackers can modify this to point to a file they control, adding unauthorized keys without modifying the user's original authorized_keys."
+exploit: "An attacker edits `/etc/ssh/sshd_config` to set `AuthorizedKeysFile /etc/ssh/attacker_keys/%u`. They then create a directory with their own authorized_keys file. Any SSH key they control can now authenticate as any user, and the modification does not appear in individual user authorized_keys files."
+impact: "Global SSH authentication bypass. The attacker can add keys for any user without touching their home directory, making forensic detection difficult. The modified sshd_config may persist across SSH package updates."
+fix: "Inspect SSH configuration:
+  cat /etc/ssh/sshd_config
+  grep -i authorizedkeysfile /etc/ssh/sshd_config /etc/ssh/sshd_config.d/*
+  Verify the AuthorizedKeysFile path is the default:
+  grep -c 'AuthorizedKeysFile.*\.ssh/authorized_keys' /etc/ssh/sshd_config
+  Restore default configuration and restart sshd."
+breakage: "Enterprise environments may legitimately centralize SSH key management via custom AuthorizedKeysFile paths (e.g., LDAP-backed or NFS-mounted key stores)."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (8.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Centralized SSH key management systems (e.g., Red Hat IdM, FreeIPA, custom LDAP solutions)"
+  - "Orchestration tools that manage SSH configuration across fleets"
+related_findings:
+  - "PER-602"
+  - "PER-601"
+severity_override: null
+tags:
+  - "persistence"
+  - "ssh"
+  - "authorized-keys"
+  - "configuration-tampering"
+mitre_mappings:
+  - "T1562.003"

@@ -1,0 +1,32 @@
+id: PER-503
+title: Udev Rules Persistence
+threat: "Udev rules execute commands when devices are added or removed. Attackers can create udev rules that trigger malicious scripts on specific device events, providing hardware-triggered persistence."
+exploit: "An attacker creates a udev rule in `/etc/udev/rules.d/` that triggers when a USB device is inserted, executing a reverse shell or payload. The attacker can re-trigger execution simply by inserting a USB stick, providing a physical trigger mechanism."
+impact: "Event-driven code execution triggered by hardware events. The attacker can re-establish access by plugging in a USB device, or escalate privileges when a privileged device is attached. Udev rules run as root."
+fix: "Inspect udev rules:
+  ls -la /etc/udev/rules.d/ /lib/udev/rules.d/
+  cat /etc/udev/rules.d/*.rules
+  Look for RUN+= or IMPORT+= directives running unexpected scripts.
+  Remove unauthorized rules and reload:
+  udevadm control --reload-rules"
+breakage: "Some hardware management tools legitimately add udev rules for device configuration."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.3
+known_exceptions:
+  - "Hardware-specific udev rules from vendor packages (printers, GPUs, NICs)"
+  - "Container runtimes that add udev rules for device passthrough"
+related_findings:
+  - "PER-601"
+severity_override: null
+tags:
+  - "persistence"
+  - "udev"
+  - "device"
+  - "trigger"
+  - "hardware"
+mitre_mappings:
+  - "T1546.011"

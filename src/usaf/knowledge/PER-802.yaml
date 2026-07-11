@@ -1,0 +1,36 @@
+id: PER-802
+title: Init.d Script Persistence
+threat: "SysV init scripts in `/etc/init.d/` execute at system boot with root privileges. While systemd has largely replaced SysV init on Ubuntu, remnants of init.d persistence are still supported and frequently abused by attackers targeting older patterns."
+exploit: "An attacker creates a malicious init.d script (e.g., `/etc/init.d/update-manager`) and registers it with `update-rc.d`. The script executes with root privileges on every boot, providing reliable persistence that survives reboots."
+impact: "Boot-time execution of arbitrary code with root privileges. The init.d framework is still supported for backward compatibility, making it a viable persistence vector even on modern Ubuntu systems."
+fix: "Inspect init.d scripts:
+  ls -la /etc/init.d/
+  cat /etc/init.d/<suspicious_script>
+  Check runlevel links:
+  ls -la /etc/rc*.d/
+  Remove unauthorized scripts:
+  update-rc.d -f <script> remove
+  rm /etc/init.d/<script>"
+breakage: "Some legacy applications and third-party software still use init.d scripts. Cross-reference with installed packages before removal."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.4
+known_exceptions:
+  - "Legacy software installed from .deb packages that include init.d scripts"
+  - "Third-party hardware management software"
+  - "Containers or chroots using SysV init"
+related_findings:
+  - "PER-801"
+  - "PER-804"
+severity_override: null
+tags:
+  - "persistence"
+  - "init-d"
+  - "boot"
+  - "startup"
+  - "sysv"
+mitre_mappings:
+  - "T1037.004"

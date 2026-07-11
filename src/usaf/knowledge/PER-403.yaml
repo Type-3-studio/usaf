@@ -1,0 +1,32 @@
+id: PER-403
+title: LD_LIBRARY_PATH Anomalies
+threat: "The LD_LIBRARY_PATH environment variable overrides the system library search path. Attackers can manipulate it to load malicious libraries instead of legitimate ones, hijacking the dynamic linking process."
+exploit: "An attacker sets LD_LIBRARY_PATH to a directory containing a malicious `libc.so.6` that wraps standard functions. Any process started with this environment loads the fake libc, enabling credential theft or command interception."
+impact: "Library hijacking in processes running under the modified environment. The attacker can intercept function calls, steal credentials, modify command output, and subvert program behavior without modifying system files."
+fix: "Check for LD_LIBRARY_PATH in processes and scripts:
+  grep -r 'LD_LIBRARY_PATH' /etc/profile.d/ /etc/environment /etc/bash.bashrc
+  grep -l 'LD_LIBRARY_PATH' /proc/*/environ 2>/dev/null
+  Verify library paths and remove unexpected entries.
+  Check .bashrc and .profile for unauthorized path additions."
+breakage: "Legitimate LD_LIBRARY_PATH usage is common in development environments (custom library builds), containerization, and certain enterprise applications."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.4
+known_exceptions:
+  - "Development environments with custom library builds"
+  - "Container runtimes and application containers"
+  - "CUDA and GPU computing environments"
+related_findings:
+  - "PER-401"
+  - "PER-402"
+severity_override: null
+tags:
+  - "persistence"
+  - "library-injection"
+  - "ld-library-path"
+  - "hijack"
+mitre_mappings:
+  - "T1574.006"

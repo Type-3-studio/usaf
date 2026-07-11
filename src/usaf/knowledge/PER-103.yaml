@@ -1,0 +1,30 @@
+id: PER-103
+title: At Job Anomalies
+threat: "The `at` daemon schedules one-time job executions. Attackers can use `at` to delay execution of malicious payloads or to execute cleanup commands after a breach, evading immediate detection."
+exploit: "An attacker schedules a malicious script with `at now + 5 minutes` to execute a data exfiltration payload after the initial intrusion. The one-time nature of at jobs makes them harder to detect during post-mortem analysis."
+impact: "Delayed execution of arbitrary commands with the privileges of the scheduling user. At jobs are ephemeral and leave minimal forensic traces after execution."
+fix: "Inspect at job queues:
+  atq
+  for job in $(atq | awk '{print $1}'); do at -c $job; done
+  Remove suspicious jobs with atrm <job_id>.
+  Check /var/spool/cron/atjobs/ for remaining spool files."
+breakage: "Legitimate scheduled maintenance or one-off administrative tasks may be flagged. Verify job origin with the scheduler."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.5
+known_exceptions:
+  - "One-time administrative jobs scheduled for maintenance windows"
+  - "Automation scripts that use at for delayed job processing"
+related_findings:
+  - "PER-101"
+  - "PER-102"
+severity_override: null
+tags:
+  - "persistence"
+  - "scheduled-task"
+  - "at-job"
+mitre_mappings:
+  - "T1053.002"

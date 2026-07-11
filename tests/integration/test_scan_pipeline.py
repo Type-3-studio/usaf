@@ -22,7 +22,7 @@ class TestScanPipeline:
     """Integration tests for the full scan pipeline."""
 
     EXPECTED_COLLECTOR_COUNT = 22
-    EXPECTED_CHECK_COUNT = 64
+    EXPECTED_CHECK_COUNT = 89
 
     def test_collector_discovery_registers_all(self):
         collector_registry.discover()
@@ -88,7 +88,32 @@ class TestScanPipeline:
             "NET-401",
             "NET-402",
             "NET-501",
+            "PER-101",
+            "PER-102",
+            "PER-103",
             "PER-201",
+            "PER-202",
+            "PER-203",
+            "PER-204",
+            "PER-301",
+            "PER-302",
+            "PER-303",
+            "PER-401",
+            "PER-402",
+            "PER-403",
+            "PER-501",
+            "PER-502",
+            "PER-503",
+            "PER-601",
+            "PER-602",
+            "PER-603",
+            "PER-701",
+            "PER-702",
+            "PER-801",
+            "PER-802",
+            "PER-803",
+            "PER-804",
+            "PER-805",
             "PKG-101",
             "PKG-201",
             "PKG-202",

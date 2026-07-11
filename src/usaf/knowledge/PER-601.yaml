@@ -1,0 +1,33 @@
+id: PER-601
+title: Network Hook Scripts
+threat: "Network hook scripts in `/etc/network/if-up.d/`, `/etc/NetworkManager/dispatcher.d/`, or `/etc/dhcp/dhclient-exit-hooks.d/` execute when network interfaces change state. Attackers can abuse these for network-triggered persistence."
+exploit: "An attacker places a reverse shell script in `/etc/network/if-up.d/`. The script executes every time a network interface comes up (e.g., at boot, when connecting to Wi-Fi, when plugging in an Ethernet cable), re-establishing outbound access."
+impact: "Network-triggered execution of arbitrary code with root privileges. The attacker can re-establish C2 communication on network state changes, and the scripts survive reboots and network reconnections."
+fix: "Inspect network hook directories:
+  ls -la /etc/network/if-up.d/ /etc/network/if-down.d/ /etc/network/if-post-down.d/ /etc/network/if-pre-up.d/
+  ls -la /etc/NetworkManager/dispatcher.d/
+  ls -la /etc/dhcp/dhclient-exit-hooks.d/
+  Remove unauthorized scripts and verify with dpkg."
+breakage: "Legitimate scripts for network configuration management, VPN clients, and firewall updates."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.4
+known_exceptions:
+  - "VPN client scripts for automatic connection management"
+  - "Network monitoring agents and firewall management tools"
+  - "Wake-on-LAN or network configuration automation"
+related_findings:
+  - "PER-503"
+  - "PER-602"
+  - "PER-603"
+severity_override: null
+tags:
+  - "persistence"
+  - "network"
+  - "hook"
+  - "trigger"
+mitre_mappings:
+  - "T1546.010"

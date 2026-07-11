@@ -1,0 +1,31 @@
+id: PER-701
+title: APT Hook Persistence
+threat: "APT package manager hooks execute scripts before or after package operations. Attackers can create or modify APT hooks to execute malicious code during legitimate package management activities, which often run with root privileges."
+exploit: "An attacker adds a script to `/etc/apt/apt.conf.d/` or modifies an existing hook (e.g., `01autoremove`) to execute a payload. When the administrator runs `apt install` or `apt update`, the malicious hook executes with root privileges, re-infecting the system."
+impact: "Execution of arbitrary code with root privileges triggered by routine package management operations. The hook re-executes every time APT is used, making removal difficult without also removing the hook."
+fix: "Inspect APT hook directories:
+  ls -la /etc/apt/apt.conf.d/
+  cat /etc/apt/apt.conf.d/*
+  Look for DPkg::Pre-Invoke, DPkg::Post-Invoke, APT::Update::Pre-Invoke, or APT::Update::Post-Invoke directives running unexpected commands.
+  Remove unauthorized files and reinstall if part of a package:
+  apt-get install --reinstall apt"
+breakage: "Many packages legitimately add APT hooks (unattended-upgrades, apport, apt-listchanges, update-notifier). Verify against installed packages."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.3
+known_exceptions:
+  - "Package-installed hooks (unattended-upgrades, apport, apt-listchanges, update-notifier-common)"
+  - "Corporate repository configuration hooks for proxy settings"
+related_findings:
+  - "PER-702"
+severity_override: null
+tags:
+  - "persistence"
+  - "apt"
+  - "hook"
+  - "package-manager"
+mitre_mappings:
+  - "T1546.015"

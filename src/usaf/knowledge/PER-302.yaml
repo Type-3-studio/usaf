@@ -1,0 +1,34 @@
+id: PER-302
+title: Modified Bash Initialization Files
+threat: "Bash initialization files (.bashrc, .bash_profile, .bash_login, .profile) execute automatically when a user starts an interactive shell. Attackers modify these files to execute malicious code each time the compromised user opens a terminal."
+exploit: "An attacker appends a reverse shell command to a user's `~/.bashrc`. The next time the user opens a terminal, the command executes silently. This can also capture commands typed by the user for credential harvesting."
+impact: "Per-session code execution for the affected user. The malicious code runs every time a shell opens, providing persistent access and potential credential theft. It can also be used to maintain access when the primary backdoor is removed."
+fix: "Inspect bash init files for all users:
+  for homedir in /home/* /root; do
+    for f in .bashrc .bash_profile .bash_login .profile; do
+      cat $homedir/$f 2>/dev/null
+    done
+  done
+  Remove unauthorized modifications and restore from backup."
+breakage: "Users may have legitimate customizations in their init files. Focus on encoded, obfuscated, or network-related entries rather than aliases and exports."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.3
+known_exceptions:
+  - "Power users with complex shell configurations"
+  - "Development environments with source-activated virtual environments"
+related_findings:
+  - "PER-301"
+  - "PER-303"
+  - "PER-803"
+severity_override: null
+tags:
+  - "persistence"
+  - "shell-init"
+  - "bash"
+  - "login-hook"
+mitre_mappings:
+  - "T1546.004"

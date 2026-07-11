@@ -1,0 +1,38 @@
+id: PER-805
+title: XDG Autostart Persistence
+threat: "XDG autostart entries in `~/.config/autostart/` and `/etc/xdg/autostart/` define applications that launch automatically when a desktop environment starts. Attackers can abuse this for user-level persistence on graphical systems."
+exploit: "An attacker creates a `.desktop` file in `~/.config/autostart/` that executes a reverse shell script. The next time the user logs into the graphical desktop, the malicious application launches silently, providing persistent access in the user's graphical session."
+impact: "Per-session code execution in the desktop environment. The malicious application runs automatically on every graphical login, with access to the user's session, clipboard, and files."
+fix: "Inspect XDG autostart directories:
+  ls -la /etc/xdg/autostart/
+  ls -la ~/.config/autostart/
+  for homedir in /home/*; do
+    ls -la $homedir/.config/autostart/ 2>/dev/null
+    for f in $homedir/.config/autostart/*.desktop; do
+      cat $f 2>/dev/null
+    done
+  done
+  Remove unauthorized .desktop files."
+breakage: "Many desktop applications legitimately install autostart entries (updaters, indicators, sync clients, messaging apps)."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.4
+known_exceptions:
+  - "Desktop environment components (indicators, applets, session managers)"
+  - "Cloud sync clients (Nextcloud, Dropbox, Google Drive)"
+  - "Messaging and collaboration apps (Slack, Teams, Discord)"
+related_findings:
+  - "PER-804"
+  - "PER-301"
+severity_override: null
+tags:
+  - "persistence"
+  - "xdg"
+  - "autostart"
+  - "desktop"
+  - "user-session"
+mitre_mappings:
+  - "T1547.001"

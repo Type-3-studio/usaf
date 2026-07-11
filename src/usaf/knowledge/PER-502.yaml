@@ -1,0 +1,32 @@
+id: PER-502
+title: PAM Module Modifications
+threat: "Existing PAM modules can be replaced or trojaned to perform malicious actions while maintaining normal authentication behavior. Modified PAM libraries are difficult to detect because they appear functionally identical."
+exploit: "An attacker replaces `/lib/x86_64-linux-gnu/security/pam_unix.so` with a trojaned version that validates the password normally but additionally logs it to a hidden file or accepts a master password. The system continues to authenticate normally, masking the compromise."
+impact: "Credential harvesting and backdoor authentication through modified system libraries. The trojaned module intercepts every authentication attempt while maintaining normal system behavior, making detection extremely difficult."
+fix: "Verify PAM module integrity:
+  dpkg --verify $(dpkg -S /lib/security/pam_unix.so | cut -d: -f1)
+  Check file hashes against package database:
+  debsums -s pam_modules
+  Reinstall compromised packages:
+  apt-get install --reinstall libpam-modules"
+breakage: "File integrity flags may appear after legitimate package updates. Verify with dpkg and debsums first."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.3
+known_exceptions:
+  - "PAM module modifications from package upgrades (mitigated by verifying against dpkg database)"
+  - "Custom PAM module builds from source for enterprise environments"
+related_findings:
+  - "PER-501"
+severity_override: null
+tags:
+  - "persistence"
+  - "pam"
+  - "authentication"
+  - "trojan"
+  - "library-hijack"
+mitre_mappings:
+  - "T1556.003"

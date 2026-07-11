@@ -1,0 +1,32 @@
+id: PER-602
+title: SSH Forced Commands in Authorized Keys
+threat: "SSH authorized_keys files can specify a forced command that executes instead of the user's requested command. Attackers can add forced commands to their own or other users' keys to execute arbitrary code upon SSH login."
+exploit: "An attacker with access to a user's `~/.ssh/authorized_keys` adds `command='/bin/backdoor.sh'` before an existing SSH key. When the legitimate user (or attacker) authenticates with that key, the forced command executes instead of the requested shell or command."
+impact: "Execution of arbitrary code on every SSH authentication using the modified key. The forced command runs in the authenticated user's context and can exfiltrate data, execute payloads, or log credentials."
+fix: "Inspect authorized_keys files:
+  for homedir in /home/* /root; do
+    cat $homedir/.ssh/authorized_keys 2>/dev/null
+  done
+  Look for command=, no-pty, or restrict options that limit normal shell access.
+  Remove unauthorized entries and regenerate keys if compromised."
+breakage: "Some automation and CI/CD systems use forced commands for restricted access (e.g., rsync, git pulls). Verify against known use cases."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (8.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Automation tools (rsync, ansible, git) that use forced commands for restricted SSH access"
+  - "Backup systems that force specific commands for data transfer"
+related_findings:
+  - "PER-603"
+  - "PER-601"
+severity_override: null
+tags:
+  - "persistence"
+  - "ssh"
+  - "authorized-keys"
+  - "forced-command"
+mitre_mappings:
+  - "T1562.003"

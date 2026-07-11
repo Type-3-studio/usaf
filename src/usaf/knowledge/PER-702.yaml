@@ -1,0 +1,31 @@
+id: PER-702
+title: Dpkg Hook Persistence
+threat: "Dpkg hooks execute scripts during package installation, upgrade, and removal. Attackers can abuse dpkg hooks to maintain persistence by re-installing backdoors whenever a related package is modified."
+exploit: "An attacker creates a dpkg hook in `/etc/dpkg/dpkg.cfg.d/` or `/etc/dpkg/dpkg.d/` that re-creates a malicious cron entry whenever the cron package is upgraded. Even if the administrator cleans the cron entry, the next cron update restores it."
+impact: "Self-repairing persistence that re-installs backdoors during legitimate package operations. Standard cleanup procedures are ineffective because the hook restores the compromise on the next package operation."
+fix: "Inspect dpkg hook directories:
+  ls -la /etc/dpkg/dpkg.cfg.d/ /etc/dpkg/dpkg.d/
+  cat /etc/dpkg/dpkg.cfg.d/*
+  cat /etc/dpkg/dpkg.d/*
+  Look for unexpected hooks executing scripts from non-standard locations.
+  Remove unauthorized hook files."
+breakage: "Some packages may add dpkg configuration snippets. Verify against installed packages with dpkg -S."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.3
+known_exceptions:
+  - "Legitimate dpkg configuration snippets from installed packages"
+  - "Multiarch configuration files (dpkg --add-architecture)"
+related_findings:
+  - "PER-701"
+severity_override: null
+tags:
+  - "persistence"
+  - "dpkg"
+  - "hook"
+  - "package-manager"
+mitre_mappings:
+  - "T1546.015"

@@ -1,0 +1,31 @@
+id: CTN-001
+title: Docker Socket Permissions
+threat: The Docker socket provides root-equivalent access to the Docker daemon. Any user or group with access can create privileged containers, mount host filesystems, and escalate to root.
+exploit: "A developer account with access to the docker group (via /var/run/docker.sock) creates a privileged container mounting the host root filesystem. The attacker then chroots into the mounted filesystem and gains root on the host."
+impact: Complete host compromise from any user or process with Docker socket access. This is a well-documented privilege escalation vector. In container environments, the socket should be tightly controlled.
+fix: "Restrict Docker socket permissions:
+  chown root:docker /var/run/docker.sock
+  chmod 660 /var/run/docker.sock
+  Only add trusted users to the docker group
+  Consider rootless Docker or Podman"
+breakage: "Applications that rely on the Docker API from non-root users will break if socket permissions are restricted. Use Docker's context or rootless mode for such cases."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H (8.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Single-user development systems where the only user needs Docker access"
+  - "Systems using rootless Docker (socket not world-accessible)"
+  - "Podman environments that don't use a central Docker socket"
+related_findings:
+  - "PRM-001"
+  - "USR-001"
+severity_override: null
+tags:
+  - "containers"
+  - "docker"
+  - "privilege-escalation"
+mitre_mappings:
+  - "T1610"

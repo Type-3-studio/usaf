@@ -1,0 +1,30 @@
+id: PKG-001
+title: Unnecessary or Risky Installed Packages
+threat: Every installed package, especially network services, expands the attack surface. Legacy or unnecessary services may contain unpatched vulnerabilities or expose unintended functionality.
+exploit: "An attacker scans the network, discovers a telnet or rsh service running on the target, and brute-forces credentials transmitted in cleartext. Alternatively, an unpatched CUPS or Samba vulnerability provides remote code execution."
+impact: Remote code execution, credential theft, or information disclosure through unnecessary network services. Increased patch management burden and compliance violations.
+fix: "Remove unnecessary packages:
+  apt purge <package>
+  apt autoremove
+  Verify dependencies before removal on production systems."
+breakage: "Some applications may depend on these packages indirectly. Verify application functionality after removal in non-production first."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L (7.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.3
+known_exceptions:
+  - "CUPS may be required on desktops or print server environments"
+  - "Samba required for file sharing with Windows clients"
+  - "Avahi required for zero-configuration networking in some environments"
+related_findings:
+  - "SVC-001"
+  - "NET-001"
+severity_override: null
+tags:
+  - "attack-surface"
+  - "hardening"
+  - "packages"
+mitre_mappings:
+  - "T1190"

@@ -48,6 +48,7 @@ class KernelModuleLoadingCheck(AuditCheck):
                 detected_value=value or "unreadable",
                 expected_value="1",
                 affected_component="kernel",
+                reference="https://ubuntu.com/security/cis",
                 confidence=Confidence.LOW,
                 false_positive_probability=0.4,
                 mitre_attack_ids=["T1214"],

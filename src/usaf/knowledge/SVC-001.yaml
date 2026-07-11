@@ -1,0 +1,29 @@
+id: SVC-001
+title: Legacy Insecure Services
+threat: Legacy services like telnet, rsh, and FTP transmit credentials and data in cleartext. Any attacker on the network path can capture passwords, session tokens, and sensitive data.
+exploit: "An attacker on the same network segment uses ARP spoofing or passive sniffing to capture telnet traffic. Username and password pairs are extracted from the cleartext session, granting unauthorized access to the system."
+impact: Immediate credential theft and unauthorized system access. All data transmitted through these protocols is visible to network attackers. Modern alternatives (SSH, SFTP) provide encryption and authentication.
+fix: "Disable and remove legacy services:
+  systemctl disable --now telnet.socket rsh.socket rlogin.socket
+  apt purge telnetd rsh-server vsftpd proftpd
+  Use SSH/SFTP for all remote access and file transfer."
+breakage: "Some legacy environments or embedded systems may require these protocols for compatibility. In such cases, isolate the service on a dedicated VLAN with strict firewall rules."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "FTP may be required for legacy application integrations with explicit approval"
+  - "Internal isolated networks with compensating controls may accept TFTP for PXE boot"
+related_findings:
+  - "PKG-001"
+  - "NET-001"
+severity_override: null
+tags:
+  - "legacy-services"
+  - "cryptography"
+  - "hardening"
+mitre_mappings:
+  - "T1071"

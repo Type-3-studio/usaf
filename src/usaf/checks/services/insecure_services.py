@@ -69,6 +69,7 @@ class InsecureServicesCheck(AuditCheck):
                     detected_value=f"Unit file present for {unit}",
                     expected_value=f"No unit file for {unit}",
                     affected_component=unit,
+                    reference="https://ubuntu.com/security/cis",
                     confidence=Confidence.HIGH,
                     false_positive_probability=0.05,
                     mitre_attack_ids=["T1071"],

@@ -56,10 +56,12 @@ class UbuntuVersionCheck(AuditCheck):
                 detected_value=version,
                 expected_value="A supported Ubuntu LTS version",
                 affected_component="Operating System",
+                reference="https://ubuntu.com/about/release-cycle",
                 confidence=Confidence.HIGH,
                 false_positive_probability=0.05,
+                mitre_attack_ids=["T1562"],
                 cis_benchmarks=["CIS Ubuntu 20.04: 1.1"],
-                tags=["compliance", "support-lifecycle"],
+                tags=["compliance", "support-lifecycle", "patch-management"],
             )
         )
         return findings

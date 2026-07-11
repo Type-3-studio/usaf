@@ -73,11 +73,6 @@
 | `MountCollector` | ✅ | `/proc/mounts`, `/etc/fstab` parsing |
 | `ContainerCollector` | ✅ | Docker/Podman runtime, running containers |
 | `AuditdCollector` | ✅ | Auditd status, rules, log statistics |
-| `ContainerCollector` | ✅ | Docker/Podman runtime detection, running containers |
-| `AuditdCollector` | ✅ | Auditd status, rules, log statistics |
-| `container/` | ✅ | `ContainerCollector` implemented |
-| `filesystem/` | ◐ | `MountCollector` implemented |
-| `security/` | ◐ | `FirewallCollector`, `AuditdCollector` implemented |
 
 #### Checks (25 total)
 | Check | Status | Severity | Evidence |
@@ -170,7 +165,7 @@
 | Compliance | ✅ | 335 | CIS 27 controls, NIST 6 controls, gap analysis |
 | Profiles | ✅ | 451 | Desktop/server reference profiles, auto-detect |
 | Context Severity | ✅ | 201 | SSH, file perms, users, network context evaluators |
-| Knowledge Base | ✅ | 174 + 16 YAML | One YAML per check with threat/exploit/impact/fix/CVSS |
+| Knowledge Base | ✅ | 171 + 25 YAML | YAML for all 25 checks with threat/exploit/impact/fix/CVSS; KB wired into runner pipeline for finding enrichment |
 | Trust Scoring | ✅ | 106 | Evidence-quality adjusted confidence |
 | Policies | ✅ | 86 | YAML policy loading, check overrides, severity overrides |
 
@@ -201,49 +196,57 @@
 #### Testing
 | Area | Tests | Lines | Notes |
 |------|-------|-------|-------|
-| Unit tests | 490 | 7,150+ | 40 test files across all modules |
+| Unit tests | 490 | 7,150+ | **48 test files** across all modules (organized in subdirectories) |
 | Integration tests | 21 | 450+ | Pipeline, scoring, reporter, and check integration tests |
 | Golden tests | ✅ | 80 | JSON and Markdown golden report snapshot tests |
-| Kernel checks | ✅ | 131 | test_kernel_checks.py |
-| SSH checks | ✅ | 127 | test_ssh_checks.py |
-| Network checks | ✅ | 113 | test_network_checks.py |
-| Permission checks | ✅ | 193 | test_permission_checks.py (+known-safe package allowlist tests) |
-| User checks | ✅ | 156 | test_user_checks.py |
-| Scoring engine | ✅ | 330 | test_scoring_engine.py (+edge cases: all severities, empty, zero weight) |
-| Trust scoring | ✅ | 259 | test_trust_scoring.py (+multi-evidence bonus, effective_to_confidence) |
-| Baseline | ✅ | 246 | test_baseline_manager.py |
-| Correlation | ✅ | 518 | engine + rules |
-| Compliance | ✅ | 134 | test_compliance_framework.py |
-| Knowledge | ✅ | 216 | test_knowledge_base.py |
-| Profiles | ✅ | 161 | test_profile_manager.py |
-| Severity | ✅ | 305 | test_context_severity.py (+repr, SSH/permission/user/network edge cases) |
-| Compromise checks (COM-001) | ✅ | 48 | test_compromise_checks.py |
-| Compliance checks (CMP-001) | ✅ | 55 | test_compliance_checks.py |
-| Container checks (CTN-001) | ✅ | 56 | test_container_checks.py |
-| Forensics checks (FOR-001) | ✅ | 48 | test_forensics_checks.py |
-| Kernel module checks (KRN-001) | ✅ | 25 | test_krn_checks.py |
-| Package checks (PKG-001) | ✅ | 50 | test_package_checks.py |
-| Persistence checks (PER-001) | ✅ | 48 | test_persistence_checks.py |
-| Security checks (FIREWALL/SEC/USB) | ✅ | 94 | test_security_checks.py |
-| Service checks (SVC-001) | ✅ | 42 | test_service_checks.py |
-| Password policy (PWD-001) | ✅ | 60 | test_password_policy_checks.py |
-| Cache engine | ✅ | 56 | test_cache.py |
-| Config loader/model | ✅ | 118 | test_config.py (+OSError, XDG path tests) |
-| Policy engine | ✅ | 136 | test_policy_engine.py (+skip invalid, model_dump, apply_to_config edge cases) |
-| Terminal reporter | ✅ | 43 | test_terminal_reporter.py |
-| Markdown reporter | ✅ | 41 | test_markdown_reporter.py |
-| Base reporter | ✅ | 26 | test_base_reporter.py |
-| References model | ✅ | 66 | test_references.py (NEW — CVE, CIS, MITRE, OWASP models) |
-| Base collector | ✅ | 75 | collectors/test_collector_base.py |
-| Collector manager | ✅ | 130 | test_collector_manager.py (+circular dep, init with collectors, none defaults) |
-| Kernel collector | ✅ | 74 | collectors/test_kernel_collector.py |
-| Socket/Interface collector | ✅ | 91 | collectors/test_socket_collector.py |
-| User/Group/Sudo collector | ✅ | 68 | collectors/test_user_collectors.py |
-| Process collector | ✅ | 55 | collectors/test_process_collector.py |
-| Systemd/Cron collector | ✅ | 67 | collectors/test_systemd_collector.py |
-| Mount collector | ✅ | 36 | collectors/test_mount_collector.py |
-| Firewall collector | ✅ | 50 | collectors/test_firewall_collector.py |
-| APT collector | ✅ | 40 | collectors/test_apt_collector.py |
+| Kernel checks | ✅ | 131 | tests/unit/checks/test_kernel_checks.py |
+| SSH checks | ✅ | 127 | tests/unit/checks/test_ssh_checks.py |
+| Network checks | ✅ | 113 | tests/unit/checks/test_network_checks.py |
+| Permission checks | ✅ | 193 | tests/unit/checks/test_permission_checks.py |
+| User checks | ✅ | 156 | tests/unit/checks/test_user_checks.py |
+| Scoring engine | ✅ | 330 | tests/unit/scoring/test_scoring_engine.py |
+| Trust scoring | ✅ | 259 | tests/unit/scoring/test_trust_scoring.py |
+| Baseline | ✅ | 246 | tests/unit/baseline/test_baseline_manager.py |
+| Correlation engine | ✅ | 518 | tests/unit/correlation/test_correlation_engine.py |
+| Correlation rules | ✅ | — | tests/unit/correlation/test_correlation_rules.py |
+| Compliance | ✅ | 134 | tests/unit/compliance/test_compliance_framework.py |
+| Knowledge | ✅ | 216 | tests/unit/knowledge/test_knowledge_base.py |
+| Profiles | ✅ | 161 | tests/unit/profiles/test_profile_manager.py |
+| Severity | ✅ | 305 | tests/unit/severity/test_context_severity.py |
+| Compromise checks (COM-001) | ✅ | 48 | tests/unit/checks/test_compromise_checks.py |
+| Compliance checks (CMP-001) | ✅ | 55 | tests/unit/checks/test_compliance_checks.py |
+| Container checks (CTN-001) | ✅ | 56 | tests/unit/checks/test_container_checks.py |
+| Forensics checks (FOR-001) | ✅ | 48 | tests/unit/checks/test_forensics_checks.py |
+| Kernel module checks (KRN-001) | ✅ | 25 | tests/unit/checks/test_krn_checks.py |
+| Package checks (PKG-001) | ✅ | 50 | tests/unit/checks/test_package_checks.py |
+| Persistence checks (PER-001) | ✅ | 48 | tests/unit/checks/test_persistence_checks.py |
+| Security checks (FIREWALL/SEC/USB) | ✅ | 94 | tests/unit/checks/test_security_checks.py |
+| Service checks (SVC-001) | ✅ | 42 | tests/unit/checks/test_service_checks.py |
+| Password policy (PWD-001) | ✅ | 60 | tests/unit/checks/test_password_policy_checks.py |
+| Cache engine | ✅ | 56 | tests/unit/test_cache.py |
+| Config loader/model | ✅ | 118 | tests/unit/test_config.py |
+| Policy engine | ✅ | 136 | tests/unit/test_policy_engine.py |
+| JSON reporter | ✅ | — | tests/unit/reporting/test_json_reporter.py |
+| Terminal reporter | ✅ | 43 | tests/unit/reporting/test_terminal_reporter.py |
+| Markdown reporter | ✅ | 41 | tests/unit/reporting/test_markdown_reporter.py |
+| Base reporter | ✅ | 26 | tests/unit/reporting/test_base_reporter.py |
+| Finding model | ✅ | — | tests/unit/models/test_finding.py |
+| References model | ✅ | 66 | tests/unit/models/test_references.py |
+| Severity model | ✅ | — | tests/unit/models/test_severity.py |
+| Base collector | ✅ | 75 | tests/unit/collectors/test_collector_base.py |
+| Collector manager | ✅ | 130 | tests/unit/core/test_collector_manager.py |
+| Collector registry | ✅ | — | tests/unit/core/test_collector_registry.py |
+| Plugin registry | ✅ | — | tests/unit/core/test_registry.py |
+| Kernel collector | ✅ | 74 | tests/unit/collectors/test_kernel_collector.py |
+| Socket/Interface collector | ✅ | 91 | tests/unit/collectors/test_socket_collector.py |
+| User/Group/Sudo collector | ✅ | 68 | tests/unit/collectors/test_user_collectors.py |
+| Process collector | ✅ | 55 | tests/unit/collectors/test_process_collector.py |
+| Systemd/Cron collector | ✅ | 67 | tests/unit/collectors/test_systemd_collector.py |
+| Mount collector | ✅ | 36 | tests/unit/collectors/test_mount_collector.py |
+| Firewall collector | ✅ | 50 | tests/unit/collectors/test_firewall_collector.py |
+| APT collector | ✅ | 40 | tests/unit/collectors/test_apt_collector.py |
+| Container collector | ✅ | — | tests/unit/collectors/test_container_collector.py |
+| Auditd collector | ✅ | — | tests/unit/collectors/test_auditd_collector.py |
 
 #### Developer Infrastructure
 | Tool | Status | Notes |
@@ -252,7 +255,7 @@
 | `mypy` config | ✅ | strict mode |
 | Pre-commit hooks | ✅ | ruff, mypy (0 errors ✅), trailing whitespace, YAML/TOML check |
 | CI/CD | ✅ | GitHub Actions: ruff lint+format, mypy (0 errors ✅), pytest on push/PR |
-| Versioning | ✅ | 0.3.0 — semver |
+| Versioning | ✅ | 0.4.0 — semver |
 
 ---
 
@@ -272,8 +275,13 @@
 |------|----------|-------|
 | Golden report tests | LOW | ✅ Implemented |
 | Container collectors | LOW | ✅ `ContainerCollector` added |
-| Filesystem collectors | LOW | `collectors/filesystem/` has `MountCollector` only |
-| Security collectors | LOW | `collectors/security/` has `FirewallCollector`, `AuditdCollector` |
+| Filesystem collectors | LOW | ✅ `MountCollector` implemented |
+| Security collectors | LOW | ✅ `FirewallCollector`, `AuditdCollector` implemented |
+| Knowledge YAML coverage | MEDIUM | ✅ All 25 checks have knowledge YAML files |
+| Reference URLs in findings | MEDIUM | ✅ All 25 checks include reference URLs |
+| MITRE ATT&CK coverage | MEDIUM | ✅ All 25 checks include mitre_attack_ids |
+| `scoring/__init__.py` exports | LOW | ✅ Populated with `ScoringEngine`, `TrustScorer` |
+| `models/__init__.py` exports | LOW | ✅ Populated with all model exports |
 
 ---
 
@@ -289,6 +297,11 @@
 | TD-006 | No parallel execution despite `parallel=True` in config | LOW | ✅ |
 | TD-007 | ~~`mypy --strict` fails (245→15 errors)~~ → **Fixed: 0 errors across 100 source files** | MEDIUM | ✅ |
 | TD-008 | ~~SUID FP rate ~80%~~ → **Resolved** (expanded whitelist, config allowlist, MEDIUM/LOW confidence tiers based on 60 known-safe packages) | HIGH | ✅ |
+| TD-009 | Severity context `apply_all()` computed adjustments but never applied them to findings (dead data pipeline) | HIGH | ✅ |
+| TD-010 | Knowledge Base YAML coverage was 16/25 checks (64%); 9 missing files added + KB wired into runner pipeline | MEDIUM | ✅ |
+| TD-011 | CMP-001 (Ubuntu version check) missing `mitre_attack_ids` entirely | MEDIUM | ✅ |
+| TD-012 | `scoring/__init__.py` and `models/__init__.py` were empty (no exports) | LOW | ✅ |
+| TD-013 | 9 checks missing `reference` URL in findings | MEDIUM | ✅ |
 
 ---
 
@@ -325,7 +338,7 @@ src/usaf/
 │   ├── score.py               # ScanScore, CategoryScore
 │   └── references.py          # CVE, CIS, MITRE, OWASP models
 ├── collectors/                # 11 collectors (+3 placeholder dirs)
-├── checks/                    # 22 checks across 13 categories
+├── checks/                    # 25 checks across 14 categories
 ├── reporting/                 # 3 reporters
 ├── scoring/
 │   ├── engine.py              # Scoring engine (with confidence*FP)
@@ -335,7 +348,7 @@ src/usaf/
 ├── compliance/framework.py    # CIS + NIST mappings
 ├── profiles/manager.py        # Profile matching
 ├── severity/engine.py         # Context-aware severity
-├── knowledge/                 # KB + 13 YAML entries
+├── knowledge/                 # KB + 25 YAML entries (one per check)
 ├── policies/engine.py         # Policy loading + overrides
 ├── config/                    # YAML config loading
 └── cache/engine.py            # In-memory cache
@@ -350,11 +363,15 @@ src/usaf/
 | Checks | 25 | 25+ | ✅ (target met) |
 | Collectors | 15 | 15+ | ✅ (target met) |
 | Unit tests | 490 | 300+ | ✅ (target exceeded) |
+| Unit test files | 48 | 40+ | ✅ (target exceeded) |
 | Integration tests | 21 | 15+ | ✅ (target exceeded) |
 | Test coverage (stmt) | ~40% → **85%** | 85%+ | ✅ (target met) |
 | Test coverage (branch) | ~29% → **82%** | 80%+ | ✅ (target met) |
 | CI pipeline | Green on push | Green on push | ✅ |
 | mypy --strict | **0 errors** | 0 errors | ✅ |
+| Knowledge YAML coverage | 16/25 (64%) → **25/25 (100%)** | 100% | ✅ (9 missing files created) |
+| Knowledge enrichment in pipeline | Off → **Enabled** | Enabled | ✅ (wired into runner Phase 3.8) |
+| Severity pipeline dead data | Yes → **Fixed** | Fixed | ✅ (adjustments now applied to findings) |
 | False positive rate (SUID) | ~80% → ~30% → **~5%** | <10% | ✅ (known-safe package allowlist: 60 packages auto-allowlisted) |
 | Confidence scoring | Applied | Applied | ✅ |
 | Correlation rules | 4 | 4+ | ✅ |

@@ -31,6 +31,7 @@ from usaf.correlation.rules import (
     UnauthorizedService,
 )
 from usaf.severity.engine import SeverityContextEngine
+from usaf.knowledge.base import KnowledgeBase
 
 # Optional imports (graceful fallback if not available)
 from usaf.scoring.engine import ScoringEngine
@@ -57,6 +58,7 @@ class ScanRunner:
         # Phase 2 components
         self.correlation_engine = self._build_correlation_engine()
         self.severity_context = SeverityContextEngine()
+        self.knowledge_base = KnowledgeBase()
         self.baseline_manager: Any = None
         self.profile_manager: Any = None
 
@@ -225,13 +227,36 @@ class ScanRunner:
                     print(f"  -> Correlation produced {len(correlated)} synthetic finding(s)")
 
         # Phase 3.75: Context-aware severity adjustment
+        all_findings = [f for r in results for f in r.findings]
         severity_adjustments = self.severity_context.apply_all(
-            [f for r in results for f in r.findings],
+            all_findings,
             collectors_data,
         )
-        adjustments_count = sum(1 for s in severity_adjustments.values() if s.changed)
+        adjustments_count = 0
+        for f in all_findings:
+            adj = severity_adjustments.get(f.id)
+            if adj and adj.changed:
+                f.severity = adj.adjusted
+                f.risk_score = adj.adjusted.score
+                adjustments_count += 1
         if adjustments_count and verbose:
             print(f"  -> Severity adjusted for {adjustments_count} finding(s)")
+
+        # Phase 3.8: Knowledge-based finding enrichment
+        enriched_count = 0
+        for f in all_findings:
+            entry = self.knowledge_base.get(f.check_id)
+            if entry:
+                f.reference = f.reference or entry.mitre_mappings[0] if entry.mitre_mappings else None
+                # Merge KB tags into finding tags if not already present
+                existing_tags = set(f.tags)
+                for tag in entry.tags:
+                    if tag not in existing_tags:
+                        f.tags.append(tag)
+                        existing_tags.add(tag)
+                enriched_count += 1
+        if enriched_count and verbose:
+            print(f"  -> Knowledge enrichment applied to {enriched_count} finding(s)")
 
         # Phase 4: Build result
         metadata.end_time = datetime.now(UTC)

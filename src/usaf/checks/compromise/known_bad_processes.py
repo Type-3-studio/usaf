@@ -67,6 +67,7 @@ class KnownBadProcessCheck(AuditCheck):
                     detected_value=f"Process '{name}' (PID {proc['pid']})",
                     expected_value="No known malicious processes running",
                     affected_component=f"PID {proc['pid']}: {name}",
+                    reference="https://attack.mitre.org/techniques/T1071/",
                     confidence=Confidence.MEDIUM,
                     false_positive_probability=0.15,
                     mitre_attack_ids=["T1071", "T1059", "T1496"],

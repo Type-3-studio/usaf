@@ -1,0 +1,29 @@
+id: CMP-001
+title: Ubuntu Version Support Status
+threat: Running an unsupported Ubuntu release means no security patches for kernel vulnerabilities, critical libraries, or userspace tools. Unpatched CVEs accumulate over time.
+exploit: "An attacker scans the network, identifies an Ubuntu 18.04 system (end-of-life), and exploits a known CVE in the kernel or OpenSSL that was patched in later releases but never backported to the unsupported version."
+impact: Complete system compromise through known, publicly documented vulnerabilities. Compliance violations (PCI-DSS, SOC2, HIPAA) for running unsupported software. No vendor support for incident response.
+fix: "Upgrade to a supported LTS release:
+  do-release-upgrade
+  Check https://ubuntu.com/about/release-cycle
+  If ESM is available: ua attach <token>"
+breakage: "Major version upgrades may break application compatibility. Always test upgrades in a staging environment first. Some third-party software may not support newer Ubuntu releases."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H (10.0)"
+affected_versions:
+  - "Ubuntu 18.04 and earlier"
+  - "Ubuntu 20.04 (ESM only after April 2025)"
+  - "Non-LTS releases past their 9-month support window"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Systems with active Ubuntu Pro/ESM subscriptions that extend support"
+  - "Air-gapped systems with no network connectivity"
+  - "Systems scheduled for decommissioning"
+related_findings:
+  - "PKG-001"
+severity_override: null
+tags:
+  - "compliance"
+  - "support-lifecycle"
+  - "patch-management"
+mitre_mappings:
+  - "T1562"

@@ -1,0 +1,30 @@
+id: KRN-001
+title: Kernel Module Loading Restrictions
+threat: Without module loading restrictions, an attacker with root privileges can load malicious kernel modules (rootkits) that intercept system calls, hide processes, and maintain persistent kernel-level access.
+exploit: "An attacker who gains root access loads a kernel rootkit via insmod or modprobe. The rootkit hides their processes, files, and network connections from detection tools, providing persistent stealthy access."
+impact: Complete kernel-level compromise. Rootkits can hide any file, process, socket, or user from detection. System integrity is fully compromised and detection requires offline forensics.
+fix: "Set kernel.modules_disabled=1 in /etc/sysctl.d/99-hardening.conf:
+  echo 'kernel.modules_disabled=1' >> /etc/sysctl.d/99-hardening.conf
+  sysctl -w kernel.modules_disabled=1
+  Verify all required modules are loaded before enabling."
+breakage: "Disabling module loading prevents loading additional hardware drivers post-boot. Ensure all required modules (filesystem, network, storage) are loaded at boot or built into the kernel."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:H (8.2)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.4
+known_exceptions:
+  - "Systems that require dynamic kernel module loading for hardware drivers"
+  - "Container hosts that need to load kernel modules for container functionality"
+  - "Systems with DKMS-managed drivers that require module rebuilds"
+related_findings:
+  - "KRN-002"
+  - "KERN-001"
+severity_override: null
+tags:
+  - "kernel-hardening"
+  - "rootkit-prevention"
+  - "module-loading"
+mitre_mappings:
+  - "T1214"

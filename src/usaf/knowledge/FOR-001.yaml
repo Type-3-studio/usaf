@@ -1,0 +1,32 @@
+id: FOR-001
+title: Audit Log Availability
+threat: Without audit logs, there is no record of system calls, file access, or authentication events. This severely hampers incident response and forensic investigation.
+exploit: "An attacker who compromises the system disables auditd (systemctl stop auditd) and clears /var/log/audit/ to cover their tracks. Without audit logs, the incident response team cannot determine the attack vector, scope, or timeline."
+impact: Complete loss of forensic visibility. Security teams cannot determine what happened, when, or how. Compliance violations (PCI-DSS 10.x, CIS 4.1). Legal and regulatory consequences for failure to detect and report breaches.
+fix: "Install and configure auditd:
+  apt install auditd
+  systemctl enable auditd && systemctl start auditd
+  Add audit rules: auditctl -l
+  Configure log rotation in /etc/audit/auditd.conf"
+breakage: "Auditd can generate significant log volume on busy systems. Adjust audit rules to focus on security-relevant events and configure appropriate log rotation limits."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H (8.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Containers that inherit the host audit system"
+  - "Ephemeral systems where audit logs are sent to a centralized SIEM"
+related_findings:
+  - "CMP-001"
+  - "PER-001"
+severity_override: null
+tags:
+  - "auditing"
+  - "forensics"
+  - "logging"
+  - "incident-response"
+mitre_mappings:
+  - "T1070"
+  - "T1562"

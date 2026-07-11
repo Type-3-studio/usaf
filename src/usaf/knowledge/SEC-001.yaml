@@ -1,0 +1,32 @@
+id: SEC-001
+title: AppArmor Status
+threat: Without AppArmor (or another MAC system), compromised applications have full access to user files and system resources. AppArmor confines applications to only the resources they need.
+exploit: "An attacker exploits a buffer overflow in a network-facing application like nginx or cups. Without AppArmor, the exploited process has the full privileges of its user. With AppArmor, the exploit is contained to the profile's allowed resources."
+impact: Defense-in-depth bypass. Mandatory Access Control provides a critical safety net against zero-day exploits. Without it, every application vulnerability becomes a potential full system compromise.
+fix: "Enable AppArmor:
+  Ensure 'apparmor=1 security=apparmor' in kernel cmdline (/etc/default/grub)
+  update-grub && reboot
+  Install profiles: apt install apparmor-profiles
+  Set profiles to enforcing: aa-enforce /etc/apparmor.d/*"
+breakage: "Some applications may require profile adjustments or custom profiles to function correctly. Check audit.log for DENIED messages and adjust profiles as needed."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H (8.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Containers inherit the host AppArmor profile or use their own"
+  - "Some kernel configurations may not include AppArmor LSM support"
+  - "SELinux systems (CentOS/RHEL) use a different MAC system"
+related_findings:
+  - "KERN-001"
+  - "KERN-002"
+severity_override: null
+tags:
+  - "security"
+  - "apparmor"
+  - "mandatory-access-control"
+  - "mac"
+mitre_mappings:
+  - "T1562"

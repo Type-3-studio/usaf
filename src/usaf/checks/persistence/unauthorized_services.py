@@ -59,14 +59,15 @@ class UnauthorizedServicesCheck(AuditCheck):
                         f"'systemctl disable --now {name}' and "
                         f"remove the unit file."
                     ),
-                    evidence=FileEvidence(
-                        path=f"/etc/systemd/system/{name}",
-                        content=svc.get("description", ""),
-                    ),
-                    detected_value=f"Active service '{name}' with suspicious patterns",
-                    expected_value="No active services matching suspicious patterns",
-                    affected_component=f"systemd: {name}",
-                    confidence=Confidence.LOW,
+                evidence=FileEvidence(
+                    path=f"/etc/systemd/system/{name}",
+                    content=svc.get("description", ""),
+                ),
+                detected_value=f"Active service '{name}' with suspicious patterns",
+                expected_value="No active services matching suspicious patterns",
+                affected_component=f"systemd: {name}",
+                reference="https://attack.mitre.org/techniques/T1543/002/",
+                confidence=Confidence.LOW,
                     false_positive_probability=0.6,
                     mitre_attack_ids=["T1543.002"],
                     tags=["persistence", "systemd", "backdoor"],

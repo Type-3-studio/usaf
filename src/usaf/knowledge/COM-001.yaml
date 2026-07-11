@@ -1,0 +1,34 @@
+id: COM-001
+title: Known Malicious Process Detection
+threat: Running processes with names matching known malware, coin miners, or C2 implants are strong indicators of active compromise requiring immediate incident response.
+exploit: "An attacker exploits a vulnerable web application, downloads a coin miner binary (e.g., xmrig), and executes it. The miner consumes CPU resources for cryptocurrency mining while potentially exfiltrating data through the mining pool connection."
+impact: Active system compromise. The system is under attacker control. Immediate containment (network isolation, forensic imaging, rebuild) is required. Data breach, resource theft, and lateral movement are likely in progress.
+fix: "Immediately contain and investigate:
+  kill -9 <PID>
+  ls -la /proc/<PID>/exe
+  Upload sample to VirusTotal
+  Check for persistence mechanisms (cron, systemd)
+  Perform full incident response"
+breakage: "Some legitimate software may coincidentally share names with known malware (e.g., 'shell' in scripts). Verify the binary origin and behavior before concluding compromise."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H (9.1)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Security testing tools intentionally run on audit systems"
+  - "Honeypot systems designed to attract attackers"
+  - "Research environments running malware samples for analysis"
+related_findings:
+  - "PER-001"
+  - "NET-001"
+severity_override: null
+tags:
+  - "compromise-indicator"
+  - "malware"
+  - "incident-response"
+mitre_mappings:
+  - "T1071"
+  - "T1059"
+  - "T1496"

@@ -57,15 +57,16 @@ class UnnecessaryPackagesCheck(AuditCheck):
                         f"Remove the package: 'apt purge {pkg_name}'. "
                         f"Verify no dependencies need it: 'apt autoremove'."
                     ),
-                    evidence=PackageEvidence(
-                        name=pkg_name,
-                        version=pkg_info.get("version"),
-                        status=pkg_info.get("status"),
-                    ),
-                    detected_value=f"{pkg_name} is installed",
-                    expected_value=f"{pkg_name} is not installed",
-                    affected_component=f"Package: {pkg_name}",
-                    confidence=Confidence.MEDIUM,
+                evidence=PackageEvidence(
+                    name=pkg_name,
+                    version=pkg_info.get("version"),
+                    status=pkg_info.get("status"),
+                ),
+                detected_value=f"{pkg_name} is installed",
+                expected_value=f"{pkg_name} is not installed",
+                affected_component=f"Package: {pkg_name}",
+                reference="https://ubuntu.com/security/cis",
+                confidence=Confidence.MEDIUM,
                     false_positive_probability=0.3,
                     mitre_attack_ids=["T1190"],
                     cis_benchmarks=["CIS Ubuntu 20.04: 2.1"],

@@ -1,0 +1,31 @@
+id: PER-001
+title: Suspicious Systemd Services
+threat: Attackers frequently create systemd services to maintain persistence after initial compromise. Suspicious service names or descriptions are strong indicators of malicious activity.
+exploit: "An attacker gains initial access via a vulnerable web application, drops a reverse shell script, and registers it as a systemd service with an innocuous name. The service restarts the reverse shell on boot, maintaining persistent access."
+impact: Persistent remote access to the compromised system. The attacker can return at any time, escalate privileges, move laterally, and exfiltrate data. Detection requires manual investigation of all suspicious services.
+fix: "Investigate suspicious services:
+  systemctl cat <service>
+  systemctl status <service>
+  Disable if unauthorized: systemctl disable --now <service>
+  Remove the unit file and verify with dpkg if it belongs to any package."
+breakage: "Some legitimate services may trigger false positives based on naming patterns. Always verify the service origin before disabling."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.6
+known_exceptions:
+  - "Legitimate software using common terms like 'shell' or 'proxy' in service names"
+  - "Development environments with intentionally installed backdoor-like services"
+  - "Container images with pre-installed management agents"
+related_findings:
+  - "COM-001"
+  - "SVC-001"
+severity_override: null
+tags:
+  - "persistence"
+  - "systemd"
+  - "backdoor"
+mitre_mappings:
+  - "T1543.002"

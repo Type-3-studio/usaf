@@ -63,6 +63,7 @@ class DockerSocketCheck(AuditCheck):
                 detected_value=f"Mode {oct(mode)}, owner UID {owner}",
                 expected_value="Mode 660, owner root:docker",
                 affected_component=str(sock),
+                reference="https://docs.docker.com/engine/security/",
                 confidence=Confidence.HIGH,
                 false_positive_probability=0.05,
                 mitre_attack_ids=["T1610"],

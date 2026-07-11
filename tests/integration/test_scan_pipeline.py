@@ -21,7 +21,7 @@ SKIP_LINUX = pytest.mark.skipif(
 class TestScanPipeline:
     """Integration tests for the full scan pipeline."""
 
-    EXPECTED_COLLECTOR_COUNT = 13
+    EXPECTED_COLLECTOR_COUNT = 15
     EXPECTED_CHECK_COUNT = 25
 
     def test_collector_discovery_registers_all(self):
@@ -30,6 +30,8 @@ class TestScanPipeline:
         assert len(names) == self.EXPECTED_COLLECTOR_COUNT
         assert names == [
             "apt",
+            "auditd",
+            "containers",
             "cron",
             "firewall",
             "groups",

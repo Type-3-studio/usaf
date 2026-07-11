@@ -55,7 +55,7 @@
 
 ### Detailed Status
 
-#### Collectors (13 total)
+#### Collectors (15 total)
 | Collector | Status | Notes |
 |-----------|--------|-------|
 | `KernelCollector` | ✅ | `/proc/sys`, sysctl, uname |
@@ -71,9 +71,13 @@
 | `CronCollector` | ✅ | crontabs, cron.d, cron.daily |
 | `FirewallCollector` | ✅ | ufw, nftables, iptables status |
 | `MountCollector` | ✅ | `/proc/mounts`, `/etc/fstab` parsing |
-| `container/` | ⬜ | Placeholder directory, no collectors yet |
+| `ContainerCollector` | ✅ | Docker/Podman runtime, running containers |
+| `AuditdCollector` | ✅ | Auditd status, rules, log statistics |
+| `ContainerCollector` | ✅ | Docker/Podman runtime detection, running containers |
+| `AuditdCollector` | ✅ | Auditd status, rules, log statistics |
+| `container/` | ✅ | `ContainerCollector` implemented |
 | `filesystem/` | ◐ | `MountCollector` implemented |
-| `security/` | ◐ | `FirewallCollector` implemented |
+| `security/` | ◐ | `FirewallCollector`, `AuditdCollector` implemented |
 
 #### Checks (25 total)
 | Check | Status | Severity | Evidence |
@@ -270,10 +274,10 @@
 ### Filling Empty Placeholders
 | Area | Priority | Notes |
 |------|----------|-------|
-| Golden report tests | LOW | Config + marker exist, no tests |
-| Container collectors | LOW | `collectors/container/` empty |
-| Filesystem collectors | LOW | `collectors/filesystem/` empty |
-| Security collectors | LOW | `collectors/security/` empty |
+| Golden report tests | LOW | ✅ Implemented |
+| Container collectors | LOW | ✅ `ContainerCollector` added |
+| Filesystem collectors | LOW | `collectors/filesystem/` has `MountCollector` only |
+| Security collectors | LOW | `collectors/security/` has `FirewallCollector`, `AuditdCollector` |
 
 ---
 
@@ -348,7 +352,7 @@ src/usaf/
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
 | Checks | 25 | 25+ | ✅ (target met) |
-| Collectors | 13 | 15+ | ◐ |
+| Collectors | 15 | 15+ | ✅ (target met) |
 | Unit tests | 424 | 300+ | ✅ (target exceeded) |
 | Integration tests | 21 | 15+ | ✅ (target exceeded) |
 | Test coverage | ~40% | 85%+ | ◐ |

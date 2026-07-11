@@ -284,3 +284,107 @@ class TestScoringEngine:
         # * (1 - 0.5 FP) = 0.15 effective
         # 10.0 * 1.0 * 0.15 = 1.5 base
         assert score.overall_score > 0
+
+    def test_all_severity_counts(self):
+        engine = ScoringEngine()
+        result = ScanResult(
+            results=[
+                CheckResult(
+                    check_id="T1", name="T", category=CheckCategory.SYSTEM, passed=False,
+                    findings=[
+                        Finding(id="F1", check_id="T1", category=CheckCategory.SYSTEM,
+                                severity=Severity.INFO, risk_score=0.0, title="I",
+                                description="d", rationale="r", remediation="f", source="s"),
+                        Finding(id="F2", check_id="T1", category=CheckCategory.SYSTEM,
+                                severity=Severity.LOW, risk_score=2.5, title="L",
+                                description="d", rationale="r", remediation="f", source="s"),
+                        Finding(id="F3", check_id="T1", category=CheckCategory.SYSTEM,
+                                severity=Severity.MEDIUM, risk_score=5.0, title="M",
+                                description="d", rationale="r", remediation="f", source="s"),
+                        Finding(id="F4", check_id="T1", category=CheckCategory.SYSTEM,
+                                severity=Severity.HIGH, risk_score=7.5, title="H",
+                                description="d", rationale="r", remediation="f", source="s"),
+                        Finding(id="F5", check_id="T1", category=CheckCategory.SYSTEM,
+                                severity=Severity.CRITICAL, risk_score=10.0, title="C",
+                                description="d", rationale="r", remediation="f", source="s"),
+                    ],
+                )
+            ]
+        )
+        score = engine.calculate(result)
+        assert score.total_findings == 5
+        assert score.critical_count == 1
+        assert score.high_count == 1
+        assert score.medium_count == 1
+        assert score.low_count == 1
+        assert score.info_count == 1
+
+    def test_empty_categories_returns_zero(self):
+        engine = ScoringEngine()
+        score = engine._calculate_overall([])
+        assert score == 0.0
+
+    def test_zero_weight_returns_zero(self):
+        from usaf.models.score import CategoryScore
+        engine = ScoringEngine()
+        cat = CategoryScore(
+            category=CheckCategory.GENERAL, score=5.0, finding_count=1,
+            critical_count=0, high_count=0, medium_count=1, low_count=0, info_count=0,
+            max_severity=None, weight=0.0,
+        )
+        score = engine._calculate_overall([cat])
+        assert score == 0.0
+
+    def test_no_trust_scoring_disabled(self):
+        engine = ScoringEngine(use_trust_scoring=False)
+        result = ScanResult(
+            results=[
+                CheckResult(
+                    check_id="T1", name="T", category=CheckCategory.SYSTEM, passed=False,
+                    findings=[
+                        Finding(id="F1", check_id="T1", category=CheckCategory.SYSTEM,
+                                severity=Severity.CRITICAL, risk_score=10.0, title="C",
+                                description="d", rationale="r", remediation="f", source="s",
+                                confidence=Confidence.MEDIUM),
+                    ],
+                )
+            ]
+        )
+        score = engine.calculate(result)
+        assert score.critical_count == 1
+        assert score.overall_score > 0
+
+    def test_info_severity_weight(self):
+        engine = ScoringEngine()
+        result = ScanResult(
+            results=[
+                CheckResult(
+                    check_id="T1", name="T", category=CheckCategory.SYSTEM, passed=False,
+                    findings=[
+                        Finding(id="F1", check_id="T1", category=CheckCategory.SYSTEM,
+                                severity=Severity.INFO, risk_score=0.0, title="I",
+                                description="d", rationale="r", remediation="f", source="s"),
+                    ],
+                )
+            ]
+        )
+        score = engine.calculate(result)
+        assert score.overall_score == 0.0
+
+    def test_category_beyond_max_weight(self):
+        engine = ScoringEngine()
+        result = ScanResult(
+            results=[
+                CheckResult(
+                    check_id="T1", name="T", category=CheckCategory.GENERAL, passed=False,
+                    findings=[
+                        Finding(id="F1", check_id="T1", category=CheckCategory.GENERAL,
+                                severity=Severity.HIGH, risk_score=7.5, title="H",
+                                description="d", rationale="r", remediation="f", source="s"),
+                    ],
+                )
+            ]
+        )
+        score = engine.calculate(result)
+        assert score.total_findings == 1
+        assert len(score.categories) == 1

@@ -174,6 +174,88 @@ class TestSeverityContextEngine:
         result = engine.apply_all([], {})
         assert result == {}
 
+    def test_context_aware_severity_repr_changed(self):
+        from usaf.severity.engine import ContextAwareSeverity
+        cas = ContextAwareSeverity(
+            original=Severity.HIGH,
+            adjusted=Severity.CRITICAL,
+            check_id="SSH-001",
+            context_reason="public exposure",
+        )
+        assert "HIGH→CRITICAL" in repr(cas)
+
+    def test_context_aware_severity_repr_unchanged(self):
+        from usaf.severity.engine import ContextAwareSeverity
+        cas = ContextAwareSeverity(
+            original=Severity.MEDIUM,
+            adjusted=Severity.MEDIUM,
+            check_id="TEST-001",
+            context_reason="no adjustment",
+        )
+        assert repr(cas) == "MEDIUM"
+
+    def test_ssh_not_listening_no_adjustment(self):
+        engine = SeverityContextEngine()
+        finding = _make_finding("SSH-001-001", "ssh", Severity.HIGH)
+        result = engine.evaluate(finding, {"sockets": {"connections": []}})
+        assert not result.changed
+
+    def test_ssh_unspecified_address(self):
+        engine = SeverityContextEngine()
+        finding = _make_finding("SSH-001-001", "ssh", Severity.HIGH)
+        collectors = {
+            "sockets": {
+                "connections": [
+                    {"local_port": 22, "local_address": "192.168.1.1", "state": "LISTEN"},
+                ]
+            }
+        }
+        result = engine.evaluate(finding, collectors)
+        assert result.adjusted == Severity.HIGH
+
+    def test_permission_no_path_no_adjustment(self):
+        engine = SeverityContextEngine()
+        finding = _make_finding("PRM-001-001", "perm issue", Severity.HIGH)
+        result = engine.evaluate(finding, {})
+        assert not result.changed
+
+    def test_permission_var_tmp_reduces_to_low(self):
+        engine = SeverityContextEngine()
+        finding = _make_finding_with_path("PRM-002-001", "world-writable", Severity.HIGH, "/var/tmp/foo")
+        result = engine.evaluate(finding, {})
+        assert result.adjusted == Severity.LOW
+
+    def test_permission_bin_reduces_to_medium(self):
+        engine = SeverityContextEngine()
+        finding = _make_finding_with_path("PRM-001-001", "suid binary", Severity.HIGH, "/bin/su")
+        result = engine.evaluate(finding, {})
+        assert result.adjusted == Severity.MEDIUM
+
+    def test_user_missing_in_collectors(self):
+        engine = SeverityContextEngine()
+        finding = _make_finding("USR-002-001", "empty password", Severity.CRITICAL)
+        result = engine.evaluate(finding, {"users": {}})
+        assert not result.changed
+
+    def test_user_non_dict_info(self):
+        engine = SeverityContextEngine()
+        finding = _make_finding("USR-002-001", "empty password", Severity.CRITICAL,
+                                affected_component="nobody")
+        result = engine.evaluate(finding, {"users": {"nobody": "not-a-dict"}})
+        assert not result.changed
+
+    def test_network_no_evidence(self):
+        engine = SeverityContextEngine()
+        finding = _make_finding("NET-001-001", "port check", Severity.MEDIUM)
+        result = engine.evaluate(finding, {})
+        assert not result.changed
+
+    def test_network_non_sensitive_port(self):
+        engine = SeverityContextEngine()
+        finding = _make_finding_with_network("NET-001-001", "port check", Severity.MEDIUM, 8080, "0.0.0.0")
+        result = engine.evaluate(finding, {})
+        assert not result.changed
+
 
 def _make_finding(
     finding_id: str, title: str, severity: Severity,

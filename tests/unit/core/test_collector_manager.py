@@ -92,8 +92,60 @@ class TestCollectorManager:
         assert call_count == 1  # Only collected once
 
 
+    def test_init_with_collectors(self):
+        c = _make_collector("preloaded", {"x": 1})
+        mgr = CollectorManager(collectors=[c])
+        assert mgr.count == 1
+        assert mgr.get_collector("preloaded").name == "preloaded"
+
+    def test_collect_all_none_defaults(self, collector_manager: CollectorManager):
+        c = _make_collector("auto", {"val": 1})
+        collector_manager.add(c)
+        result = collector_manager.collect_all()
+        assert "auto" in result
+
+    def test_collect_single_updates_data(self, collector_manager: CollectorManager):
+        c = _make_collector("s", {"key": "value"})
+        collector_manager.add(c)
+        data = collector_manager.collect_single("s")
+        assert data["key"] == "value"
+        assert collector_manager.get("s") == data
+
+    def test_get_returns_none_for_unknown(self, collector_manager: CollectorManager):
+        assert collector_manager.get("nope") is None
+
+    def test_circular_dependency_raises(self, collector_manager: CollectorManager):
+        class CircA(BaseCollector):
+            name = "circ_a"
+            depends = ["circ_b"]
+            def _do_collect(self):
+                return {}
+
+        class CircB(BaseCollector):
+            name = "circ_b"
+            depends = ["circ_a"]
+            def _do_collect(self):
+                return {}
+
+        collector_manager.add(CircA())
+        collector_manager.add(CircB())
+        with pytest.raises(CollectorError, match="Circular dependency"):
+            collector_manager.collect_all(["circ_a", "circ_b"])
+
+    def test_dependency_on_nonexistent_collector(self, collector_manager: CollectorManager):
+        class BadDep(BaseCollector):
+            name = "bad_dep"
+            depends = ["nonexistent"]
+            def _do_collect(self):
+                return {}
+
+        collector_manager.add(BadDep())
+        # Should just skip the missing dependency
+        result = collector_manager.collect_all(["bad_dep"])
+        assert "bad_dep" in result
+
+
 def _make_collector(col_name: str, data: dict) -> BaseCollector:
-    # Closure-based class creation using helper to avoid Python 3.14 class body scoping issues
     def _create(name_value: str):
         class DynamicCollector(BaseCollector):
             name = name_value

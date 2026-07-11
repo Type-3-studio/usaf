@@ -229,3 +229,35 @@ class TestTrustScorer:
         results = adjust_all_trust(findings)
         assert len(results) == 1
         assert results[0].confidence == Confidence.LOW
+
+    def test_multi_evidence_bonus(self):
+        scorer = TrustScorer()
+        finding = Finding(
+            id="TEST-001", check_id="TEST", category=CheckCategory.GENERAL,
+            severity=Severity.HIGH, risk_score=7.5,
+            title="T", description="d", rationale="r", remediation="f",
+            source="s", confidence=Confidence.HIGH,
+            evidence=FileEvidence(
+                path="/etc/test", permission="0644", owner="root", group="root",
+                size=1024, content="data",
+            ),
+        )
+        confidence, effective = scorer.score(finding)
+        assert confidence == Confidence.HIGH
+        assert effective > 0.8
+
+    def test_effective_to_confidence_medium(self):
+        assert TrustScorer._effective_to_confidence(0.6) == Confidence.MEDIUM
+
+    def test_effective_to_confidence_low(self):
+        assert TrustScorer._effective_to_confidence(0.3) == Confidence.LOW
+
+    def test_compute_quality_unknown_type(self):
+        from usaf.models.evidence import LogEvidence
+        ev = LogEvidence(log_path="/var/log/syslog", lines=[], pattern="fail", match_count=0)
+        bonus = TrustScorer._compute_evidence_quality(ev)
+        assert bonus == 0.08  # LogEvidence
+
+    def test_convenience_adjust_all_empty(self):
+        results = adjust_all_trust([])
+        assert results == []

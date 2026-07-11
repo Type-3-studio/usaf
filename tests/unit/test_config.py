@@ -139,3 +139,24 @@ class TestLoadConfig:
         config_file.write_text("{invalid: yaml: stuff\n  broken")
         with pytest.raises(ConfigurationError):
             load_config(str(config_file))
+
+    def test_raises_on_os_error(self, tmp_path):
+        config_file = tmp_path / "nonexistent_dir" / "config.yaml"
+        with pytest.raises(ConfigurationError, match="Cannot read"):
+            load_config(str(config_file))
+
+    def test_loads_from_yaml_specifying_path(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("usaf.config.loader.find_config_files", lambda: [])
+        config_file = tmp_path / "cfg.yaml"
+        config_file.write_text("general:\n  scan_name: explicit\n")
+        config = load_config(str(config_file))
+        assert config.general.scan_name == "explicit"
+
+
+class TestFindConfigFiles:
+    def test_finds_xdg_config(self, monkeypatch):
+        monkeypatch.setattr(Path, "exists", lambda _: True)
+        monkeypatch.setattr(Path, "home", lambda: Path("/nonexistent"))
+        monkeypatch.setenv("XDG_CONFIG_HOME", "/custom/config")
+        files = find_config_files()
+        assert any("/custom/config/usaf/config.yaml" in str(f) for f in files)

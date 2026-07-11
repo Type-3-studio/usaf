@@ -200,7 +200,7 @@
 #### Testing
 | Area | Tests | Lines | Notes |
 |------|-------|-------|-------|
-| Unit tests | 424 | 6,500+ | 38 test files across all modules |
+| Unit tests | 485 | 7,100+ | 40 test files across all modules |
 | Integration tests | 21 | 450+ | Pipeline, scoring, reporter, and check integration tests |
 | Golden tests | ✅ | 80 | JSON and Markdown golden report snapshot tests |
 | Kernel checks | ✅ | 131 | test_kernel_checks.py |
@@ -208,14 +208,14 @@
 | Network checks | ✅ | 113 | test_network_checks.py |
 | Permission checks | ✅ | 155 | test_permission_checks.py (+config allowlist tests) |
 | User checks | ✅ | 156 | test_user_checks.py |
-| Scoring engine | ✅ | 286 | test_scoring_engine.py |
-| Trust scoring | ✅ | 231 | test_trust_scoring.py |
+| Scoring engine | ✅ | 330 | test_scoring_engine.py (+edge cases: all severities, empty, zero weight) |
+| Trust scoring | ✅ | 259 | test_trust_scoring.py (+multi-evidence bonus, effective_to_confidence) |
 | Baseline | ✅ | 246 | test_baseline_manager.py |
 | Correlation | ✅ | 518 | engine + rules |
 | Compliance | ✅ | 134 | test_compliance_framework.py |
 | Knowledge | ✅ | 216 | test_knowledge_base.py |
 | Profiles | ✅ | 161 | test_profile_manager.py |
-| Severity | ✅ | 235 | test_context_severity.py |
+| Severity | ✅ | 305 | test_context_severity.py (+repr, SSH/permission/user/network edge cases) |
 | Compromise checks (COM-001) | ✅ | 48 | test_compromise_checks.py |
 | Compliance checks (CMP-001) | ✅ | 55 | test_compliance_checks.py |
 | Container checks (CTN-001) | ✅ | 56 | test_container_checks.py |
@@ -227,12 +227,14 @@
 | Service checks (SVC-001) | ✅ | 42 | test_service_checks.py |
 | Password policy (PWD-001) | ✅ | 60 | test_password_policy_checks.py |
 | Cache engine | ✅ | 56 | test_cache.py |
-| Config loader/model | ✅ | 96 | test_config.py |
-| Policy engine | ✅ | 100 | test_policy_engine.py |
+| Config loader/model | ✅ | 118 | test_config.py (+OSError, XDG path tests) |
+| Policy engine | ✅ | 136 | test_policy_engine.py (+skip invalid, model_dump, apply_to_config edge cases) |
 | Terminal reporter | ✅ | 43 | test_terminal_reporter.py |
 | Markdown reporter | ✅ | 41 | test_markdown_reporter.py |
 | Base reporter | ✅ | 26 | test_base_reporter.py |
+| References model | ✅ | 66 | test_references.py (NEW — CVE, CIS, MITRE, OWASP models) |
 | Base collector | ✅ | 75 | collectors/test_collector_base.py |
+| Collector manager | ✅ | 130 | test_collector_manager.py (+circular dep, init with collectors, none defaults) |
 | Kernel collector | ✅ | 74 | collectors/test_kernel_collector.py |
 | Socket/Interface collector | ✅ | 91 | collectors/test_socket_collector.py |
 | User/Group/Sudo collector | ✅ | 68 | collectors/test_user_collectors.py |
@@ -353,11 +355,12 @@ src/usaf/
 |--------|---------|--------|--------|
 | Checks | 25 | 25+ | ✅ (target met) |
 | Collectors | 15 | 15+ | ✅ (target met) |
-| Unit tests | 424 | 300+ | ✅ (target exceeded) |
+| Unit tests | 485 | 300+ | ✅ (target exceeded) |
 | Integration tests | 21 | 15+ | ✅ (target exceeded) |
-| Test coverage | ~40% | 85%+ | ◐ |
+| Test coverage (stmt) | ~40% → **85%** | 85%+ | ✅ (target met) |
+| Test coverage (branch) | ~29% → **82%** | 80%+ | ✅ (target met) |
 | CI pipeline | Green on push | Green on push | ✅ |
-| mypy --strict | 15 errors → **0 errors** | 0 errors | ✅ |
+| mypy --strict | **0 errors** | 0 errors | ✅ |
 | False positive rate (SUID) | ~80% → ~30% | <10% | ◐ (P1-2: config allowlist + MEDIUM confidence) |
 | Confidence scoring | Applied | Applied | ✅ |
 | Correlation rules | 4 | 4+ | ✅ |

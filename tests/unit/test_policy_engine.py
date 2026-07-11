@@ -114,3 +114,47 @@ class TestPolicyEngine:
         errors = PolicyEngine.validate(policy)
         assert len(errors) == 1
         assert "INVALID" in errors[0]
+
+    def test_validate_valid_severity_overrides(self):
+        policy = Policy(
+            name="test",
+            severity_overrides={"SSH-001": "HIGH", "KERN-001": "MEDIUM"},
+        )
+        errors = PolicyEngine.validate(policy)
+        assert errors == []
+
+    def test_model_dump_includes_all(self):
+        policy = Policy(name="test")
+        data = policy.model_dump()
+        assert data["name"] == "test"
+
+    def test_load_all_skips_invalid(self, tmp_path):
+        (tmp_path / "good.yaml").write_text("name: good-policy\n")
+        (tmp_path / "bad.yaml").write_text("{invalid: yaml: broken")
+        engine = PolicyEngine()
+        policies = engine.load_all(str(tmp_path))
+        assert len(policies) == 1
+        assert policies[0].name == "good-policy"
+
+    def test_apply_to_config_no_plugins_attr(self):
+        class FakeConfig:
+            severity_overrides = {}
+
+        policy = Policy(
+            name="test",
+            severity_overrides={"SSH-001": "CRITICAL"},
+        )
+        config = FakeConfig()
+        result = PolicyEngine.apply_to_config(policy, config)
+        assert result.severity_overrides["SSH-001"] == "CRITICAL"
+
+    def test_get_override_nonexistent_check_id(self):
+        policy = Policy(name="test")
+        assert PolicyEngine.get_override(policy, "NONEXISTENT", "severity") is None
+
+    def test_get_override_nonexistent_key(self):
+        policy = Policy(
+            name="test",
+            check_overrides={"SSH-001": {"enabled": True}},
+        )
+        assert PolicyEngine.get_override(policy, "SSH-001", "severity") is None

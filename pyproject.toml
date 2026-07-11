@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "usaf"
-version = "0.4.0"
+version = "0.5.0"
 description = "Ubuntu Security Audit Framework - Production-grade security auditing for Ubuntu Linux"
 readme = "README.md"
 requires-python = ">=3.13"

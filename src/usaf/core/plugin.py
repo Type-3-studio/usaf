@@ -43,6 +43,29 @@ class AuditCheck(AuditCheckInterface):
         )
         try:
             findings = self._run_check(collectors)
+            max_f = getattr(self, "max_findings", 0)
+            if 0 < max_f < len(findings):
+                truncated = len(findings) - max_f
+                findings = findings[:max_f]
+                findings.append(
+                    self.finding(
+                        finding_id="MAX",
+                        title=f"Check exceeded max findings limit ({max_f} of {max_f + truncated} shown)",
+                        description=(
+                            f"This check generated {max_f + truncated} findings, which exceeds "
+                            f"the configured limit of {max_f}. Only the first {max_f} are shown. "
+                            "Configure exclusions or increase max_findings to see all findings."
+                        ),
+                        rationale="Excessive findings can overwhelm reports and hide critical issues.",
+                        remediation=(
+                            "Add path-based exclusions or increase max_findings "
+                            "in the check configuration."
+                        ),
+                        confidence=Confidence.HIGH,
+                        false_positive_probability=0.0,
+                        tags=["truncated"],
+                    )
+                )
             result.findings = findings
             result.passed = len(findings) == 0
         except Exception as e:

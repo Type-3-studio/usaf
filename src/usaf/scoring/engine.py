@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 from usaf.core.interfaces import ScoringEngineInterface
 from usaf.models.finding import Finding
 from usaf.models.result import ScanResult
@@ -17,6 +19,7 @@ class ScoringEngine(ScoringEngineInterface):
       - Score is driven by severity, confidence, false-positive probability,
         evidence quality, and finding count
       - Trust scoring (P3-3) adjusts confidence based on evidence quality
+      - Scoring is MONOTONIC: adding more findings never improves the score
     """
 
     # Severity weights: critical findings penalise more per-unit than low
@@ -119,11 +122,12 @@ class ScoringEngine(ScoringEngineInterface):
 
             max_sev = max(f.severity for f in cat_findings) if cat_findings else None
 
-            # Normalize: cap at 10.0, penalise proportionally to finding count
+            # Monotonic scoring: each finding adds to total_penalty.
+            # The log-density factor prevents unbounded growth from thousands
+            # of noise findings, but the score NEVER decreases with more findings.
             total_findings = len(cat_findings)
-            normalized = min(
-                10.0, total_penalty / max(1, total_findings) * (1.0 + total_findings * 0.1)
-            )
+            density_factor = 1.0 + 0.05 * math.log2(1.0 + total_findings)
+            normalized = min(10.0, total_penalty * density_factor)
             score = min(10.0, max(0.0, normalized))
 
             weight = self.CATEGORY_WEIGHTS.get(category, 1.0)

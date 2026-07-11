@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from usaf.collectors.packages.apt import get_package_for_file
+from usaf.collectors.packages.resolver import resolve_package
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
 from usaf.models.evidence import CommandEvidence, FileEvidence, ProcessEvidence, RegistryEvidence
@@ -45,8 +46,7 @@ class UnexpectedFilesInEtcCheck(AuditCheck):
         "init.d", "rc0.d", "rc1.d", "rc2.d", "rc3.d",
         "rc4.d", "rc5.d", "rc6.d", "rcS.d",
         "init", "inittab",
-        "sysconfig", "default",
-        "NetworkManager", "network",
+        "sysconfig", "NetworkManager", "network",
         "logrotate.d", "logrotate.conf",
         "rsyslog.conf", "rsyslog.d",
         "ufw", "ufw.conf",
@@ -101,7 +101,6 @@ class UnexpectedFilesInEtcCheck(AuditCheck):
         "vtrgb",
         "wbem",
         "wodim.conf",
-        "xdg",
     }
 
     def _run_check(self, collectors: dict[str, Any]) -> list:
@@ -225,6 +224,22 @@ class HiddenFilesInWorldWritableCheck(AuditCheck):
     description = "Identifies hidden files (dot-files) in world-writable locations"
     depends = ["filesystem"]
     tags = ["filesystem", "hidden", "world-writable"]
+    max_findings = 200
+
+    _KNOWN_SAFE_HIDDEN_NAMES: set[str] = {
+        ".X11-unix", ".XIM-unix", ".font-unix", ".ICE-unix",
+    }
+    _KNOWN_SAFE_HIDDEN_PREFIXES: tuple[str, ...] = (
+        ".X", ".tmp", ".com.google.Chrome", ".org.chromium",
+        ".com.canonical.", ".dde-workspace",
+    )
+
+    def _is_safe_hidden(self, name: str) -> bool:
+        if name in self._KNOWN_SAFE_HIDDEN_NAMES:
+            return True
+        if name.startswith(self._KNOWN_SAFE_HIDDEN_PREFIXES):
+            return True
+        return False
 
     def _run_check(self, collectors: dict[str, Any]) -> list:
         findings: list = []
@@ -236,6 +251,9 @@ class HiddenFilesInWorldWritableCheck(AuditCheck):
             name = Path(path).name
 
             if not name.startswith("."):
+                continue
+            if self._is_safe_hidden(name):
+
                 continue
 
             findings.append(
@@ -343,6 +361,18 @@ class UnexpectedSymlinksInEtcCheck(AuditCheck):
     depends = ["filesystem"]
     tags = ["filesystem", "etc", "symlinks"]
 
+    _KNOWN_SAFE_SYMLINKS: set[str] = {
+        "localtime",
+        "mtab",
+        "os-release",
+        "resolv.conf",
+        "printcap",
+        "rmt",
+        "vtrgb",
+        "vconsole.conf",
+        "kernel-img.conf",
+    }
+
     def _run_check(self, collectors: dict[str, Any]) -> list:
         findings: list = []
         fs_data = self._get_data(collectors, "filesystem")
@@ -355,6 +385,9 @@ class UnexpectedSymlinksInEtcCheck(AuditCheck):
 
             path = entry.get("path", "")
             name = entry.get("name", "")
+
+            if name in self._KNOWN_SAFE_SYMLINKS:
+                continue
 
             findings.append(
                 self.finding(
@@ -594,6 +627,7 @@ class WorldWritableDirectoriesCheck(AuditCheck):
     description = "Identifies world-writable directories outside expected locations"
     depends = ["filesystem"]
     tags = ["filesystem", "permissions", "world-writable"]
+    max_findings = 200
 
     KNOWN_WW_EXCEPTIONS: set[str] = {
         "/tmp",
@@ -602,6 +636,13 @@ class WorldWritableDirectoriesCheck(AuditCheck):
         "/run/lock",
         "/var/run/lock",
     }
+
+    _WW_IGNORED_PREFIXES: tuple[str, ...] = (
+        "/proc/",
+        "/sys/",
+        "/run/",
+        "/var/run/",
+    )
 
     def _run_check(self, collectors: dict[str, Any]) -> list:
         findings: list = []
@@ -615,6 +656,8 @@ class WorldWritableDirectoriesCheck(AuditCheck):
             path = entry.get("path", "")
 
             if path in self.KNOWN_WW_EXCEPTIONS:
+                continue
+            if path.startswith(self._WW_IGNORED_PREFIXES):
                 continue
 
             findings.append(
@@ -663,6 +706,35 @@ class OrphanedFilesCheck(AuditCheck):
     description = "Identifies files on the system not owned by any installed package"
     depends = ["filesystem", "apt"]
     tags = ["filesystem", "orphaned", "file-integrity"]
+    max_findings = 500
+
+    _IGNORED_PREFIXES = (
+        "/var/lib/flatpak/",
+        "/var/lib/snapd/",
+        "/snap/",
+        "/var/log/",
+        "/var/cache/",
+        "/var/tmp/",
+        "/tmp/",
+        "/var/lib/containers/",
+        "/var/lib/docker/",
+        "/var/lib/lxd/",
+        "/var/lib/machines/",
+        "/var/spool/",
+        "/var/backups/",
+        "/var/mail/",
+        "/var/crash/",
+        "/var/metrics/",
+        "/var/lib/postgresql/",
+        "/var/lib/mysql/",
+        "/var/lib/mongodb/",
+        "/var/lib/redis/",
+        "/var/lib/rabbitmq/",
+        "/var/www/",
+        "/var/games/",
+        "/var/opt/",
+        "/var/lib/snapd/",
+    )
 
     def _run_check(self, collectors: dict[str, Any]) -> list:
         findings: list = []
@@ -678,16 +750,16 @@ class OrphanedFilesCheck(AuditCheck):
         for e in fs_data.get("path_executables", []):
             file_entries.append(e)
 
-        for e in fs_data.get("world_writable", []):
-            file_entries.append(e)
-
         for entry in file_entries:
             path = entry.get("path", "")
             if not path or path in seen_paths:
                 continue
             seen_paths.add(path)
 
-            owning_package = get_package_for_file(path)
+            if path.startswith(self._IGNORED_PREFIXES):
+                continue
+
+            owning_package = resolve_package(path)
             if owning_package is not None:
                 continue
 
@@ -836,9 +908,9 @@ class MountOptionGapsCheck(AuditCheck):
                             f"security options: {opt_list}. Current options: {options_str}"
                         ),
                         rationale=(
-                            f"Writable filesystems should use noexec (prevent binary execution), "
-                            f"nosuid (block SUID binaries), and nodev (block device nodes) "
-                            f"where applicable to limit attack surface."
+                            "Writable filesystems should use noexec (prevent binary execution), "
+                            "nosuid (block SUID binaries), and nodev (block device nodes) "
+                            "where applicable to limit attack surface."
                         ),
                         remediation=(
                             f"Add missing options in /etc/fstab for '{device} {mount_point}': "

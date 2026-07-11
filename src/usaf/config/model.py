@@ -15,6 +15,7 @@ class PluginOverride(BaseModel):
     severity: str | None = None
     enabled: bool | None = None
     timeout: int | None = None
+    max_findings: int | None = None
 
 
 class PluginConfig(BaseModel):
@@ -80,6 +81,8 @@ class USAFConfig(BaseModel):
     plugins: PluginConfig = Field(default_factory=PluginConfig)
     severity: SeverityConfig = Field(default_factory=SeverityConfig)
     ignore: list[str] = Field(default_factory=list)
+    ignore_paths: list[str] = Field(default_factory=list,
+        description="Glob patterns for paths to ignore (e.g., /var/log/**)")
     baseline: BaselineConfig = Field(default_factory=BaselineConfig)
     reporting: ReportingConfig = Field(default_factory=ReportingConfig)
     policies: list[PolicyConfig] = Field(default_factory=list)

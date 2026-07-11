@@ -21,8 +21,8 @@ SKIP_LINUX = pytest.mark.skipif(
 class TestScanPipeline:
     """Integration tests for the full scan pipeline."""
 
-    EXPECTED_COLLECTOR_COUNT = 22
-    EXPECTED_CHECK_COUNT = 89
+    EXPECTED_COLLECTOR_COUNT = 24
+    EXPECTED_CHECK_COUNT = 91
 
     def test_collector_discovery_registers_all(self):
         collector_registry.discover()
@@ -38,6 +38,7 @@ class TestScanPipeline:
             "dns",
             "filesystem",
             "firewall",
+            "flatpak",
             "groups",
             "interfaces",
             "journald",
@@ -46,6 +47,7 @@ class TestScanPipeline:
             "mounts",
             "pam",
             "processes",
+            "snap",
             "sockets",
             "ssh_config",
             "sudo",
@@ -117,8 +119,10 @@ class TestScanPipeline:
             "PKG-101",
             "PKG-201",
             "PKG-202",
+            "PKG-210",
             "PKG-301",
             "PKG-302",
+            "PKG-310",
             "PKG-401",
             "PKG-402",
             "PRM-101",

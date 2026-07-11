@@ -99,9 +99,8 @@ class SSHBruteForceSurface(CorrelationRule):
             return False
         if isinstance(ev, NetworkEvidence) and ev.local_port == 22:
             return True
-        if isinstance(ev, NetworkEvidence) and ev.local_port == 22:
-            return True
-        if hasattr(ev, "local_port") and getattr(ev, "local_port", None) == 22:
+        local_port = getattr(ev, "local_port", None)
+        if local_port == 22:
             return True
         return False
 
@@ -593,10 +592,10 @@ class SupplyChainAttack(CorrelationRule):
         broken_sigs = [f for f in findings if f.check_id == "PKG-202"]
         modified_files = [f for f in findings if f.check_id == "PKG-201"]
 
-        if not unknown_repos:
+        total_indicators = len(unknown_repos) + len(broken_sigs) + len(modified_files)
+        if total_indicators < 2:
             return []
-
-        if len(unknown_repos) + len(broken_sigs) + len(modified_files) < 2:
+        if not unknown_repos and len(broken_sigs) + len(modified_files) < 2:
             return []
 
         details: list[str] = []
@@ -794,8 +793,11 @@ class RogueServiceDeployment(CorrelationRule):
         unexpected_enabled = [f for f in findings if f.check_id == "SVC-102"]
         unexpected_listening = [f for f in findings if f.check_id == "SVC-302"]
 
-        if not unknown_binary_svcs and not unexpected_enabled:
+        indicator_count = len(unknown_binary_svcs) + len(unexpected_enabled) + len(unexpected_listening)
+        if indicator_count < 2:
             return []
+
+        sev = Severity.CRITICAL if indicator_count >= 3 else Severity.HIGH
 
         details: list[str] = []
         if unknown_binary_svcs:
@@ -835,7 +837,7 @@ class RogueServiceDeployment(CorrelationRule):
                     "5. Audit for other persistence mechanisms: cron, ssh keys, timers"
                 ),
                 source_findings=source_findings,
-                severity=Severity.CRITICAL,
+                severity=sev,
                 tags=["rogue-service", "backdoor", "persistence", "compromise"],
                 mitre_attack_ids=["T1543", "T1543.002", "T1505", "T1505.001"],
             )
@@ -862,8 +864,15 @@ class FileIntegrityBreach(CorrelationRule):
         deleted_bins = [f for f in findings if f.check_id == "FS-202"]
         unexpected_etc = [f for f in findings if f.check_id == "FS-101"]
 
-        combined_count = len(orphaned) + len(symlinks) + len(modified_units) + len(deleted_bins) + len(unexpected_etc)
-        if combined_count < 2:
+        # Require at least 2 DIFFERENT check types to avoid a single
+        # noisy check (e.g. FS-403 with 4000+ findings) always firing
+        categories = set()
+        if orphaned: categories.add("FS-403")
+        if symlinks: categories.add("FS-301")
+        if modified_units: categories.add("SVC-402")
+        if deleted_bins: categories.add("FS-202")
+        if unexpected_etc: categories.add("FS-101")
+        if len(categories) < 2:
             return []
 
         details: list[str] = []

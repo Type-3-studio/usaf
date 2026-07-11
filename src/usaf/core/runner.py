@@ -72,6 +72,14 @@ class ScanRunner:
 
         self._setup_collectors()
 
+    @staticmethod
+    def _get_check_category(check_id: str) -> CheckCategory:
+        try:
+            cls = registry.get_class(check_id)
+            return cls.category
+        except Exception:
+            return CheckCategory.GENERAL
+
     def _build_correlation_engine(self) -> CorrelationEngine:
         """Build the correlation engine with all registered rules."""
         engine = CorrelationEngine()
@@ -152,9 +160,15 @@ class ScanRunner:
         # Phase 3: Execute checks (parallel if config.general.parallel)
         results: list[CheckResult] = []
         if self.config.general.parallel and len(execution_order) > 1:
+            def _apply_overrides(instance: Any) -> None:
+                override = self.config.plugins.overrides.get(instance.id)
+                if override and override.max_findings is not None:
+                    setattr(instance, "max_findings", override.max_findings)
+
             def _run_check(check_id: str) -> CheckResult:
                 try:
                     instance = registry.get_instance(check_id)
+                    _apply_overrides(instance)
                     result = instance.evaluate(collectors_data)
                     result = self._apply_ignore_list(result)
                     return result
@@ -162,7 +176,7 @@ class ScanRunner:
                     return CheckResult(
                         check_id=check_id,
                         name=check_id,
-                        category=CheckCategory.GENERAL,
+                        category=self._get_check_category(check_id),
                         passed=False,
                         error=str(e),
                         execution_time_ms=0.0,
@@ -171,7 +185,7 @@ class ScanRunner:
                     return CheckResult(
                         check_id=check_id,
                         name=check_id,
-                        category=CheckCategory.GENERAL,
+                        category=self._get_check_category(check_id),
                         passed=False,
                         error=f"{type(e).__name__}: {e}",
                         execution_time_ms=0.0,
@@ -195,7 +209,7 @@ class ScanRunner:
                             CheckResult(
                                 check_id=cid,
                                 name=cid,
-                                category=CheckCategory.GENERAL,
+                                category=self._get_check_category(cid),
                                 passed=False,
                                 error=f"ExecutorError: {e}",
                                 execution_time_ms=0.0,
@@ -205,6 +219,9 @@ class ScanRunner:
             for check_id in execution_order:
                 try:
                     instance = registry.get_instance(check_id)
+                    override = self.config.plugins.overrides.get(instance.id)
+                    if override and override.max_findings is not None:
+                        setattr(instance, "max_findings", override.max_findings)
                     if verbose:
                         print(f"  -> Running {check_id}: {instance.name}...")
                     result = instance.evaluate(collectors_data)
@@ -215,7 +232,7 @@ class ScanRunner:
                         CheckResult(
                             check_id=check_id,
                             name=check_id,
-                            category=CheckCategory.GENERAL,
+                            category=self._get_check_category(check_id),
                             passed=False,
                             error=str(e),
                             execution_time_ms=0.0,
@@ -226,7 +243,7 @@ class ScanRunner:
                         CheckResult(
                             check_id=check_id,
                             name=check_id,
-                            category=CheckCategory.GENERAL,
+                            category=self._get_check_category(check_id),
                             passed=False,
                             error=f"{type(e).__name__}: {e}",
                             execution_time_ms=0.0,
@@ -321,18 +338,25 @@ class ScanRunner:
         return result
 
     def _apply_ignore_list(self, result: CheckResult) -> CheckResult:
-        """Remove findings matching ignore patterns."""
-        ignore_patterns = self.config.ignore
-        if not ignore_patterns:
-            return result
-
+        """Remove findings matching ignore patterns (by ID or path)."""
         import fnmatch
 
-        result.findings = [
-            f
-            for f in result.findings
-            if not any(fnmatch.fnmatch(f.id, pattern) for pattern in ignore_patterns)
-        ]
+        ignore_patterns = self.config.ignore
+        ignore_paths = self.config.ignore_paths
+
+        if not ignore_patterns and not ignore_paths:
+            return result
+
+        def _is_ignored(finding: Any) -> bool:
+            if ignore_patterns and any(fnmatch.fnmatch(finding.id, p) for p in ignore_patterns):
+                return True
+            if ignore_paths and finding.affected_component:
+                for pat in ignore_paths:
+                    if fnmatch.fnmatch(finding.affected_component, pat):
+                        return True
+            return False
+
+        result.findings = [f for f in result.findings if not _is_ignored(f)]
         result.passed = len(result.findings) == 0
         return result
 

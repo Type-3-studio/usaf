@@ -55,7 +55,7 @@
 
 ### Detailed Status
 
-#### Collectors (22 total)
+#### Collectors (24 total)
 | Collector | Status | Notes |
 |-----------|--------|-------|
 | `KernelCollector` | ✅ | `/proc/sys`, sysctl, uname |
@@ -80,8 +80,10 @@
 | `JournaldCollector` | ✅ | journald config, log usage, persistence (P0) |
 | `FilesystemCollector` | ✅ | SUID, world-writable, capabilities, hidden files (P0) |
 | `CertStoreCollector` | ✅ | System CA bundles, certificate inventory (P0) |
+| `FlatpakCollector` | ✅ | Flatpak app/runtime inventory, file→package resolution |
+| `SnapCollector` | ✅ | Snap package inventory, file→package resolution |
 
-#### Checks (89 total)
+#### Checks (91 total)
 | Check | Status | Severity | Evidence |
 |-------|--------|----------|----------|
 | KERN-101 (ASLR) | ✅ | HIGH | RegistryEvidence |
@@ -110,7 +112,9 @@
 | PKG-101 (Unnecessary Pkgs) | ✅ | MEDIUM | PackageEvidence |
 | PKG-201 (Modified Files) | ✅ | MEDIUM | CommandEvidence |
 | PKG-202 (Broken Signatures) | ✅ | HIGH | RegistryEvidence / CommandEvidence |
+| PKG-210 (Flatpak Integrity) | ✅ | MEDIUM | RegistryEvidence |
 | PKG-301 (Unknown Repos) | ✅ | MEDIUM | RegistryEvidence |
+| PKG-310 (Snap Integrity) | ✅ | MEDIUM | RegistryEvidence |
 | PKG-302 (Expired Keys) | ✅ | MEDIUM | RegistryEvidence |
 | PKG-401 (Known CVEs) | ✅ | HIGH | PackageEvidence |
 | PKG-402 (Pending Updates) | ✅ | HIGH | PackageEvidence |
@@ -329,7 +333,7 @@
 | `mypy` config | ✅ | strict mode |
 | Pre-commit hooks | ✅ | ruff, mypy (0 errors ✅), trailing whitespace, YAML/TOML check |
 | CI/CD | ✅ | GitHub Actions: ruff lint+format, mypy (0 errors ✅), pytest on push/PR |
-| Versioning | ✅ | 0.4.0 — semver |
+| Versioning | ✅ | 0.5.0 — semver |
 
 ---
 
@@ -691,7 +695,7 @@ The goal is **~500 checks** organized into **20+ categories**, with a **correlat
 | Kernel | 4 | 4 | 4 | 4 | 4 | 25 |
 | Users | 9 | 9 | 9 | 9 | 9 | 20 |
 | Network | 7 | 7 | 7 | 7 | 7 | 35 |
-| Packages | 7 | 7 | 7 | 7 | 7 | 25 |
+| Packages | 9 | 9 | 9 | 9 | 9 | 25 |
 | Filesystem | 10 | 10 | 10 | 10 | 10 | 30 |
 | Permissions | 2 | 2 | 2 | 2 | 2 | 25 |
 | Boot | 5 | 5 | 5 | 5 | 5 | 15 |
@@ -706,7 +710,7 @@ The goal is **~500 checks** organized into **20+ categories**, with a **correlat
 | Security (AppArmor/USB) | 2 | 2 | 2 | 2 | 2 | 10 |
 | Compromise | 1 | 1 | 1 | 1 | 1 | 15 |
 | Password | 1 | 1 | 1 | 1 | 1 | 10 |
-| **Total checks** | **89** | **117** | **133** | **133** | **133** | **~450** |
+| **Total checks** | **91** | **119** | **135** | **135** | **135** | **~450** |
 | **Correlation rules** | 12 | 17 | 21 | 24 | 24 | **50+** |
 
 ---
@@ -799,15 +803,14 @@ src/usaf/
 
 | Metric | Current | Short-term (P3) | Medium-term (P4) | Long-term (P6) |
 |--------|---------|-----------------|-------------------|-----------------|
-| Checks | 89 | 117 | 133 | 133 → **450+** |
-| Collectors | 22 | 24 | 28 | 30 |
+| Checks | 91 | 119 | 135 | 135 → **450+** |
+| Collectors | 24 | 24 | 28 | 30 |
 | Correlation rules | 12 | 17 | 21 | 24 → **50+** |
-| Unit tests | 616 | 1,500+ | 2,000+ | 3,000+ |
-| Integration tests | 93 | 150+ | 300+ | 500+ |
+| Unit tests | 900+ | 1,500+ | 2,000+ | 3,000+ |
+| Integration tests | 93+ | 150+ | 300+ | 500+ |
 | Test coverage (stmt) | 85% | 88% | 90% | 92%+ |
 | Test coverage (branch) | 82% | 85% | 88% | 90%+ |
 | mypy --strict | 0 errors | 0 errors | 0 errors | 0 errors |
-| Unit tests | 900 | 1,500+ | 2,000+ | 3,000+ |
 | False positive rate | ~2% | <3% | <3% | <2% |
 | Attack scenario coverage | 5 | 10 | 15 | 20+ |
 | Correlation engine maturity | Chained | Temporal | Temporal | Full kill chain |

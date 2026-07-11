@@ -549,7 +549,7 @@ class TestOrphanedFilesCheck:
             },
         }
         with patch(
-            "usaf.checks.filesystem.checks.get_package_for_file",
+            "usaf.checks.filesystem.checks.resolve_package",
             return_value="base-files",
         ):
             result = check.evaluate(collectors)
@@ -570,7 +570,7 @@ class TestOrphanedFilesCheck:
             },
         }
         with patch(
-            "usaf.checks.filesystem.checks.get_package_for_file",
+            "usaf.checks.filesystem.checks.resolve_package",
             return_value=None,
         ):
             result = check.evaluate(collectors)
@@ -600,7 +600,7 @@ class TestOrphanedFilesCheck:
             },
         }
         with patch(
-            "usaf.checks.filesystem.checks.get_package_for_file",
+            "usaf.checks.filesystem.checks.resolve_package",
             return_value=None,
         ):
             result = check.evaluate(collectors)
@@ -625,12 +625,13 @@ class TestOrphanedFilesCheck:
             },
         }
         with patch(
-            "usaf.checks.filesystem.checks.get_package_for_file",
+            "usaf.checks.filesystem.checks.resolve_package",
             return_value=None,
         ):
             result = check.evaluate(collectors)
         assert not result.passed
-        assert len(result.findings) == 3
+        # world_writable no longer checked by FS-403 (too noisy)
+        assert len(result.findings) == 2
 
     def test_passes_with_empty_data(self):
         check = OrphanedFilesCheck()

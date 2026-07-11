@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import logging
 import pkgutil
 
 from usaf.core.exceptions import (
@@ -9,6 +10,8 @@ from usaf.core.exceptions import (
     PluginRegistrationError,
 )
 from usaf.core.plugin import AuditCheck
+
+logger = logging.getLogger("usaf.registry")
 
 
 class PluginRegistry:
@@ -153,8 +156,10 @@ def discover_checks(package: str = "usaf.checks") -> None:
     for _info in pkgutil.walk_packages(pkg.__path__, prefix=package + ".", onerror=lambda _: None):
         try:
             importlib.import_module(_info.name)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(
+                "Failed to import check module '%s': %s", _info.name, e, exc_info=True
+            )
 
 
 __all__ = ["PluginRegistry", "discover_checks", "register_check", "registry"]

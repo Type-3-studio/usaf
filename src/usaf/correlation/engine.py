@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -7,6 +8,8 @@ from pydantic import Field
 
 from usaf.models.finding import Finding
 from usaf.models.severity import Severity
+
+logger = logging.getLogger("usaf.correlation")
 
 
 class CorrelatedFinding(Finding):
@@ -124,8 +127,10 @@ class CorrelationEngine:
                 result = rule.evaluate(combined)
                 correlated.extend(result)
                 combined.extend(result)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning(
+                    "Correlation rule '%s' failed: %s", rule_id, e, exc_info=True
+                )
 
         return correlated
 

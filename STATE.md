@@ -223,7 +223,7 @@
 ### P4: Scale & Distribution
 | Feature | Priority | Notes |
 |---------|----------|-------|
-| Parallel execution | MEDIUM | Config has `parallel=True` but no impl. Use ThreadPoolExecutor. |
+| Parallel execution | ✅ | `ThreadPoolExecutor` with `max_workers` from config |
 | Plugin isolation | LOW | No sandbox for 3rd-party plugins |
 | Remote / Fleet scanning | LOW | SSH transport for remote collectors |
 | Agent mode / MQ | LOW | Periodic publishing to NATS/MQTT |
@@ -250,12 +250,12 @@
 
 | ID | Description | Severity | Status |
 |----|-------------|----------|--------|
-| TD-001 | `metadata.configuration_file` set to `scan_name` instead of config path | LOW | Open |
-| TD-002 | `metadata.end_time` set to `scan_start_dt` instead of actual end time | LOW | Open |
+| TD-001 | `metadata.configuration_file` set to `scan_name` instead of config path | LOW | ✅ |
+| TD-002 | `metadata.end_time` set to `scan_start_dt` instead of actual end time | LOW | ✅ |
 | TD-003 | No integration tests (5 added, more needed) | MEDIUM | ◐ |
 | TD-004 | ~~Scoring ignores confidence~~ → **Fixed** (P1-1 + P3-3) | HIGH | ✅ |
 | TD-005 | Collectors hardcoded in runner → **Fixed** (auto-discovered) | MEDIUM | ✅ |
-| TD-006 | No parallel execution despite `parallel=True` in config | LOW | Open |
+| TD-006 | No parallel execution despite `parallel=True` in config | LOW | ✅ |
 | TD-007 | `mypy --strict` likely fails — never run in CI | MEDIUM | Open |
 
 ---

@@ -290,6 +290,30 @@ The framework is designed for these future additions without core changes:
 - **Plugin marketplace**: Community check repository
 - **Real-time monitoring**: Inotify/fanotify collectors
 
+## STATE.md — Mandatory Update Rule
+
+**Every agent that modifies the codebase MUST update STATE.md to match reality.**
+
+STATE.md (`STATE.md`) is the single source of truth for project status. It tracks:
+- What's implemented vs. stubbed vs. not started
+- Check/collector/module counts
+- Technical debt status
+- Test coverage status
+- Version number
+
+### When to update STATE.md:
+1. **A new check/collector/module is added** — update the count and status table
+2. **A feature is completed** — move from ◐/🔴 to ✅
+3. **Technical debt is resolved** — update TD log
+4. **The version changes** — update the version field
+5. **Any claim in the document becomes false** — fix it immediately
+
+### How to update:
+- Read STATE.md first before making changes
+- After implementing, update the relevant sections
+- If unsure about a status, verify against the actual code (don't guess)
+- Commit STATE.md changes alongside the code changes
+
 ## Need Help?
 
 - Check existing checks in `src/usaf/checks/` for patterns

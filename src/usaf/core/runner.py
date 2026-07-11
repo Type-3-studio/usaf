@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import concurrent.futures
 import platform
 import sys
 import time
@@ -46,6 +47,7 @@ class ScanRunner:
     """
 
     def __init__(self, config_path: str | None = None) -> None:
+        self.config_path = config_path
         self.config = load_config(config_path)
         self.collector_manager = CollectorManager()
         self.scoring_engine = ScoringEngine()
@@ -92,7 +94,7 @@ class ScanRunner:
             kernel_info=platform.release(),
             usaf_version=about.__version__,
             python_version=sys.version,
-            configuration_file=self.config.general.scan_name,
+            configuration_file=self.config_path or str(self.config.general.scan_name),
         )
 
         if verbose:
@@ -123,19 +125,17 @@ class ScanRunner:
         metadata.total_checks = len(all_check_ids)
         metadata.enabled_checks = len(enabled_ids)
 
-        # Phase 3: Execute checks (sequential; parallel in future)
+        # Phase 3: Execute checks (parallel if config.general.parallel)
         results: list[CheckResult] = []
-        for check_id in execution_order:
-            try:
-                instance = registry.get_instance(check_id)
-                if verbose:
-                    print(f"  -> Running {check_id}: {instance.name}...")
-                result = instance.evaluate(collectors_data)
-                result = self._apply_ignore_list(result)
-                results.append(result)
-            except PluginDependencyError as e:
-                results.append(
-                    CheckResult(
+        if self.config.general.parallel and len(execution_order) > 1:
+            def _run_check(check_id: str) -> CheckResult:
+                try:
+                    instance = registry.get_instance(check_id)
+                    result = instance.evaluate(collectors_data)
+                    result = self._apply_ignore_list(result)
+                    return result
+                except PluginDependencyError as e:
+                    return CheckResult(
                         check_id=check_id,
                         name=check_id,
                         category="GENERAL",
@@ -143,10 +143,8 @@ class ScanRunner:
                         error=str(e),
                         execution_time_ms=0.0,
                     )
-                )
-            except Exception as e:
-                results.append(
-                    CheckResult(
+                except Exception as e:
+                    return CheckResult(
                         check_id=check_id,
                         name=check_id,
                         category="GENERAL",
@@ -154,7 +152,62 @@ class ScanRunner:
                         error=f"{type(e).__name__}: {e}",
                         execution_time_ms=0.0,
                     )
-                )
+
+            if verbose:
+                print(f"  -> Running {len(execution_order)} checks in parallel ({self.config.general.max_workers} workers)")
+            with concurrent.futures.ThreadPoolExecutor(
+                max_workers=self.config.general.max_workers
+            ) as executor:
+                future_map = {
+                    executor.submit(_run_check, cid): cid for cid in execution_order
+                }
+                for future in concurrent.futures.as_completed(future_map):
+                    cid = future_map[future]
+                    try:
+                        result = future.result()
+                        results.append(result)
+                    except Exception as e:
+                        results.append(
+                            CheckResult(
+                                check_id=cid,
+                                name=cid,
+                                category="GENERAL",
+                                passed=False,
+                                error=f"ExecutorError: {e}",
+                                execution_time_ms=0.0,
+                            )
+                        )
+        else:
+            for check_id in execution_order:
+                try:
+                    instance = registry.get_instance(check_id)
+                    if verbose:
+                        print(f"  -> Running {check_id}: {instance.name}...")
+                    result = instance.evaluate(collectors_data)
+                    result = self._apply_ignore_list(result)
+                    results.append(result)
+                except PluginDependencyError as e:
+                    results.append(
+                        CheckResult(
+                            check_id=check_id,
+                            name=check_id,
+                            category="GENERAL",
+                            passed=False,
+                            error=str(e),
+                            execution_time_ms=0.0,
+                        )
+                    )
+                except Exception as e:
+                    results.append(
+                        CheckResult(
+                            check_id=check_id,
+                            name=check_id,
+                            category="GENERAL",
+                            passed=False,
+                            error=f"{type(e).__name__}: {e}",
+                            execution_time_ms=0.0,
+                        )
+                    )
 
         # Phase 3.5: Correlation — cross-check analysis
         if self.config.general.cache:
@@ -175,7 +228,7 @@ class ScanRunner:
             print(f"  -> Severity adjusted for {adjustments_count} finding(s)")
 
         # Phase 4: Build result
-        metadata.end_time = scan_start_dt
+        metadata.end_time = datetime.now(UTC)
         metadata.duration_seconds = time.time() - start_time
 
         return ScanResult(

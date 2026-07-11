@@ -1,0 +1,31 @@
+id: SECR-401
+title: Database Credentials in Configuration Files
+threat: Database access via exposed connection strings in world-readable config files.
+exploit: 'grep -r -E "(postgresql|mysql|mongodb)://" /etc/ 2>/dev/null; grep -r "database_url\|db_password" /home/ 2>/dev/null'
+impact: Direct database access and data exfiltration, SQL injection without web app exploitation, lateral movement to DB servers, compliance violations.
+fix: 'Move credentials to environment variables. Set restricted permissions (600). Use a secrets manager. Rotate DB passwords immediately. Implement network DB access controls.'
+breakage: Applications reading connection strings from config files will fail until environment variables are configured.
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N (9.1)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Connection strings with placeholder credentials"
+  - "Development databases with no sensitive data"
+  - "Connection strings using IAM authentication"
+related_findings:
+  - "SECR-202"
+  - "SECR-101"
+severity_override: null
+tags:
+  - "secrets"
+  - "database"
+  - "credentials"
+  - "configuration"
+mitre_mappings:
+  - "T1552.001"
+  - "T1552.005"
+  - "T1505"

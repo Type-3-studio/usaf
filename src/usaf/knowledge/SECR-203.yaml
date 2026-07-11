@@ -1,0 +1,30 @@
+id: SECR-203
+title: Hardcoded API Keys and Tokens
+threat: Third-party service compromise via hardcoded API keys allowing unauthorized access to paid services.
+exploit: 'grep -r -E "(api_key|apikey|api_secret)" /home/ 2>/dev/null'
+impact: Financial fraud via paid APIs, data exfiltration from third-party platforms, service disruption through quota exhaustion.
+fix: 'Remove hardcoded keys. Use environment variables. Rotate exposed keys. Use secrets manager for production. Implement pre-commit hooks.'
+breakage: Applications reading keys from config files will need environment variable configuration.
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N (7.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Placeholder values like YOUR_API_KEY_HERE"
+  - "Test keys with limited scope"
+  - "Keys for development-only services"
+related_findings:
+  - "SECR-101"
+  - "SECR-201"
+  - "SECR-401"
+severity_override: null
+tags:
+  - "secrets"
+  - "api-keys"
+  - "tokens"
+  - "credentials"
+mitre_mappings:
+  - "T1552.001"

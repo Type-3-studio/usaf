@@ -28,8 +28,8 @@ class TestPipelineErrorHandling:
         collector_registry.discover()
         check_ids = registry.get_all_ids()
         collector_names = collector_registry.get_all_names()
-        assert len(collector_names) == 24
-        assert len(check_ids) == 91
+        assert len(collector_names) == 25
+        assert len(check_ids) == 101
 
     @pytest.mark.slow
     @SKIP_LINUX
@@ -40,7 +40,7 @@ class TestPipelineErrorHandling:
             runner = ScanRunner()
             result = runner.run()
         assert isinstance(result, ScanResult)
-        assert result.metadata.collector_count == 24
+        assert result.metadata.collector_count == 25
 
     @pytest.mark.slow
     @SKIP_LINUX
@@ -63,7 +63,7 @@ class TestPipelineErrorHandling:
             runner.config.general.max_workers = 4
             result = runner.run()
         assert isinstance(result, ScanResult)
-        assert result.metadata.collector_count == 24
+        assert result.metadata.collector_count == 25
 
     @pytest.mark.slow
     @SKIP_LINUX

@@ -1,0 +1,27 @@
+id: SECR-102
+title: GCP Service Account Keys in Filesystem
+threat: GCP cloud resource compromise via leaked service account keys that grant programmatic access to Google Cloud resources.
+exploit: 'find /home -name "*.json" -exec grep -l "service_account" {} \;'
+impact: Full GCP project compromise, data access in Cloud Storage/BigQuery/Cloud SQL, ability to create/modify/delete resources, lateral movement within organization.
+fix: 'Delete key file. Rotate key in GCP IAM. Use workload identity federation or attached service accounts. Use Secret Manager for required secrets.'
+breakage: Removing service account keys may break automated deployments and CI/CD pipelines that depend on JSON key authentication.
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N (9.1)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Dedicated service account management directories"
+  - "Backup copies in encrypted archives"
+related_findings:
+  - "SECR-401"
+severity_override: null
+tags:
+  - "secrets"
+  - "gcp"
+  - "credentials"
+  - "cloud"
+mitre_mappings:
+  - "T1552.001"

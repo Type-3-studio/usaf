@@ -18,14 +18,14 @@ class TestCollectorLifecycleIntegration:
         instances = collector_registry.create_all_instances()
         for inst in instances:
             mgr.add(inst)
-        assert mgr.count == 24
+        assert mgr.count == 25
         collected_names = sorted(mgr.names)
         expected_names = sorted([
             "apt", "auditd", "boot", "certificates", "containers",
             "cron", "dns", "filesystem", "firewall", "flatpak",
             "groups", "interfaces", "journald", "kernel", "kernel_params",
             "mounts", "pam", "processes", "snap", "sockets", "ssh_config",
-            "sudo", "systemd", "users",
+            "secrets", "sudo", "systemd", "users",
         ])
         assert collected_names == expected_names
 
@@ -67,7 +67,7 @@ class TestCollectorLifecycleIntegration:
         for inst in collector_registry.create_all_instances():
             mgr.add(inst)
         order = mgr._resolve_dependencies(mgr.names)
-        assert len(order) == 24
+        assert len(order) == 25
         kernel_pos = order.index("kernel")
         kernel_params_pos = order.index("kernel_params")
         assert kernel_params_pos > kernel_pos
@@ -79,7 +79,7 @@ class TestCollectorRegistryIntegration:
     def test_discover_finds_all_collectors(self):
         collector_registry.discover()
         names = sorted(collector_registry.get_all_names())
-        assert len(names) == 24
+        assert len(names) == 25
         assert names == [
             "apt",
             "auditd",
@@ -99,6 +99,7 @@ class TestCollectorRegistryIntegration:
             "mounts",
             "pam",
             "processes",
+            "secrets",
             "snap",
             "sockets",
             "ssh_config",
@@ -110,7 +111,7 @@ class TestCollectorRegistryIntegration:
     def test_create_all_instances_returns_instances(self):
         collector_registry.discover()
         instances = collector_registry.create_all_instances()
-        assert len(instances) == 24
+        assert len(instances) == 25
         for inst in instances:
             assert hasattr(inst, "name")
             assert hasattr(inst, "collect")
@@ -141,7 +142,7 @@ class TestCollectorManagerCollectAllIntegration:
             mgr.add(inst)
         data = mgr.collect_all()
         assert isinstance(data, dict)
-        assert len(data) == 24
+        assert len(data) == 25
         must_have = {"kernel", "kernel_params", "users", "sockets", "processes", "apt"}
         assert must_have.issubset(set(data.keys()))
 

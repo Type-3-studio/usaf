@@ -1,0 +1,28 @@
+id: SECR-202
+title: .env Files with Secrets
+threat: Plaintext credential exposure via environment files that commonly store database passwords, API keys, and tokens.
+exploit: 'cat /home/*/.env 2>/dev/null; cat /home/*/.env.production 2>/dev/null'
+impact: Exposure of multiple service credentials at once, database/API/cloud service compromise, lateral movement, compliance violations.
+fix: 'Move secrets to a secrets manager. Set .env permissions to 600. Add .env to .gitignore. Use .env.example with placeholder values.'
+breakage: Applications reading .env files directly will stop working until environment variables are configured.
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N (7.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - ".env files with only non-sensitive config (ports, debug flags)"
+  - "Template .env.example with placeholder values"
+related_findings:
+  - "SECR-101"
+  - "SECR-401"
+severity_override: null
+tags:
+  - "secrets"
+  - "env"
+  - "credentials"
+  - "dotenv"
+mitre_mappings:
+  - "T1552.001"

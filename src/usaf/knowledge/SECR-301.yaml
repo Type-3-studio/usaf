@@ -1,0 +1,29 @@
+id: SECR-301
+title: Exposed SSH Private Keys
+threat: Lateral movement and privilege escalation via SSH private keys with world-readable permissions.
+exploit: 'find /etc/ssh -name "*_key" ! -perm 600 -ls 2>/dev/null; find /home -name "id_rsa" -o -name "id_ed25519" 2>/dev/null'
+impact: Lateral movement to all systems using exposed keys, privilege escalation on target systems, persistent access, data exfiltration.
+fix: 'chmod 600 /path/to/private_key. Rotate key on all target systems. Use SSH certificates for short-lived access. Audit authorized_keys.'
+breakage: Restricting permissions on keys used by system processes may cause those services to fail.
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:N (8.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.02
+known_exceptions:
+  - "Non-authentication keys used by monitoring tools"
+  - "Backup copies with restrictive ACLs"
+related_findings:
+  - "SECR-302"
+  - "SSH-101"
+severity_override: null
+tags:
+  - "secrets"
+  - "ssh"
+  - "private-key"
+  - "credentials"
+mitre_mappings:
+  - "T1552.004"
+  - "T1558.001"

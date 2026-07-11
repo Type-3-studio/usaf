@@ -1,0 +1,29 @@
+id: SECR-201
+title: GitHub Tokens in Filesystem
+threat: Source code and CI/CD pipeline compromise via leaked GitHub tokens allowing repo access and pipeline modification.
+exploit: 'grep -r "ghp_\|github_pat_" /home/ 2>/dev/null'
+impact: Source code theft, supply chain attacks via CI/CD modification, package publishing under your org, repo deletion, Actions runner compromise.
+fix: 'Revoke token at github.com/settings/tokens. Remove from all files. Use GitHub Actions secrets. Use environment variables for local dev.'
+breakage: Revoking tokens in active use will break CI/CD pipelines and git operations until replaced.
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:L (8.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Revoked tokens in git history"
+  - "Example tokens in documentation"
+  - "Tokens with zero remaining permissions"
+related_findings:
+  - "SECR-203"
+severity_override: null
+tags:
+  - "secrets"
+  - "github"
+  - "tokens"
+  - "credentials"
+mitre_mappings:
+  - "T1552.001"
+  - "T1552.004"

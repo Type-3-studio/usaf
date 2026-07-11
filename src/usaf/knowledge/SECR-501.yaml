@@ -1,0 +1,29 @@
+id: SECR-501
+title: Expired TLS/SSL Certificates
+threat: Service disruption and loss of trust due to expired certificates causing client connection failures.
+exploit: 'openssl x509 -in /path/to/cert.pem -noout -enddate (past date = expired)'
+impact: Complete service disruption for HTTPS/TLS services, browser security warnings, CI/CD pipeline failures, compliance violations.
+fix: 'Renew with certbot or reissue with CA. Set up automated renewal monitoring. Test renewal 30+ days before expiry.'
+breakage: Removing expired certs without replacement will cause all TLS services to fail to start.
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L (5.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.01
+known_exceptions:
+  - "Expired root CA certificates no longer needed"
+  - "Intentionally expired client certificates"
+  - "Test certificates in isolated environments"
+related_findings:
+  - "SECR-502"
+severity_override: null
+tags:
+  - "secrets"
+  - "certificates"
+  - "tls"
+  - "expiry"
+mitre_mappings:
+  - "T1588.003"
+  - "T1574"

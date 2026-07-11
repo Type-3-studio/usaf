@@ -1,0 +1,28 @@
+id: SECR-101
+title: AWS Access Keys in Filesystem
+threat: Cloud credential theft via filesystem access — attackers who gain filesystem access search for AWS credentials in common locations.
+exploit: 'grep -r "AKIA" /home/ 2>/dev/null; cat ~/.aws/credentials'
+impact: Full AWS account compromise, data exfiltration from S3/RDS/DynamoDB, cryptomining on EC2, long-term persistence via IAM.
+fix: 'Remove credentials from files. Rotate exposed keys in AWS IAM. Use IAM roles for EC2/ECS/Lambda. Use environment variables for local dev.'
+breakage: Removing credentials from automated deployment scripts may break CI/CD pipelines until secrets manager integration is complete.
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N (9.1)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Test fixtures in test directories"
+  - "Obfuscated example keys in documentation"
+  - "Previously rotated keys still present in git history"
+related_findings:
+  - "SECR-401"
+severity_override: null
+tags:
+  - "secrets"
+  - "aws"
+  - "credentials"
+  - "cloud"
+mitre_mappings:
+  - "T1552.001"

@@ -55,7 +55,7 @@
 
 ### Detailed Status
 
-#### Collectors (24 total)
+#### Collectors (25 total)
 | Collector | Status | Notes |
 |-----------|--------|-------|
 | `KernelCollector` | ✅ | `/proc/sys`, sysctl, uname |
@@ -81,9 +81,10 @@
 | `FilesystemCollector` | ✅ | SUID, world-writable, capabilities, hidden files (P0) |
 | `CertStoreCollector` | ✅ | System CA bundles, certificate inventory (P0) |
 | `FlatpakCollector` | ✅ | Flatpak app/runtime inventory, file→package resolution |
+| `SecretsCollector` | ✅ | Credential scanning: AWS/GCP keys, GitHub tokens, API keys, .env files, DB creds |
 | `SnapCollector` | ✅ | Snap package inventory, file→package resolution |
 
-#### Checks (91 total)
+#### Checks (101 total)
 | Check | Status | Severity | Evidence |
 |-------|--------|----------|----------|
 | KERN-101 (ASLR) | ✅ | HIGH | RegistryEvidence |
@@ -141,6 +142,16 @@
 | FOR-101 (Audit Logs) | ✅ | MEDIUM | FileEvidence |
 | PER-201 (Unauth Services) | ✅ | HIGH | FileEvidence |
 | SEC-101 (AppArmor) | ✅ | HIGH | FileEvidence |
+| SECR-101 (AWS Keys) | ✅ | CRITICAL | FileEvidence |
+| SECR-102 (GCP Keys) | ✅ | CRITICAL | FileEvidence |
+| SECR-201 (GitHub Tokens) | ✅ | CRITICAL | FileEvidence |
+| SECR-202 (.env Secrets) | ✅ | MEDIUM | FileEvidence |
+| SECR-203 (API Keys) | ✅ | HIGH | FileEvidence |
+| SECR-301 (Exposed SSH Keys) | ✅ | CRITICAL | FileEvidence |
+| SECR-302 (Weak SSH Keys) | ✅ | MEDIUM | FileEvidence |
+| SECR-401 (DB Credentials) | ✅ | CRITICAL | FileEvidence |
+| SECR-501 (Expired Certs) | ✅ | MEDIUM | FileEvidence |
+| SECR-502 (Self-Signed Certs) | ✅ | MEDIUM | FileEvidence |
 | SVC-101 (Insecure Svcs) | ✅ | HIGH | FileEvidence |
 | SVC-102 (Unexpected Enabled Svcs) | ✅ | MEDIUM | RegistryEvidence |
 | SVC-201 (Services Running as Root) | ✅ | MEDIUM | ProcessEvidence |
@@ -240,7 +251,7 @@
 | Compliance | ✅ | 335 | CIS 27 controls, NIST 6 controls, gap analysis |
 | Profiles | ✅ | 451 | Desktop/server reference profiles, auto-detect |
 | Context Severity | ✅ | 201 | SSH, file perms, users, network context evaluators |
-| Knowledge Base | ✅ | 171 + 67 YAML | YAML for all 67 checks with threat/exploit/impact/fix/CVSS; KB wired into runner pipeline |
+| Knowledge Base | ✅ | 171 + 77 YAML | YAML for all 77 checks with threat/exploit/impact/fix/CVSS; KB wired into runner pipeline |
 | Trust Scoring | ✅ | 106 | Evidence-quality adjusted confidence |
 | Policies | ✅ | 86 | YAML policy loading, check overrides, severity overrides |
 
@@ -560,6 +571,20 @@ The goal is **~500 checks** organized into **20+ categories**, with a **correlat
 
 **Goal:** Cover modern deployment realities.
 
+#### Phase 4a: Secrets (10 checks) — ✅ COMPLETE
+| ID | Name | Depends | Status |
+|----|------|---------|--------|
+| SECR-101 | AWS keys in filesystem | `secrets` | ✅ |
+| SECR-102 | GCP service account keys | `secrets` | ✅ |
+| SECR-201 | GitHub tokens in files | `secrets` | ✅ |
+| SECR-202 | .env files with secrets | `secrets` | ✅ |
+| SECR-203 | API keys in config files | `secrets` | ✅ |
+| SECR-301 | Exposed SSH private keys | `ssh_config` | ✅ |
+| SECR-302 | Weak SSH key types | `ssh_config` | ✅ |
+| SECR-401 | Database credentials in files | `secrets` | ✅ |
+| SECR-501 | Expired TLS certificates | `certificates` | ✅ |
+| SECR-502 | Self-signed certificates | `certificates` | ✅ |
+
 #### Containers (8 checks)
 | ID | Name | Depends |
 |----|------|---------|
@@ -584,19 +609,7 @@ The goal is **~500 checks** organized into **20+ categories**, with a **correlat
 | LOG-501 | Auditd rule coverage gaps | `auditd` |
 | LOG-502 | Auditd log exhaustion risk | `auditd` |
 
-#### Secrets (10 checks)
-| ID | Name | Depends |
-|----|------|---------|
-| SECR-101 | AWS keys in filesystem | `filesystem` |
-| SECR-102 | GCP service account keys | `filesystem` |
-| SECR-201 | GitHub tokens in files | `filesystem` |
-| SECR-202 | .env files with secrets | `filesystem` |
-| SECR-203 | API keys in config files | `filesystem` |
-| SECR-301 | Exposed SSH private keys | `filesystem` |
-| SECR-302 | Weak SSH key types (DSA, 1024-bit RSA) | `ssh_config` |
-| SECR-401 | Database credentials in world-readable files | `filesystem` |
-| SECR-501 | Expired TLS certificates | `certificates` |
-| SECR-502 | Self-signed certificates in prod | `certificates` |
+_Secrets completed in Phase 4a above._
 
 #### Phase 4 Correlation Rules (4 new)
 | Rule ID | What it detects |
@@ -703,14 +716,14 @@ The goal is **~500 checks** organized into **20+ categories**, with a **correlat
 | Persistence | 26 | 26 | 26 | 26 | 26 | 40 |
 | Containers | 1 | 1 | 9 | 9 | 9 | 25 |
 | Logs & Forensics | 1 | 1 | 9 | 9 | 9 | 25 |
-| Secrets | 0 | 0 | 10 | 10 | 10 | 20 |
+| Secrets | 10 | 10 | 10 | 10 | 10 | 20 |
 | Cloud | 0 | 0 | 0 | 6 | 6 | 20 |
 | Compliance | 1 | 1 | 1 | 11 | 11 | 20 |
 | Firewall | 1 | 1 | 1 | 1 | 1 | 10 |
 | Security (AppArmor/USB) | 2 | 2 | 2 | 2 | 2 | 10 |
 | Compromise | 1 | 1 | 1 | 1 | 1 | 15 |
 | Password | 1 | 1 | 1 | 1 | 1 | 10 |
-| **Total checks** | **91** | **119** | **135** | **135** | **135** | **~450** |
+| **Total checks** | **101** | **119** | **135** | **135** | **135** | **~450** |
 | **Correlation rules** | 12 | 17 | 21 | 24 | 24 | **50+** |
 
 ---
@@ -791,7 +804,7 @@ src/usaf/
 ├── compliance/framework.py    # CIS + NIST mappings
 ├── profiles/manager.py        # Profile matching
 ├── severity/engine.py         # Context-aware severity
-├── knowledge/                 # KB + 67 YAML entries (one per check)
+├── knowledge/                 # KB + 77 YAML entries (one per check)
 ├── policies/engine.py         # Policy loading + overrides
 ├── config/                    # YAML config loading
 └── cache/engine.py            # In-memory cache
@@ -803,8 +816,8 @@ src/usaf/
 
 | Metric | Current | Short-term (P3) | Medium-term (P4) | Long-term (P6) |
 |--------|---------|-----------------|-------------------|-----------------|
-| Checks | 91 | 119 | 135 | 135 → **450+** |
-| Collectors | 24 | 24 | 28 | 30 |
+| Checks | 101 | 119 | 135 | 135 → **450+** |
+| Collectors | 25 | 24 | 28 | 30 |
 | Correlation rules | 12 | 17 | 21 | 24 → **50+** |
 | Unit tests | 900+ | 1,500+ | 2,000+ | 3,000+ |
 | Integration tests | 93+ | 150+ | 300+ | 500+ |

@@ -1,0 +1,30 @@
+id: SECR-502
+title: Self-Signed TLS/SSL Certificates
+threat: Man-in-the-middle vulnerability from unverifiable certificates where clients cannot verify server identity.
+exploit: 'openssl x509 -in /path/to/cert.pem -noout -subject -issuer (subject == issuer = self-signed)'
+impact: MITM attacks in production, browser warning messages, shadow IT, compliance violations, mobile app trust failures.
+fix: 'Obtain CA-signed certificate from Let\'s Encrypt or commercial CA. For internal services, run an internal CA (e.g., step-ca) and install in trust stores.'
+breakage: Replacing self-signed certs with CA-signed ones may require updating trust stores on internal clients.
+cvss: "CVSS:3.1/AV:N/AC:M/PR:N/UI:R/S:U/C:H/I:L/A:N (6.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.3
+known_exceptions:
+  - "Development and staging environments"
+  - "Internal test infrastructure"
+  - "CA root certificates that are inherently self-signed"
+  - "Embedded devices with no internet connectivity"
+related_findings:
+  - "SECR-501"
+severity_override: null
+tags:
+  - "secrets"
+  - "certificates"
+  - "tls"
+  - "self-signed"
+mitre_mappings:
+  - "T1588.003"
+  - "T1574"

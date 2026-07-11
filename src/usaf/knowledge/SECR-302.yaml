@@ -1,0 +1,28 @@
+id: SECR-302
+title: Weak SSH Key Algorithms and Sizes
+threat: Cryptographic weakness in SSH host authentication — DSA is broken, and weak RSA can be factored.
+exploit: 'ssh-keygen -l -f /etc/ssh/ssh_host_dsa_key (1024-bit output indicates weakness)'
+impact: SSH server impersonation via MITM, session hijacking for DSA connections, loss of trust in host key verification.
+fix: 'Generate Ed25519 keys: ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key. Update sshd_config. Remove weak keys. Update known_hosts.'
+breakage: Older SSH clients that do not support Ed25519 will be unable to connect.
+cvss: "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:N (5.9)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.01
+known_exceptions:
+  - "Backup copies of old keys no longer in use"
+  - "Keys used only for legacy compatibility with pinned entries"
+related_findings:
+  - "SECR-301"
+  - "SSH-201"
+severity_override: null
+tags:
+  - "secrets"
+  - "ssh"
+  - "weak-keys"
+  - "cryptography"
+mitre_mappings:
+  - "T1552.004"

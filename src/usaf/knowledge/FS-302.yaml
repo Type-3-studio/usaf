@@ -1,0 +1,30 @@
+id: FS-302
+title: Immutable File Drift
+threat: Critical system files that should have the immutable attribute (chattr +i) to prevent tampering are modifiable, allowing attackers to alter authentication or authorization data.
+exploit: "An attacker modifies /etc/passwd or /etc/shadow to add a new user account or change root password. Without the immutable attribute, these changes are written directly and persist until detected."
+impact: Unauthorized account creation, privilege escalation, and authentication bypass. Critical files without immutable protection are vulnerable to tampering by any process running as root.
+fix: "Set the immutable attribute on critical files:
+  chattr +i /etc/passwd /etc/shadow /etc/gshadow /etc/sudoers
+  Verify: 'lsattr /etc/passwd /etc/shadow'
+  Note: Remove immutable bit before updates: 'chattr -i <file>'"
+breakage: "Package updates require removing the immutable bit first. System administration tasks may need to temporarily remove immutable protection."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H (6.7)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.40
+known_exceptions:
+  - "Some environments do not use immutable files for manageability reasons"
+  - "Cloud images and containers rarely set immutable attributes"
+related_findings:
+  - "FS-101"
+  - "PRM-201"
+severity_override: null
+tags:
+  - "filesystem"
+  - "immutable"
+  - "hardening"
+mitre_mappings:
+  - "T1222"
+  - "T1565"

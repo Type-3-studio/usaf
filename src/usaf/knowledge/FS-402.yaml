@@ -1,0 +1,31 @@
+id: FS-402
+title: World-Writable Directories
+threat: World-writable directories (permissions with o+w) on system partitions allow any user to create files, enabling privilege escalation via symlink attacks and race conditions.
+exploit: "An attacker identifies a world-writable directory in /opt or /var. They create a symlink from a temporary file in that directory to /etc/shadow. When a privileged process writes to the temp file, it overwrites /etc/shadow."
+impact: Privilege escalation, file overwrite attacks, and unauthorized file creation. World-writable directories on system partitions violate the principle of least privilege.
+fix: "Remove world-writable permissions:
+  Find: 'find / -type d -perm -o+w -ls 2>/dev/null'
+  Fix: 'chmod o-w <directory>'
+  Exceptions: /tmp, /var/tmp, /dev/shm"'
+breakage: "/tmp, /var/tmp, and /dev/shm must remain world-writable for normal operation."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N (4.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.10
+known_exceptions:
+  - "/tmp must be world-writable (but should be mounted noexec,nosuid)"
+  - "/var/tmp must be world-writable"
+  - "/dev/shm must be world-writable"
+  - "User home directories (should be restricted individually)"
+related_findings:
+  - "PRM-201"
+  - "FS-501"
+severity_override: null
+tags:
+  - "filesystem"
+  - "permissions"
+  - "world-writable"
+mitre_mappings:
+  - "T1222"

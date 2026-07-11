@@ -1,0 +1,33 @@
+id: FS-403
+title: Orphaned Files (Not Owned by Package)
+threat: Files on the system not owned by any installed package are invisible to package integrity checking and may indicate malware droppings, unauthorized software, or persistence artifacts.
+exploit: "An attacker drops multiple files across the filesystem as part of a rootkit or backdoor installation. These files are not tracked by dpkg, so 'dpkg --verify' will not detect modifications, and 'apt purge' will not remove them."
+impact: Persistent malware that evades package-based detection. Orphaned files can survive system updates and package reinstalls, providing long-term persistence.
+fix: "Investigate and remove orphaned files:
+  Check package: 'dpkg -S <path>'
+  If unowned, investigate content: 'file <path>', 'sha256sum <path>'
+  Remove unauthorized: 'rm <path>'"
+breakage: "User data files, logs, caches, and manually installed software are legitimate unowned files."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N (6.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.40
+known_exceptions:
+  - "User-generated files and data"
+  - "Log files rotated by system"
+  - "Cached data in /var/cache"
+  - "Manually installed software in /opt or /usr/local"
+related_findings:
+  - "FS-101"
+  - "PRM-101"
+  - "PKG-201"
+severity_override: null
+tags:
+  - "filesystem"
+  - "orphaned"
+  - "integrity"
+mitre_mappings:
+  - "T1070"
+  - "T1565"

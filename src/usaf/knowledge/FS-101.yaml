@@ -1,0 +1,31 @@
+id: FS-101
+title: Unexpected Files in /etc
+threat: Unexpected files in /etc can indicate malware droppings, unauthorized configuration changes, or attacker persistence mechanisms that bypass package management visibility.
+exploit: "An attacker drops a malicious script or configuration file into /etc that loads on boot. Since the file is not tracked by dpkg, it evades package integrity checking and can persist across system updates."
+impact: Persistent backdoor access that survives package updates. Files outside package management evade integrity checking and forensic analysis.
+fix: "Investigate and remove unexpected files:
+  Identify: 'dpkg -S /etc/<file>' (shows 'not found' if unexpected)
+  Remove unauthorized files: 'rm /etc/<file>'
+  Check file origin: 'stat /etc/<file>'"
+breakage: "Some third-party software legitimately installs files into /etc outside the package manager. Document such exceptions in usaf.yaml ignore patterns."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N (6.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.20
+known_exceptions:
+  - "Third-party software may drop configuration files outside package management"
+  - "Container images may have custom /etc layouts"
+  - "Manual administrator configurations are expected but should be documented"
+related_findings:
+  - "FS-301"
+  - "FS-403"
+severity_override: null
+tags:
+  - "filesystem"
+  - "integrity"
+  - "tampering"
+mitre_mappings:
+  - "T1070"
+  - "T1565"

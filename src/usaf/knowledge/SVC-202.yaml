@@ -1,0 +1,33 @@
+id: SVC-202
+title: Services From Unknown Binaries
+threat: Systemd services executing binaries not owned by any installed package may indicate backdoor services, malware, or unauthorized software installations.
+exploit: "An attacker creates a service that launches /usr/local/bin/.updated that executes a reverse shell. Since the binary is not package-managed, dpkg --verify will not detect it, and it persists across updates."
+impact: Persistent backdoor execution on every boot. Services from unknown binaries are invisible to package-based integrity checking and can be difficult to detect.
+fix: "Investigate and remove unknown service binaries:
+  Find: 'systemctl cat <service> | grep ExecStart'
+  Check package: 'dpkg -S <binary>'
+  Disable: 'systemctl disable --now <service>'
+  Remove binary: 'rm <binary>'"
+breakage: "Custom software installed in /usr/local/bin or /opt produces valid unowned binaries."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.20
+known_exceptions:
+  - "Custom applications in /usr/local"
+  - "Third-party software in /opt"
+  - "Container platform services (docker, containerd)"
+related_findings:
+  - "SVC-102"
+  - "FS-403"
+severity_override: null
+tags:
+  - "services"
+  - "backdoor"
+  - "integrity"
+mitre_mappings:
+  - "T1543"
+  - "T1543.002"
+  - "T1505"

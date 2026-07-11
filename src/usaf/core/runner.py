@@ -28,6 +28,8 @@ from usaf.correlation.rules import (
     DefenseEvasionIndicators,
     DNSHijacking,
     ExposedVulnerableService,
+    FileIntegrityBreach,
+    RogueServiceDeployment,
     SSHBruteForceSurface,
     SuidArmingChain,
     SupplyChainAttack,
@@ -83,6 +85,8 @@ class ScanRunner:
         engine.register(SupplyChainAttack())
         engine.register(BootIntegrityFailure())
         engine.register(DNSHijacking())
+        engine.register(RogueServiceDeployment())
+        engine.register(FileIntegrityBreach())
         return engine
 
     def _setup_collectors(self) -> None:

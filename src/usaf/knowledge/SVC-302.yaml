@@ -1,0 +1,34 @@
+id: SVC-302
+title: Unexpected Listening Services
+threat: Services listening on network ports that are not known-safe may be backdoors, unauthorized daemons, or exposed applications that increase the attack surface.
+exploit: "An attacker deploys a reverse shell listener on a high TCP port (4444). The service is registered with systemd for persistence. Without port monitoring, the backdoor remains undetected."
+impact: Remote access to the system, increased attack surface, and potential data exfiltration. Every listening port is a potential entry point for attackers.
+fix: "Investigate unexpected listeners:
+  Identify: 'ss -tlnp'
+  Check service: 'systemctl status <service>'
+  Verify: 'dpkg -S <binary>'
+  Block: 'ufw deny <port>'
+  Disable: 'systemctl disable --now <service>'"
+breakage: "Some applications legitimately listen on non-standard ports. Document exceptions in the security baseline."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.20
+known_exceptions:
+  - "Development servers on non-standard ports"
+  - "Container port mappings may expose unusual ports"
+  - "Monitoring agents with custom ports"
+related_findings:
+  - "SVC-102"
+  - "NET-101"
+  - "SVC-202"
+severity_override: null
+tags:
+  - "services"
+  - "network"
+  - "attack-surface"
+mitre_mappings:
+  - "T1043"
+  - "T1505"

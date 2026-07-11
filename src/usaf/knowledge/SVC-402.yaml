@@ -1,0 +1,31 @@
+id: SVC-402
+title: Modified Systemd Unit Files
+threat: Systemd unit files that differ from package defaults may indicate service hijacking, configuration tampering, or attacker persistence modifications.
+exploit: "An attacker modifies an existing service unit file to execute a malicious payload before the legitimate service starts. The ExecStartPre line is added to run /root/.cache/hidden.sh as root."
+impact: Service-level persistence that survives package reinstalls. Modified unit files can redirect execution of legitimate services to malicious code.
+fix: "Investigate and restore modified unit files:
+  Compare: diff /lib/systemd/system/<service> /etc/systemd/system/<service>
+  Restore: 'systemctl revert <service>'
+  Reinstall: 'apt install --reinstall <package>'"
+breakage: "Administrators may legitimately modify unit files to customize service behavior."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.25
+known_exceptions:
+  - "Administrator-customized service configurations"
+  - "Package maintainer scripts that modify unit files during upgrades"
+related_findings:
+  - "SVC-102"
+  - "FS-403"
+severity_override: null
+tags:
+  - "services"
+  - "systemd"
+  - "tampering"
+mitre_mappings:
+  - "T1543"
+  - "T1543.002"
+  - "T1505"

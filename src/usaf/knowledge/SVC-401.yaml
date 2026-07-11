@@ -1,0 +1,30 @@
+id: SVC-401
+title: Recently Installed Services
+threat: Services installed or modified in the last 7 days may indicate unauthorized software deployment, attacker persistence installation, or security control bypass.
+exploit: "An attacker gains access and immediately installs a systemd service for persistence. The service unit file has a recent timestamp, which correlates with the breach timeline."
+impact: Early detection of persistence mechanisms. Recent service installations may be the earliest indicator of a breach, allowing response before data exfiltration occurs.
+fix: "Investigate recently installed services:
+  Check timestamp: 'stat <unit-file>'
+  Review content: 'systemctl cat <service>'
+  Check auth.log for related activity: 'grep <service> /var/log/auth.log'"
+breakage: "Package updates may modify unit file timestamps. Planned maintenance activities produce legitimate recent changes."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N (4.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.35
+known_exceptions:
+  - "Package updates that modify unit files"
+  - "Scheduled maintenance and legitimate service installations"
+related_findings:
+  - "SVC-102"
+  - "PER-201"
+severity_override: null
+tags:
+  - "services"
+  - "timeline"
+  - "persistence"
+mitre_mappings:
+  - "T1543"
+  - "T1543.002"

@@ -1,0 +1,33 @@
+id: FS-202
+title: Deleted Binaries Still Running
+threat: A process running from a binary that no longer exists on disk is a strong indicator of malware that has deleted itself after execution to avoid forensic analysis.
+exploit: "An attacker executes a malicious binary that immediately deletes itself from the filesystem. The process continues running in memory but the binary leaves no trace for filesystem scanners or integrity checkers."
+impact: Complete evasion from filesystem-based detection. The running process can continue malicious activity (C2 communication, data exfiltration, keylogging) without leaving a binary artifact for forensic analysis.
+fix: "Investigate the running process immediately:
+  Inspect: 'ls -la /proc/<pid>/exe'
+  Capture memory: 'cat /proc/<pid>/maps'
+  Kill process: 'kill <pid>'
+  Check network connections: 'ss -p | grep <pid>'
+  Scan for rootkits: 'rkhunter --check'"
+breakage: "Some temporary processes (kernel threads, short-lived daemons) may legitimately have their binaries removed during upgrades."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.10
+known_exceptions:
+  - "Processes that outlive package upgrades (binary was updated)"
+  - "Kernel threads (appear in /proc but have no binary)"
+related_findings:
+  - "COM-101"
+  - "PER-201"
+severity_override: null
+tags:
+  - "filesystem"
+  - "processes"
+  - "compromise"
+mitre_mappings:
+  - "T1070"
+  - "T1070.004"
+  - "T1564"

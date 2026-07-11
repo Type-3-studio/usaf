@@ -1,0 +1,30 @@
+id: FS-501
+title: Mount Option Security Gaps
+threat: Filesystem mounts without security options (noexec, nosuid, nodev) on writable partitions allow execution of untrusted code, SUID privilege escalation, and device node creation.
+exploit: "An attacker downloads a malicious binary to /tmp, which lacks the noexec mount option. The binary executes, scans for kernel vulnerabilities, and escalates to root. With noexec, the download would be non-executable."
+impact: Easy local privilege escalation, code execution from writable directories, and device file attacks. Missing mount options negate filesystem-level security controls.
+fix: "Add security options to /etc/fstab:
+  /tmp: 'tmpfs /tmp tmpfs defaults,nosuid,nodev,noexec 0 0'
+  /var/tmp: 'tmpfs /var/tmp tmpfs defaults,nosuid,nodev,noexec 0 0'
+  /home: 'nosuid,nodev' options
+  Apply: 'mount -o remount,noexec,nosuid,nodev /tmp'"
+breakage: "Some applications require executable /tmp for temporary code generation (JIT compilers, installer scripts)."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L (5.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Systems using /tmp for JIT compilation (container builds, developer machines)"
+  - "Chroot environments may have specific mount requirements"
+related_findings:
+  - "FS-402"
+  - "PRM-101"
+severity_override: null
+tags:
+  - "filesystem"
+  - "mount"
+  - "hardening"
+mitre_mappings:
+  - "T1222"

@@ -1,0 +1,33 @@
+id: SVC-102
+title: Unexpected Enabled Services
+threat: Enabled services that are not recognized as standard system services may be backdoors, unauthorized applications, or malware persistence mechanisms.
+exploit: "An attacker installs a custom systemd service that executes a reverse shell or cryptocurrency miner on boot. The service is not from any known package and evades package-level detection."
+impact: Persistent unauthorized access, resource misuse (cryptomining), and potential data exfiltration. Unknown services can provide remote access that bypasses firewall rules.
+fix: "Investigate and disable unauthorized services:
+  Status: 'systemctl status <service>'
+  Disable: 'systemctl disable --now <service>'
+  Check package: 'dpkg -S $(systemctl cat <service> | head -1)'
+  Review unit file: 'systemctl cat <service>'"
+breakage: "Some custom applications install their own systemd services. Document exceptions in the security baseline."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.20
+known_exceptions:
+  - "Custom application services installed by administrators"
+  - "Docker containers with custom entrypoint services"
+  - "Snap services (snap.*)"
+related_findings:
+  - "SVC-202"
+  - "SVC-301"
+  - "PER-201"
+severity_override: null
+tags:
+  - "services"
+  - "systemd"
+  - "persistence"
+mitre_mappings:
+  - "T1543"
+  - "T1543.002"

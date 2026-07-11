@@ -1,0 +1,31 @@
+id: SVC-201
+title: Services Running as Root
+threat: Services running as the root user have full system access. Any vulnerability in these services leads to complete system compromise.
+exploit: "An attacker exploits a buffer overflow in a network-accessible service running as root. The exploit grants a root shell, providing complete control over the system including kernel module loading, firmware access, and data access."
+impact: Complete system compromise from a single service vulnerability. Root-level services are the highest-value targets for attackers.
+fix: "Review and reduce services running as root:
+  Identify: 'ps aux | grep root | grep -v "^root"'
+  Check if service needs root: 'systemctl cat <service>'
+  Harden: Use User= and Group= in systemd unit files
+  Migrate: Use capabilities instead of full root access"'
+breakage: "Some system services legitimately require root (sshd, cron, systemd-logind, NetworkManager)."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "sshd requires root for privilege separation"
+  - "cron requires root for system crontab execution"
+  - "systemd services that manage hardware or network"
+related_findings:
+  - "SVC-202"
+  - "NET-101"
+severity_override: null
+tags:
+  - "services"
+  - "privilege"
+  - "hardening"
+mitre_mappings:
+  - "T1548"

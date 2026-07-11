@@ -1,0 +1,30 @@
+id: FS-201
+title: Hidden Files in World-Writable Directories
+threat: Hidden files (names starting with '.') in world-writable directories provide hiding places for malware that are easily overlooked by casual inspections.
+exploit: "An attacker writes a hidden executable or script to /tmp/.cache-update.sh and sets up a cron job or systemd timer to execute it. The hidden file evades 'ls' without '-a' flag and common cleanup scripts."
+impact: Persistent malware that evades casual detection. Hidden files in world-writable directories are classic hiding techniques used by cryptominers, rootkits, and backdoors.
+fix: "Audit and clean hidden files:
+  Find hidden files: 'find /tmp /var/tmp -name ".*" -type f'
+  Remove unauthorized: 'rm <path>'
+  Check for suspicious content: 'file <path>'"
+breakage: "Some applications legitimately create hidden files (lock files, temp state). Review before removing."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N (4.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.35
+known_exceptions:
+  - "Application state files (.tmp, .lock files)"
+  - "X server lock files in /tmp"
+related_findings:
+  - "PER-201"
+  - "FS-402"
+severity_override: null
+tags:
+  - "filesystem"
+  - "hidden-files"
+  - "persistence"
+mitre_mappings:
+  - "T1564"
+  - "T1564.001"

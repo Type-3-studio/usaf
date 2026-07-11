@@ -22,7 +22,7 @@ class TestScanPipeline:
     """Integration tests for the full scan pipeline."""
 
     EXPECTED_COLLECTOR_COUNT = 22
-    EXPECTED_CHECK_COUNT = 47
+    EXPECTED_CHECK_COUNT = 64
 
     def test_collector_discovery_registers_all(self):
         collector_registry.discover()
@@ -66,6 +66,16 @@ class TestScanPipeline:
             "COM-101",
             "CTN-101",
             "FOR-101",
+            "FS-101",
+            "FS-102",
+            "FS-201",
+            "FS-202",
+            "FS-301",
+            "FS-302",
+            "FS-401",
+            "FS-402",
+            "FS-403",
+            "FS-501",
             "FW-101",
             "KERN-101",
             "KERN-201",
@@ -94,6 +104,13 @@ class TestScanPipeline:
             "SSH-102",
             "SSH-201",
             "SVC-101",
+            "SVC-102",
+            "SVC-201",
+            "SVC-202",
+            "SVC-301",
+            "SVC-302",
+            "SVC-401",
+            "SVC-402",
             "USB-101",
             "USR-101",
             "USR-102",

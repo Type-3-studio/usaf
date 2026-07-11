@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TypedDict
+
 from usaf.correlation.engine import CorrelatedFinding, CorrelationRule
 from usaf.models.evidence import NetworkEvidence, PackageEvidence
 from usaf.models.finding import Finding
@@ -509,7 +511,13 @@ class ExposedVulnerableService(CorrelationRule):
         if not risky_pkgs or not listening_ports:
             return []
 
-        exposed: list[dict[str, object]] = []
+        class _ExposedEntry(TypedDict):
+            package: str
+            port: int
+            pkg_finding: Finding
+            port_finding: Finding
+
+        exposed: list[_ExposedEntry] = []
         for pkg_name, pkg_finding in risky_pkgs.items():
             expected_ports = self.PKG_PORT_MAP.get(pkg_name, set())
             matched_ports = expected_ports & listening_ports.keys()
@@ -527,7 +535,7 @@ class ExposedVulnerableService(CorrelationRule):
         details = "; ".join(
             f"{e['package']} on port {e['port']}" for e in exposed
         )
-        source_findings = []
+        source_findings: list[Finding] = []
         for e in exposed:
             if e["pkg_finding"] not in source_findings:
                 source_findings.append(e["pkg_finding"])
@@ -764,5 +772,146 @@ class DNSHijacking(CorrelationRule):
                 tags=["dns", "hijacking", "redirection", "tampering"],
                 mitre_attack_ids=["T1553", "T1553.001", "T1553.002"],
                 cis_benchmarks=["CIS Ubuntu 22.04: 4.3", "CIS Ubuntu 22.04: 4.4", "CIS Ubuntu 22.04: 4.5"],
+            )
+        ]
+
+
+class RogueServiceDeployment(CorrelationRule):
+    """Detects rogue service deployment on the system.
+
+    Combines unknown binary services (SVC-202), unexpected enabled
+    services (SVC-102), and unexpected listening ports (SVC-302)
+    to identify potential backdoor or rogue service installation.
+    """
+
+    id = "ROGUE-SVC"
+    name = "Rogue Service Deployment Detection"
+    description = "Detects indicators of unauthorized service deployment"
+    severity = Severity.CRITICAL
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        unknown_binary_svcs = [f for f in findings if f.check_id == "SVC-202"]
+        unexpected_enabled = [f for f in findings if f.check_id == "SVC-102"]
+        unexpected_listening = [f for f in findings if f.check_id == "SVC-302"]
+
+        if not unknown_binary_svcs and not unexpected_enabled:
+            return []
+
+        details: list[str] = []
+        if unknown_binary_svcs:
+            details.append(f"{len(unknown_binary_svcs)} service(s) from unknown binaries")
+        if unexpected_enabled:
+            details.append(f"{len(unexpected_enabled)} unexpected enabled service(s)")
+        if unexpected_listening:
+            details.append(f"{len(unexpected_listening)} unexpected listening service(s)")
+
+        source_findings: list[Finding] = []
+        source_findings.extend(unknown_binary_svcs)
+        source_findings.extend(unexpected_enabled)
+        source_findings.extend(unexpected_listening[:2])
+
+        return [
+            self._make_finding(
+                finding_id="001",
+                title="Rogue Service Deployment Indicators Detected",
+                description=(
+                    f"Found evidence consistent with rogue service deployment: "
+                    f"{'; '.join(details)}. "
+                    "This pattern indicates an unauthorized service may have been "
+                    "installed on the system."
+                ),
+                rationale=(
+                    "Attackers commonly deploy backdoor services to maintain persistent "
+                    "access. A service from an unknown binary that is enabled and listening "
+                    "on a network port is a strong indicator of compromise. Legitimate "
+                    "services are installed via package manager, have known binaries, "
+                    "and are documented in the system baseline."
+                ),
+                remediation=(
+                    "1. Investigate each unknown service: 'systemctl cat <service>'\n"
+                    "2. Check binary origin: 'dpkg -S <binary>'\n"
+                    "3. Disable unauthorized services: 'systemctl disable --now <service>'\n"
+                    "4. Remove unknown binaries: 'rm <binary>' after investigation\n"
+                    "5. Audit for other persistence mechanisms: cron, ssh keys, timers"
+                ),
+                source_findings=source_findings,
+                severity=Severity.CRITICAL,
+                tags=["rogue-service", "backdoor", "persistence", "compromise"],
+                mitre_attack_ids=["T1543", "T1543.002", "T1505", "T1505.001"],
+            )
+        ]
+
+
+class FileIntegrityBreach(CorrelationRule):
+    """Detects file integrity breach indicators.
+
+    Combines orphaned files (FS-403), unexpected symlinks (FS-301),
+    modified systemd units (SVC-402), and deleted running binaries
+    (FS-202) to identify potential file integrity compromise.
+    """
+
+    id = "FILE-INTEGRITY"
+    name = "File Integrity Breach Detection"
+    description = "Detects indicators of filesystem integrity compromise"
+    severity = Severity.HIGH
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        orphaned = [f for f in findings if f.check_id == "FS-403"]
+        symlinks = [f for f in findings if f.check_id == "FS-301"]
+        modified_units = [f for f in findings if f.check_id == "SVC-402"]
+        deleted_bins = [f for f in findings if f.check_id == "FS-202"]
+        unexpected_etc = [f for f in findings if f.check_id == "FS-101"]
+
+        combined_count = len(orphaned) + len(symlinks) + len(modified_units) + len(deleted_bins) + len(unexpected_etc)
+        if combined_count < 2:
+            return []
+
+        details: list[str] = []
+        if orphaned:
+            details.append(f"{len(orphaned)} orphaned file(s)")
+        if symlinks:
+            details.append(f"{len(symlinks)} unexpected symlink(s)")
+        if modified_units:
+            details.append(f"{len(modified_units)} modified systemd unit(s)")
+        if deleted_bins:
+            details.append(f"{len(deleted_bins)} deleted running binary(/ies)")
+        if unexpected_etc:
+            details.append(f"{len(unexpected_etc)} unexpected file(s) in /etc")
+
+        source_findings: list[Finding] = []
+        source_findings.extend(orphaned[:3])
+        source_findings.extend(symlinks[:3])
+        source_findings.extend(modified_units[:3])
+        source_findings.extend(deleted_bins[:3])
+        source_findings.extend(unexpected_etc[:3])
+
+        return [
+            self._make_finding(
+                finding_id="001",
+                title="File Integrity Breach Indicators Detected",
+                description=(
+                    f"Found evidence of filesystem integrity compromise: "
+                    f"{'; '.join(details)}. "
+                    "This pattern indicates the filesystem may have been tampered with."
+                ),
+                rationale=(
+                    "File integrity breaches are a serious security indicator. Orphaned files "
+                    "not owned by any package may be malware droppings. Unexpected symlinks "
+                    "can redirect execution to malicious code. Modified systemd units suggest "
+                    "persistence installation. Deleted running binaries are a classic "
+                    "malware cleanup technique. When multiple indicators are present, the "
+                    "likelihood of active compromise is significantly elevated."
+                ),
+                remediation=(
+                    "1. Investigate all orphaned files: identify source and purpose\n"
+                    "2. Review unexpected symlinks: 'ls -la /etc/ | grep ^l'\n"
+                    "3. Audit systemd unit changes: 'systemctl status <unit>'\n"
+                    "4. Check for rootkits: 'apt install rkhunter && rkhunter --check'\n"
+                    "5. Review auth logs for unauthorized access: 'last -10'"
+                ),
+                source_findings=source_findings,
+                severity=Severity.HIGH,
+                tags=["file-integrity", "tampering", "compromise", "persistence"],
+                mitre_attack_ids=["T1070", "T1070.004", "T1565", "T1565.001", "T1505"],
             )
         ]

@@ -1,0 +1,31 @@
+id: FS-401
+title: Unexpected File Capabilities
+threat: Linux capabilities grant binaries elevated privileges without the SUID bit. Unexpected capabilities on binaries can enable privilege escalation or access to restricted operations.
+exploit: "An attacker places a binary with CAP_NET_RAW+ep capability. Even without root access, the binary can create raw sockets for packet crafting, sniffing, or ARP spoofing attacks."
+impact: Privilege escalation without SUID, network attack capabilities, and bypass of security controls. Capabilities can grant fine-grained but dangerous privileges.
+fix: "Review and remove unexpected capabilities:
+  List capabilities: 'getcap -r /usr/bin /usr/sbin /bin /sbin'
+  Remove capabilities: 'setcap -r <path>'
+  Investigate unknown binaries: 'dpkg -S <path>'"
+breakage: "Some legitimate binaries require capabilities (ping = CAP_NET_RAW, traceroute = CAP_NET_RAW, nfsd = CAP_SYS_NICE)"
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.20
+known_exceptions:
+  - "ping requires cap_net_raw"
+  - "traceroute requires cap_net_raw"
+  - "Some monitoring tools require specific capabilities"
+related_findings:
+  - "PRM-101"
+  - "FS-403"
+severity_override: null
+tags:
+  - "filesystem"
+  - "capabilities"
+  - "privilege-escalation"
+mitre_mappings:
+  - "T1548"
+  - "T1548.001"

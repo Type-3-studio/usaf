@@ -1,0 +1,32 @@
+id: FS-301
+title: Unexpected Symlinks in /etc
+threat: Unexpected symbolic links in /etc can redirect configuration file reads to attacker-controlled locations, enabling configuration hijacking and privilege escalation.
+exploit: "An attacker replaces a configuration file in /etc with a symlink pointing to a file they control. When a privileged service reads the configuration, it follows the symlink and processes attacker-controlled content."
+impact: Configuration hijacking, privilege escalation, and persistent backdoor access. Symlink attacks can redirect authentication checks, cron execution, and service configurations.
+fix: "Investigate and remove unexpected symlinks:
+  List symlinks: 'find /etc -type l -ls'
+  Verify target: 'readlink <path>'
+  Remove unauthorized: 'rm <path>'"
+breakage: "Some packages legitimately create symlinks in /etc (e.g., /etc/resolv.conf -> /run/systemd/resolve/stub-resolv.conf)"
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:N (6.1)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.30
+known_exceptions:
+  - "systemd-resolved symlinks for resolv.conf"
+  - "Alternatives system symlinks (/etc/alternatives/*)"
+  - "Package-managed symlinks for compatibility"
+related_findings:
+  - "FS-101"
+  - "FS-403"
+severity_override: null
+tags:
+  - "filesystem"
+  - "symlinks"
+  - "tampering"
+mitre_mappings:
+  - "T1574"
+  - "T1574.001"
+  - "T1574.002"

@@ -1,0 +1,31 @@
+id: FS-102
+title: Unexpected Executables in PATH
+threat: Executables in system PATH directories that are not owned by any package may be malware, backdoors, or unauthorized tools that bypass security controls.
+exploit: "An attacker places a malicious binary in /usr/local/bin with a name that matches a common command. When a privileged user or script runs that command, the malicious binary executes with their privileges."
+impact: Local privilege escalation, persistence, and potential lateral movement. Unauthorized binaries can be backdoors, keyloggers, or credential stealers.
+fix: "Investigate and remove unauthorized executables:
+  Identify package: 'dpkg -S <path>'
+  Remove unauthorized: 'rm <path>'
+  Review PATH directories: 'echo $PATH | tr : \\n'"
+breakage: "User-installed tools (pipx, cargo, go binaries) may place files in PATH without package manager tracking."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.25
+known_exceptions:
+  - "User-installed development tools (pip, npm, cargo)"
+  - "Snap binaries in /snap/bin"
+  - "Manual administrator tool installations"
+related_findings:
+  - "PRM-101"
+  - "FS-403"
+severity_override: null
+tags:
+  - "filesystem"
+  - "executables"
+  - "backdoor"
+mitre_mappings:
+  - "T1036"
+  - "T1505"

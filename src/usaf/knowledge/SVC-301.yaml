@@ -1,0 +1,31 @@
+id: SVC-301
+title: Failed Services
+threat: Failed systemd services indicate software malfunctions, configuration errors, or intentional service disabling by an attacker to evade detection.
+exploit: "An attacker disables security monitoring services (auditd, fail2ban, crowdsec) causing them to fail on startup. Alternatively, a malicious service fails due to configuration errors, masking its presence."
+impact: Reduced security monitoring coverage, potential denial of service, and visibility into service health issues that attackers exploit.
+fix: "Investigate and restart failed services:
+  List: 'systemctl --failed'
+  Details: 'journalctl -u <service> --no-pager'
+  Restart: 'systemctl restart <service>'
+  Enable: 'systemctl enable <service>'"
+breakage: "Some services may fail due to missing hardware, dependencies, or configuration during initial setup."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L (3.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.30
+known_exceptions:
+  - "Services that depend on removable hardware (printers, scanners)"
+  - "Services disabled by design on specialized systems"
+related_findings:
+  - "SVC-102"
+  - "FOR-101"
+severity_override: null
+tags:
+  - "services"
+  - "systemd"
+  - "availability"
+mitre_mappings:
+  - "T1562"
+  - "T1562.001"

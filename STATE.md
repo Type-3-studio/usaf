@@ -81,7 +81,7 @@
 | `FilesystemCollector` | ✅ | SUID, world-writable, capabilities, hidden files (P0) |
 | `CertStoreCollector` | ✅ | System CA bundles, certificate inventory (P0) |
 
-#### Checks (47 total)
+#### Checks (64 total)
 | Check | Status | Severity | Evidence |
 |-------|--------|----------|----------|
 | KERN-101 (ASLR) | ✅ | HIGH | RegistryEvidence |
@@ -116,6 +116,16 @@
 | PKG-402 (Pending Updates) | ✅ | HIGH | PackageEvidence |
 | PRM-101 (SUID Binaries) | ✅ | HIGH | FileEvidence |
 | PRM-201 (World-Writable) | ✅ | HIGH | FileEvidence |
+| FS-101 (Unexpected Files in /etc) | ✅ | MEDIUM | FileEvidence |
+| FS-102 (Unexpected PATH Executables) | ✅ | MEDIUM | FileEvidence |
+| FS-201 (Hidden World-Writable Files) | ✅ | MEDIUM | FileEvidence |
+| FS-202 (Deleted Running Binaries) | ✅ | HIGH | ProcessEvidence |
+| FS-301 (Unexpected /etc Symlinks) | ✅ | LOW | FileEvidence |
+| FS-302 (Immutable File Drift) | ✅ | HIGH | CommandEvidence |
+| FS-401 (Unexpected Capabilities) | ✅ | MEDIUM | FileEvidence |
+| FS-402 (World-Writable Directories) | ✅ | MEDIUM | FileEvidence |
+| FS-403 (Orphaned Files) | ✅ | MEDIUM | FileEvidence |
+| FS-501 (Mount Option Gaps) | ✅ | MEDIUM | RegistryEvidence |
 | BOOT-101 (Secure Boot) | ✅ | HIGH | RegistryEvidence |
 | BOOT-201 (Kernel Lockdown) | ✅ | MEDIUM | RegistryEvidence |
 | BOOT-301 (EFI Integrity) | ✅ | HIGH | RegistryEvidence / FileEvidence |
@@ -128,6 +138,13 @@
 | PER-201 (Unauth Services) | ✅ | HIGH | FileEvidence |
 | SEC-101 (AppArmor) | ✅ | HIGH | FileEvidence |
 | SVC-101 (Insecure Svcs) | ✅ | HIGH | FileEvidence |
+| SVC-102 (Unexpected Enabled Svcs) | ✅ | MEDIUM | RegistryEvidence |
+| SVC-201 (Services Running as Root) | ✅ | MEDIUM | ProcessEvidence |
+| SVC-202 (Svcs from Unknown Binaries) | ✅ | HIGH | FileEvidence |
+| SVC-301 (Failed Services) | ✅ | MEDIUM | RegistryEvidence |
+| SVC-302 (Unexpected Listening Svcs) | ✅ | MEDIUM | NetworkEvidence |
+| SVC-401 (Recently Installed Svcs) | ✅ | MEDIUM | FileEvidence |
+| SVC-402 (Modified Systemd Units) | ✅ | HIGH | FileEvidence |
 | FW-101 (Firewall Active) | ✅ | HIGH | CommandEvidence |
 | USB-101 (USB Storage Restriction) | ✅ | MEDIUM | FileEvidence |
 | PWD-101 (Password Policy Strength) | ✅ | HIGH | FileEvidence |
@@ -190,11 +207,11 @@
 | Module | Status | Lines | Notes |
 |--------|--------|-------|-------|
 | Baseline | ✅ | 300 | store/load/diff, CLI integration |
-| Correlation | ✅ | 720 | 7 rules (SSH brute, persistence, unauth svc, exfil, SUID-ARM, DEF-EVADE, EXPO-VULN), engine |
+| Correlation | ✅ | 860 | 9 rules (7 pre-existing + ROGUE-SVC + FILE-INTEGRITY), engine |
 | Compliance | ✅ | 335 | CIS 27 controls, NIST 6 controls, gap analysis |
 | Profiles | ✅ | 451 | Desktop/server reference profiles, auto-detect |
 | Context Severity | ✅ | 201 | SSH, file perms, users, network context evaluators |
-| Knowledge Base | ✅ | 171 + 25 YAML | YAML for all 25 checks with threat/exploit/impact/fix/CVSS; KB wired into runner pipeline for finding enrichment |
+| Knowledge Base | ✅ | 171 + 42 YAML | YAML for all 42 checks with threat/exploit/impact/fix/CVSS; KB wired into runner pipeline |
 | Trust Scoring | ✅ | 106 | Evidence-quality adjusted confidence |
 | Policies | ✅ | 86 | YAML policy loading, check overrides, severity overrides |
 
@@ -306,9 +323,9 @@ Each prefix has reserved 100-level blocks for subcategories. This prevents renum
 | **USR** | 100–999 | 100=Account integrity, 200=Weak creds, 300=Policy, 400=Privilege, 500=SSH keys, 600=Service accts | 9 |
 | **NET** | 100–999 | 100=Ports, 200=Interfaces, 300=DNS, 400=Kernel net, 500=Wireless, 600=TLS/Certs | 7 |
 | **PKG** | 100–999 | 100=Unnecessary, 200=Integrity, 300=Repos, 400=CVEs, 500=Held | 7 |
-| **FS** | 100–999 | 100=File integrity, 200=Hidden/orphan, 300=Mounts, 400=Symlinks/immutable, 500=Capabilities | 0 |
+| **FS** | 100–999 | 100=File integrity, 200=Hidden/orphan, 300=Mounts, 400=Symlinks/immutable, 500=Capabilities | 10 |
 | **BOOT** | 100–999 | 100=Secure Boot, 200=Lockdown, 300=EFI, 400=GRUB, 500=Kernel images | 5 |
-| **SVC** | 100–999 | 100=Enabled svcs, 200=Security, 300=Listening, 400=Failed, 500=Modified | 1 |
+| **SVC** | 100–999 | 100=Enabled svcs, 200=Security, 300=Listening, 400=Failed, 500=Modified | 8 |
 | **PER** | 100–999 | 100=Cron/at, 200=Systemd, 300=Shell init, 400=LD injection, 500=Kernel, 600=Network, 700=Package hooks, 800=Login/init | 1 |
 | **CTN** | 100–999 | 100=Socket, 200=Privileges, 300=Security, 400=Images, 500=Runtime, 600=LXC | 1 |
 | **LOG** | 100–999 | 100=Journal, 200=Rotation, 300=Tamper, 400=Auth fail, 500=Auditd | 0 |
@@ -433,42 +450,42 @@ The goal is **~500 checks** organized into **20+ categories**, with a **correlat
 
 ---
 
-### Phase 2: Filesystem & Services (~20 checks)
+### Phase 2: Filesystem & Services (~20 checks) — ✅ COMPLETE
 
 **Goal:** Cover filesystem integrity and expand service auditing.
 
-#### Filesystem Integrity (10 checks)
-| ID | Name | Depends |
-|----|------|---------|
-| FS-101 | Unexpected files in /etc | `filesystem` |
-| FS-102 | Unexpected executables in PATH | `filesystem` |
-| FS-201 | Hidden files in world-writable dirs | `filesystem` |
-| FS-202 | Deleted binaries still running | `processes`, `filesystem` |
-| FS-301 | Unexpected symlinks in /etc | `filesystem` |
-| FS-302 | Immutable file drift | `filesystem` |
-| FS-401 | Unexpected file capabilities | `filesystem` |
-| FS-402 | World-writable directories | `filesystem` |
-| FS-403 | Orphaned files (no package owner) | `filesystem`, `apt` |
-| FS-501 | Filesystem mount option gaps (noexec, nosuid) | `mounts` |
+#### Filesystem Integrity (10 checks) — ✅
+| ID | Name | Depends | File |
+|----|------|---------|------|
+| FS-101 | Unexpected files in /etc | `filesystem` | `checks/filesystem/checks.py` |
+| FS-102 | Unexpected executables in PATH | `filesystem` | `checks/filesystem/checks.py` |
+| FS-201 | Hidden files in world-writable dirs | `filesystem` | `checks/filesystem/checks.py` |
+| FS-202 | Deleted binaries still running | `processes` | `checks/filesystem/checks.py` |
+| FS-301 | Unexpected symlinks in /etc | `filesystem` | `checks/filesystem/checks.py` |
+| FS-302 | Immutable file drift | none | `checks/filesystem/checks.py` |
+| FS-401 | Unexpected file capabilities | `filesystem` | `checks/filesystem/checks.py` |
+| FS-402 | World-writable directories | `filesystem` | `checks/filesystem/checks.py` |
+| FS-403 | Orphaned files (no package owner) | `filesystem`, `apt` | `checks/filesystem/checks.py` |
+| FS-501 | Mount option gaps (noexec, nosuid) | `mounts` | `checks/filesystem/checks.py` |
 
-#### Services (7 checks)
-| ID | Name | Depends |
-|----|------|---------|
-| SVC-102 | Unexpected enabled services | `systemd` |
-| SVC-201 | Services running as root | `systemd`, `processes` |
-| SVC-202 | Services from unknown binaries | `systemd`, `apt` |
-| SVC-301 | Failed services | `systemd` |
-| SVC-302 | Unexpected listening services | `systemd`, `sockets` |
-| SVC-401 | Recently installed services | `systemd`, `apt` |
-| SVC-402 | Modified systemd unit files | `systemd` |
+#### Services (7 checks) — ✅
+| ID | Name | Depends | File |
+|----|------|---------|------|
+| SVC-102 | Unexpected enabled services | `systemd` | `checks/services/service_checks.py` |
+| SVC-201 | Services running as root | `systemd`, `processes` | `checks/services/service_checks.py` |
+| SVC-202 | Services from unknown binaries | `systemd` | `checks/services/service_checks.py` |
+| SVC-301 | Failed services | `systemd` | `checks/services/service_checks.py` |
+| SVC-302 | Unexpected listening services | `systemd`, `sockets` | `checks/services/service_checks.py` |
+| SVC-401 | Recently installed services | `systemd` | `checks/services/service_checks.py` |
+| SVC-402 | Modified systemd unit files | `systemd` | `checks/services/service_checks.py` |
 
-#### Phase 2 Correlation Rules (2 new)
+#### Phase 2 Correlation Rules (2 new) — ✅
 | Rule ID | What it detects |
 |---------|----------------|
-| CORR-201 | Rogue service deployment (unknown binary + enabled svc + listening port) |
-| CORR-202 | File integrity breach (orphaned files + unexpected symlinks + modified /etc) |
+| ROGUE-SVC | Rogue service deployment (unknown binary + enabled svc + listening port) |
+| FILE-INTEGRITY | File integrity breach (orphaned files + unexpected symlinks + modified /etc) |
 
-**Exit criteria:** 17 new checks with tests, 2 new correlation rules.
+**Exit criteria:** 17 new checks with tests, 2 new correlation rules, all tests passing. **Status: ✅ COMPLETE**
 
 ---
 
@@ -654,29 +671,29 @@ The correlation engine evolves from simple pattern matching to **attack chain de
 
 ## Target Check Counts by Layer
 
-| Layer | Current | Phase 2 | Phase 3 | Phase 4 | Phase 6 | Target |
+| Layer | Current | Phase 3 | Phase 4 | Phase 6 | Phase 7 | Target |
 |-------|---------|---------|---------|---------|---------|--------|
 | SSH | 3 | 3 | 3 | 3 | 3 | 25 |
 | Kernel | 4 | 4 | 4 | 4 | 4 | 25 |
 | Users | 9 | 9 | 9 | 9 | 9 | 20 |
 | Network | 7 | 7 | 7 | 7 | 7 | 35 |
 | Packages | 7 | 7 | 7 | 7 | 7 | 25 |
-| Filesystem | 0 | 10 | 10 | 10 | 10 | 30 |
+| Filesystem | 10 | 10 | 10 | 10 | 10 | 30 |
 | Permissions | 2 | 2 | 2 | 2 | 2 | 25 |
 | Boot | 5 | 5 | 5 | 5 | 5 | 15 |
-| Services | 1 | 8 | 8 | 8 | 8 | 30 |
-| Persistence | 1 | 1 | 26 | 26 | 26 | 40 |
-| Containers | 1 | 1 | 1 | 9 | 9 | 25 |
-| Logs & Forensics | 1 | 1 | 1 | 9 | 9 | 25 |
-| Secrets | 0 | 0 | 0 | 10 | 10 | 20 |
-| Cloud | 0 | 0 | 0 | 0 | 6 | 20 |
-| Compliance | 1 | 1 | 1 | 1 | 11 | 20 |
+| Services | 8 | 8 | 8 | 8 | 8 | 30 |
+| Persistence | 1 | 26 | 26 | 26 | 26 | 40 |
+| Containers | 1 | 1 | 9 | 9 | 9 | 25 |
+| Logs & Forensics | 1 | 1 | 9 | 9 | 9 | 25 |
+| Secrets | 0 | 0 | 10 | 10 | 10 | 20 |
+| Cloud | 0 | 0 | 0 | 6 | 6 | 20 |
+| Compliance | 1 | 1 | 1 | 11 | 11 | 20 |
 | Firewall | 1 | 1 | 1 | 1 | 1 | 10 |
 | Security (AppArmor/USB) | 2 | 2 | 2 | 2 | 2 | 10 |
 | Compromise | 1 | 1 | 1 | 1 | 1 | 15 |
 | Password | 1 | 1 | 1 | 1 | 1 | 10 |
-| **Total checks** | **47** | **65** | **91** | **117** | **133** | **~450** |
-| **Correlation rules** | 10 | 12 | 17 | 21 | 24 | **50+** |
+| **Total checks** | **64** | **91** | **117** | **133** | **133** | **~450** |
+| **Correlation rules** | 12 | 17 | 21 | 24 | 24 | **50+** |
 
 ---
 
@@ -766,20 +783,20 @@ src/usaf/
 
 ## Metrics & Targets
 
-| Metric | Current | Short-term (P2) | Medium-term (P3) | Long-term (P6) |
+| Metric | Current | Short-term (P3) | Medium-term (P4) | Long-term (P6) |
 |--------|---------|-----------------|-------------------|-----------------|
-| Checks | 47 | 65 | 91 | 133 → **450+** |
-| Collectors | 22 | 22 | 24 | 28 |
-| Correlation rules | 10 | 12 | 17 | 24 → **50+** |
-| Unit tests | 490 | 800+ | 1,500+ | 3,000+ |
+| Checks | 64 | 91 | 117 | 133 → **450+** |
+| Collectors | 22 | 24 | 28 | 30 |
+| Correlation rules | 12 | 17 | 21 | 24 → **50+** |
+| Unit tests | 616 | 1,500+ | 2,000+ | 3,000+ |
 | Integration tests | 93 | 150+ | 300+ | 500+ |
 | Test coverage (stmt) | 85% | 88% | 90% | 92%+ |
 | Test coverage (branch) | 82% | 85% | 88% | 90%+ |
 | mypy --strict | 0 errors | 0 errors | 0 errors | 0 errors |
 | Knowledge YAML coverage | 100% | 100% | 100% | 100% |
 | False positive rate | ~2% | <3% | <3% | <2% |
-| Attack scenario coverage | 3 | 6 | 10 | 20+ |
-| Correlation engine maturity | Basic | Chained | Temporal | Full kill chain |
+| Attack scenario coverage | 5 | 10 | 15 | 20+ |
+| Correlation engine maturity | Chained | Temporal | Temporal | Full kill chain |
 
 ---
 

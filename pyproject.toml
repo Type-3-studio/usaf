@@ -10,7 +10,10 @@ readme = "README.md"
 requires-python = ">=3.13"
 license = {text = "MIT"}
 authors = [
-    {name = "USAF Contributors"},
+    {name = "Type-3 Studio"},
+]
+maintainers = [
+    {name = "Yasser", email = "yasser@type3.studio"},
 ]
 keywords = [
     "security", "audit", "ubuntu", "linux", "hardening",
@@ -37,6 +40,13 @@ dependencies = [
     "requests>=2.31",
     "packaging>=24.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/type-3-studio/usaf"
+Repository = "https://github.com/type-3-studio/usaf"
+Documentation = "https://github.com/type-3-studio/usaf#readme"
+Changelog = "https://github.com/type-3-studio/usaf/releases"
+Issues = "https://github.com/type-3-studio/usaf/issues"
 
 [project.optional-dependencies]
 dev = [

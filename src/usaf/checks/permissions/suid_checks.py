@@ -102,6 +102,7 @@ class UnexpectedSUIDCheck(AuditCheck):
         # Core system utilities
         "coreutils",             # su, passwd, chsh, chfn, newgrp, gpasswd
         "sudo",                  # sudo, sudoedit
+        "sudo-rs",               # Rust implementation of sudo (su-rs, sudo-rs, sudoedit-rs)
         "sudo-ldap",             # sudo LDAP variant
         "shadow",                # login, su, passwd, chfn, chsh, newgrp, expiry, chage
         "login",                 # login

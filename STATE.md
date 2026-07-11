@@ -161,7 +161,7 @@
 | Module | Status | Lines | Notes |
 |--------|--------|-------|-------|
 | Baseline | ✅ | 300 | store/load/diff, CLI integration |
-| Correlation | ✅ | 506 | 4 rules (SSH brute, persistence, unauth svc, exfil), engine |
+| Correlation | ✅ | 720 | 7 rules (SSH brute, persistence, unauth svc, exfil, SUID-ARM, DEF-EVADE, EXPO-VULN), engine |
 | Compliance | ✅ | 335 | CIS 27 controls, NIST 6 controls, gap analysis |
 | Profiles | ✅ | 451 | Desktop/server reference profiles, auto-detect |
 | Context Severity | ✅ | 201 | SSH, file perms, users, network context evaluators |
@@ -197,7 +197,7 @@
 | Area | Tests | Lines | Notes |
 |------|-------|-------|-------|
 | Unit tests | 490 | 7,150+ | **48 test files** across all modules (organized in subdirectories) |
-| Integration tests | 21 | 450+ | Pipeline, scoring, reporter, and check integration tests |
+| Integration tests | 93 | 1,700+ | Pipeline, scoring, reporter, checks (all 25), collectors, and pipeline edge cases |
 | Golden tests | ✅ | 80 | JSON and Markdown golden report snapshot tests |
 | Kernel checks | ✅ | 131 | tests/unit/checks/test_kernel_checks.py |
 | SSH checks | ✅ | 127 | tests/unit/checks/test_ssh_checks.py |
@@ -230,6 +230,9 @@
 | Terminal reporter | ✅ | 43 | tests/unit/reporting/test_terminal_reporter.py |
 | Markdown reporter | ✅ | 41 | tests/unit/reporting/test_markdown_reporter.py |
 | Base reporter | ✅ | 26 | tests/unit/reporting/test_base_reporter.py |
+| Deep checks integration | ✅ | 520 | tests/integration/test_checks_deep_integration.py — all 25 checks with pass/fail scenarios |
+| Collectors integration | ✅ | 115 | tests/integration/test_collectors_integration.py — manager, registry, lifecycle |
+| Pipeline edge cases | ✅ | 150 | tests/integration/test_pipeline_edge_cases.py — errors, parallel, config, filtering |
 | Finding model | ✅ | — | tests/unit/models/test_finding.py |
 | References model | ✅ | 66 | tests/unit/models/test_references.py |
 | Severity model | ✅ | — | tests/unit/models/test_severity.py |
@@ -255,7 +258,7 @@
 | `mypy` config | ✅ | strict mode |
 | Pre-commit hooks | ✅ | ruff, mypy (0 errors ✅), trailing whitespace, YAML/TOML check |
 | CI/CD | ✅ | GitHub Actions: ruff lint+format, mypy (0 errors ✅), pytest on push/PR |
-| Versioning | ✅ | 0.4.0 — semver |
+| Versioning | ✅ | 0.3.0 — semver |
 
 ---
 
@@ -291,7 +294,7 @@
 |----|-------------|----------|--------|
 | TD-001 | `metadata.configuration_file` set to `scan_name` instead of config path | LOW | ✅ |
 | TD-002 | `metadata.end_time` set to `scan_start_dt` instead of actual end time | LOW | ✅ |
-| TD-003 | No integration tests (5 added, more needed) | MEDIUM | ◐ |
+| TD-003 | Integration tests coverage expanded from 21→93 tests (8 test files, 3 new) | MEDIUM | ✅ |
 | TD-004 | ~~Scoring ignores confidence~~ → **Fixed** (P1-1 + P3-3) | HIGH | ✅ |
 | TD-005 | Collectors hardcoded in runner → **Fixed** (auto-discovered) | MEDIUM | ✅ |
 | TD-006 | No parallel execution despite `parallel=True` in config | LOW | ✅ |
@@ -305,6 +308,9 @@
 | TD-014 | Systemd collector doesn't strip `●` bullet char → service names corrupted for failed/degraded units | HIGH | ✅ |
 | TD-015 | `get_package_for_file()` doesn't resolve symlinks → `/bin/*` and `/sbin/*` show "Not owned by any installed package" (merged-usr layout) | HIGH | ✅ |
 | TD-016 | CMP-001 supported versions hardcoded to 20.04/22.04/24.04 → 26.04 flagged as unsupported | MEDIUM | ✅ |
+| TD-017 | PKG-001 flags desktop packages (cups, avahi, whoopsie, xorg) on desktop systems | MEDIUM | ✅ |
+| TD-018 | PER-001 doesn't filter snap-managed services → false positives for snap.svc names | MEDIUM | ✅ |
+| TD-019 | PER-001 doesn't filter known-legitimate services (e.g., switcheroo-control → "proxy" match) | LOW | ✅ |
 
 ---
 
@@ -364,10 +370,11 @@ src/usaf/
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
 | Checks | 25 | 25+ | ✅ (target met) |
+| Findings (real desktop scan) | 29→**22** | — | ✅ (-7 false findings eliminated) |
 | Collectors | 15 | 15+ | ✅ (target met) |
-| Unit tests | 490 | 300+ | ✅ (target exceeded) |
+| Unit tests | 490→**511** | 300+ | ✅ (+21 correlation rule tests added) |
 | Unit test files | 48 | 40+ | ✅ (target exceeded) |
-| Integration tests | 21 | 15+ | ✅ (target exceeded) |
+| Integration tests | 21→**93** | 15+ | ✅ (72 new tests across 3 new files) |
 | Test coverage (stmt) | ~40% → **85%** | 85%+ | ✅ (target met) |
 | Test coverage (branch) | ~29% → **82%** | 80%+ | ✅ (target met) |
 | CI pipeline | Green on push | Green on push | ✅ |
@@ -375,9 +382,12 @@ src/usaf/
 | Knowledge YAML coverage | 16/25 (64%) → **25/25 (100%)** | 100% | ✅ (9 missing files created) |
 | Knowledge enrichment in pipeline | Off → **Enabled** | Enabled | ✅ (wired into runner Phase 3.8) |
 | Severity pipeline dead data | Yes → **Fixed** | Fixed | ✅ (adjustments now applied to findings) |
-| False positive rate (SUID) | ~80% → ~30% → **~5% → ~3%** | <10% | ✅ (known-safe allowlist + symlink resolution for merged-usr) |
+| False positive rate (SUID) | ~80% → ~30% → **~5% → ~2%** | <10% | ✅ (known-safe + symlink resolution + sudo-rs added) |
+| Desktop package false positives | 4 per scan → **0** | 0 | ✅ (desktop detection in PKG-001) |
+| Service detection false positives | varied → **eliminated** | 0 | ✅ (bullet fix + benign/snap filter) |
+| Total findings (desktop, after config) | 29 → **4** | — | ✅ (SUID allowlist eliminated 18 false positives) |
 | Confidence scoring | Applied | Applied | ✅ |
-| Correlation rules | 4 | 4+ | ✅ |
+| Correlation rules | 4→**7** | 4+ | ✅ (3 new: SUID-ARM, DEF-EVADE, EXPO-VULN) |
 | Baseline support | Full | Full + timeline | ◐ |
 | Remote scanning | None | SSH transport | 🔴 |
 

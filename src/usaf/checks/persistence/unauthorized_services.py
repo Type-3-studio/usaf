@@ -28,6 +28,10 @@ class UnauthorizedServicesCheck(AuditCheck):
         "proxy",
     ]
 
+    BENIGN_SERVICES = {
+        "switcheroo-control.service",
+    }
+
     def _run_check(self, collectors: dict) -> list:
         sysd_data = self._get_data(collectors, "systemd")
         services = sysd_data.get("services", [])
@@ -37,6 +41,10 @@ class UnauthorizedServicesCheck(AuditCheck):
             name = svc.get("name", "")
             desc = svc.get("description", "").lower()
             if not svc.get("active") or svc.get("active") == "inactive":
+                continue
+            if name in self.BENIGN_SERVICES:
+                continue
+            if name.startswith("snap."):
                 continue
             matched = [p for p in self.SUSPICIOUS_PATTERNS if p in name.lower() or p in desc]
             if not matched:

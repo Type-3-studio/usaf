@@ -33,13 +33,22 @@ class UnnecessaryPackagesCheck(AuditCheck):
         "xserver-xorg-core": "X11 server (unnecessary on headless servers)",
     }
 
+    DESKTOP_PACKAGES = {"cups", "avahi-daemon", "whoopsie", "xserver-xorg-core"}
+    DESKTOP_META_PACKAGES = {"ubuntu-desktop", "kubuntu-desktop", "xubuntu-desktop", "lubuntu-desktop", "ubuntu-desktop-minimal"}
+
+    def _is_desktop(self, installed_names: set[str]) -> bool:
+        return bool(installed_names & self.DESKTOP_META_PACKAGES)
+
     def _run_check(self, collectors: dict) -> list:
         apt_data = self._get_data(collectors, "apt")
         packages = apt_data.get("packages", [])
         findings: list = []
 
         installed_names = {p.get("name", "") for p in packages}
+        is_desktop = self._is_desktop(installed_names)
         for pkg_name, reason in self.RISKY_PACKAGES.items():
+            if is_desktop and pkg_name in self.DESKTOP_PACKAGES:
+                continue
             if pkg_name not in installed_names:
                 continue
             pkg_info: dict = next((p for p in packages if p.get("name") == pkg_name), {})

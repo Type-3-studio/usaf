@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from usaf.correlation.engine import CorrelatedFinding, CorrelationRule
-from usaf.models.evidence import NetworkEvidence
+from usaf.models.evidence import NetworkEvidence, PackageEvidence
 from usaf.models.finding import Finding
-from usaf.models.severity import CheckCategory, Severity
+from usaf.models.severity import Severity
 
 
 class SSHBruteForceSurface(CorrelationRule):
@@ -323,5 +323,245 @@ class DataExfilSurface(CorrelationRule):
                 severity=Severity.MEDIUM,
                 tags=["exfiltration", "sniffing", "promiscuous", "data-theft"],
                 mitre_attack_ids=["T1040", "T1205"],
+            )
+        ]
+
+
+class SuidArmingChain(CorrelationRule):
+    """Detects privilege escalation chains via SUID + world-writable files.
+
+    Combines world-writable critical files (PRM-002) with unexpected SUID
+    binaries (PRM-001). An attacker who can write to a file that is then
+    executed by a SUID binary can trivially escalate to root.
+    """
+
+    id = "SUID-ARM"
+    name = "SUID Privilege Escalation Chain"
+    description = "Detects world-writable files combined with SUID binaries enabling privesc"
+    severity = Severity.CRITICAL
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        ww_findings = [f for f in findings if f.check_id == "PRM-002"]
+        suid_findings = [f for f in findings if f.check_id == "PRM-001"]
+
+        if not ww_findings or not suid_findings:
+            return []
+
+        ww_paths = [
+            getattr(f.evidence, "path", "")
+            for f in ww_findings
+            if hasattr(f.evidence, "path")
+        ]
+        suid_paths = [
+            getattr(f.evidence, "path", "")
+            for f in suid_findings
+            if hasattr(f.evidence, "path")
+        ]
+
+        return [
+            self._make_finding(
+                finding_id="001",
+                title="Privilege Escalation Chain — SUID + World-Writable Files",
+                description=(
+                    f"Found {len(ww_findings)} world-writable file(s) "
+                    f"({', '.join(ww_paths[:3])}) and {len(suid_findings)} "
+                    f"unexpected SUID binary(es) ({', '.join(suid_paths[:3])}). "
+                    "A world-writable file that a SUID binary depends on can "
+                    "be replaced to execute arbitrary code as root."
+                ),
+                rationale=(
+                    "The combination of SUID binaries and world-writable files "
+                    "creates a direct privilege escalation vector. If a SUID binary "
+                    "loads a library, reads a config, or executes a helper from a "
+                    "world-writable path, any user can replace that resource with "
+                    "malicious content and gain root when the SUID binary runs. "
+                    "This is a well-known technique used by privilege escalation "
+                    "tools such as GTFO Bins."
+                ),
+                remediation=(
+                    "1. Remove world-writable permissions: 'chmod o-w <file>'\n"
+                    "2. Audit SUID binaries: 'find / -perm -4000 -ls'\n"
+                    "3. Verify all SUID binaries are from official packages\n"
+                    "4. Check SUID binary dependencies: 'ldd <binary>'"
+                ),
+                source_findings=ww_findings + suid_findings,
+                severity=Severity.CRITICAL,
+                tags=["privilege-escalation", "suid", "world-writable", "privesc-chain"],
+                mitre_attack_ids=["T1548.001", "T1574.001", "T1574.002"],
+                cis_benchmarks=["CIS Ubuntu 22.04: 1.7", "CIS Ubuntu 22.04: 5.1"],
+            )
+        ]
+
+
+class DefenseEvasionIndicators(CorrelationRule):
+    """Detects systems where multiple security controls are disabled.
+
+    Combines firewall inactive (FIREWALL-001), disabled auditd (FOR-001),
+    disabled AppArmor (SEC-001), and disabled USB storage (USB-001) to
+    identify potential defense evasion by an attacker.
+    """
+
+    id = "DEF-EVADE"
+    name = "Defense Evasion Indicators"
+    description = "Detects multiple disabled security controls suggesting defense evasion"
+    severity = Severity.HIGH
+
+    REQUIRED_CHECK_IDS = {
+        "FIREWALL-001",
+        "FOR-001",
+        "SEC-001",
+        "USB-001",
+    }
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        disabled_controls: dict[str, Finding] = {}
+
+        for f in findings:
+            check_id = f.check_id
+            if check_id in self.REQUIRED_CHECK_IDS:
+                disabled_controls[check_id] = f
+
+        if len(disabled_controls) < 2:
+            return []
+
+        control_names: list[str] = []
+        for cid in ["FIREWALL-001", "FOR-001", "SEC-001", "USB-001"]:
+            if cid in disabled_controls:
+                name = {
+                    "FIREWALL-001": "firewall",
+                    "FOR-001": "auditd",
+                    "SEC-001": "AppArmor",
+                    "USB-001": "USB storage restriction",
+                }.get(cid, cid)
+                control_names.append(name)
+
+        return [
+            self._make_finding(
+                finding_id="001",
+                title=f"Multiple Security Controls Disabled ({len(disabled_controls)}/{len(self.REQUIRED_CHECK_IDS)})",
+                description=(
+                    f"Disabled security control(s): {', '.join(control_names)}. "
+                    "Having multiple security subsystems disabled simultaneously "
+                    "may indicate defense evasion by an attacker who has "
+                    "deactivated protections to avoid detection."
+                ),
+                rationale=(
+                    "Attackers routinely disable security controls after gaining "
+                    "initial access to avoid detection and maintain persistence. "
+                    "Firewall deactivation allows outbound C2 traffic. Auditd "
+                    "disabling erases forensic evidence. AppArmor disablement "
+                    "removes containment restrictions. When multiple controls "
+                    "are disabled, the probability of active compromise increases "
+                    "significantly above the baseline of each individual finding."
+                ),
+                remediation=(
+                    "1. Enable firewall: 'ufw enable' or 'systemctl enable --now nftables'\n"
+                    "2. Enable auditd: 'systemctl enable --now auditd'\n"
+                    "3. Enable AppArmor: 'systemctl enable --now apparmor'\n"
+                    "4. Investigate HOW controls were disabled: check auth.log\n"
+                    "5. Review recent sudo usage: 'grep sudo /var/log/auth.log'"
+                ),
+                source_findings=list(disabled_controls.values()),
+                severity=Severity.HIGH,
+                tags=["defense-evasion", "tampering", "compromise", "hardening"],
+                mitre_attack_ids=["T1562.001", "T1562.004", "T1562.006", "T1562.010"],
+                cis_benchmarks=["CIS Ubuntu 22.04: 1.4", "CIS Ubuntu 22.04: 3.2"],
+            )
+        ]
+
+
+class ExposedVulnerableService(CorrelationRule):
+    """Detects vulnerable/risky packages exposed on network ports.
+
+    Combines PKG-001 findings (risky packages like cups, samba, telnet)
+    with NET-001 findings (listening ports) to identify services that
+    are both installed and network-accessible.
+    """
+
+    id = "EXPO-VULN"
+    name = "Exposed Vulnerable Service"
+    description = "Detects risky packages that are listening on network ports"
+    severity = Severity.CRITICAL
+
+    PKG_PORT_MAP: dict[str, set[int]] = {
+        "cups": {631},
+        "samba": {139, 445},
+        "snmpd": {161},
+        "telnetd": {23},
+        "rsh-server": {513, 514},
+    }
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        risky_pkgs: dict[str, Finding] = {}
+        for f in findings:
+            if f.check_id == "PKG-001":
+                ev = f.evidence
+                if isinstance(ev, PackageEvidence) and ev.name:
+                    risky_pkgs[ev.name] = f
+
+        listening_ports: dict[int, Finding] = {}
+        for f in findings:
+            if f.check_id == "NET-001":
+                port = getattr(f.evidence, "local_port", None)
+                if isinstance(port, int):
+                    listening_ports[port] = f
+
+        if not risky_pkgs or not listening_ports:
+            return []
+
+        exposed: list[dict[str, object]] = []
+        for pkg_name, pkg_finding in risky_pkgs.items():
+            expected_ports = self.PKG_PORT_MAP.get(pkg_name, set())
+            matched_ports = expected_ports & listening_ports.keys()
+            for port in matched_ports:
+                exposed.append({
+                    "package": pkg_name,
+                    "port": port,
+                    "pkg_finding": pkg_finding,
+                    "port_finding": listening_ports[port],
+                })
+
+        if not exposed:
+            return []
+
+        details = "; ".join(
+            f"{e['package']} on port {e['port']}" for e in exposed
+        )
+        source_findings = []
+        for e in exposed:
+            if e["pkg_finding"] not in source_findings:
+                source_findings.append(e["pkg_finding"])
+            if e["port_finding"] not in source_findings:
+                source_findings.append(e["port_finding"])
+
+        return [
+            self._make_finding(
+                finding_id="001",
+                title=f"Exposed Vulnerable Service(s): {details}",
+                description=(
+                    f"Risk package(s) detected listening on network port(s): {details}. "
+                    "These services are both installed (potentially with known "
+                    "vulnerabilities) and network-accessible, creating a remote "
+                    "exploitation surface."
+                ),
+                rationale=(
+                    "A service that is both installed and listening on a network "
+                    "port is remotely exploitable. Risky packages such as CUPS, "
+                    "Samba, and SNMP have historical CVEs allowing remote code "
+                    "execution, credential theft, and information disclosure. "
+                    "On internet-facing systems, exposed services are the primary "
+                    "initial access vector for attackers."
+                ),
+                remediation=(
+                    "1. Remove unnecessary packages: 'apt purge <package>'\n"
+                    "2. If required, bind to localhost only in the service config\n"
+                    "3. Add firewall rules to restrict access: 'ufw deny <port>'\n"
+                    "4. Ensure the service is patched: 'apt update && apt upgrade'"
+                ),
+                source_findings=source_findings,
+                severity=Severity.CRITICAL,
+                tags=["exposed-service", "remote-exploit", "vulnerability", "attack-surface"],
+                mitre_attack_ids=["T1190", "T1043", "T1505"],
+                cis_benchmarks=["CIS Ubuntu 22.04: 2.1", "CIS Ubuntu 22.04: 4.4"],
             )
         ]

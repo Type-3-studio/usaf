@@ -3,11 +3,14 @@ from __future__ import annotations
 from usaf.correlation.engine import CorrelationEngine
 from usaf.correlation.rules import (
     DataExfilSurface,
+    DefenseEvasionIndicators,
+    ExposedVulnerableService,
     SSHBruteForceSurface,
+    SuidArmingChain,
     SuspiciousPersistence,
     UnauthorizedService,
 )
-from usaf.models.evidence import FileEvidence, NetworkEvidence
+from usaf.models.evidence import FileEvidence, NetworkEvidence, PackageEvidence
 from usaf.models.finding import Finding
 from usaf.models.severity import CheckCategory, Severity
 
@@ -203,6 +206,162 @@ class TestDataExfilSurface:
         assert "sniffing" in result[0].title.lower()
 
 
+class TestSuidArmingChain:
+    def test_no_ww_findings_returns_empty(self):
+        rule = SuidArmingChain()
+        result = rule.evaluate([])
+        assert result == []
+
+    def test_no_suid_findings_returns_empty(self):
+        rule = SuidArmingChain()
+        findings = [
+            _make_finding_with_ww_file("PRM-002-001", "ww", Severity.HIGH, "/etc/shadow"),
+        ]
+        result = rule.evaluate(findings)
+        assert result == []
+
+    def test_both_required_for_correlation(self):
+        rule = SuidArmingChain()
+        findings = [
+            _make_finding_with_ww_file("PRM-002-001", "ww", Severity.HIGH, "/etc/shadow"),
+            _make_finding("PRM-001-001", "suid binary", Severity.HIGH),
+        ]
+        result = rule.evaluate(findings)
+        assert len(result) == 1
+        assert "privilege escalation" in result[0].title.lower()
+
+    def test_mitre_mapping_present(self):
+        rule = SuidArmingChain()
+        findings = [
+            _make_finding_with_ww_file("PRM-002-001", "ww", Severity.HIGH, "/etc/passwd"),
+            _make_finding("PRM-001-001", "suid", Severity.HIGH),
+        ]
+        result = rule.evaluate(findings)
+        assert "T1548.001" in result[0].mitre_attack_ids
+
+    def test_ww_paths_in_description(self):
+        rule = SuidArmingChain()
+        findings = [
+            _make_finding_with_ww_file("PRM-002-001", "ww", Severity.HIGH, "/etc/shadow"),
+            _make_finding("PRM-001-001", "suid", Severity.HIGH),
+        ]
+        result = rule.evaluate(findings)
+        assert "/etc/shadow" in result[0].description
+
+
+class TestDefenseEvasionIndicators:
+    def test_no_findings_returns_empty(self):
+        rule = DefenseEvasionIndicators()
+        result = rule.evaluate([])
+        assert result == []
+
+    def test_single_control_does_not_trigger(self):
+        rule = DefenseEvasionIndicators()
+        findings = [
+            _make_finding("FIREWALL-001-001", "firewall inactive", Severity.HIGH),
+        ]
+        result = rule.evaluate(findings)
+        assert result == []
+
+    def test_two_disabled_controls_triggers(self):
+        rule = DefenseEvasionIndicators()
+        findings = [
+            _make_finding("FIREWALL-001-001", "firewall inactive", Severity.HIGH),
+            _make_finding("FOR-001-001", "auditd disabled", Severity.MEDIUM),
+        ]
+        result = rule.evaluate(findings)
+        assert len(result) == 1
+        assert "defense" in result[0].title.lower() or "security" in result[0].title.lower()
+
+    def test_all_four_disabled_triggers(self):
+        rule = DefenseEvasionIndicators()
+        findings = [
+            _make_finding("FIREWALL-001-001", "fw", Severity.HIGH),
+            _make_finding("FOR-001-001", "auditd", Severity.MEDIUM),
+            _make_finding("SEC-001-001", "apparmor", Severity.HIGH),
+            _make_finding("USB-001-001", "usb", Severity.MEDIUM),
+        ]
+        result = rule.evaluate(findings)
+        assert len(result) == 1
+        assert "4/4" in result[0].title
+
+    def test_mitre_mapping_present(self):
+        rule = DefenseEvasionIndicators()
+        findings = [
+            _make_finding("FIREWALL-001-001", "fw", Severity.HIGH),
+            _make_finding("FOR-001-001", "auditd", Severity.MEDIUM),
+        ]
+        result = rule.evaluate(findings)
+        assert "T1562.001" in result[0].mitre_attack_ids
+
+
+class TestExposedVulnerableService:
+    def test_no_risky_pkgs_returns_empty(self):
+        rule = ExposedVulnerableService()
+        result = rule.evaluate([])
+        assert result == []
+
+    def test_no_listening_ports_returns_empty(self):
+        rule = ExposedVulnerableService()
+        findings = [
+            _make_finding_with_package("PKG-001-001", "cups", Severity.MEDIUM, "cups"),
+        ]
+        result = rule.evaluate(findings)
+        assert result == []
+
+    def test_cups_on_port_631_triggers(self):
+        rule = ExposedVulnerableService()
+        findings = [
+            _make_finding_with_package("PKG-001-001", "cups installed", Severity.MEDIUM, "cups"),
+            _make_finding_with_port("NET-001-001", "ipp", Severity.MEDIUM, 631),
+        ]
+        result = rule.evaluate(findings)
+        assert len(result) == 1
+        assert "cups" in result[0].title.lower()
+        assert "631" in result[0].title
+
+    def test_samba_on_port_445_triggers(self):
+        rule = ExposedVulnerableService()
+        findings = [
+            _make_finding_with_package("PKG-001-001", "samba installed", Severity.MEDIUM, "samba"),
+            _make_finding_with_port("NET-001-001", "smb", Severity.MEDIUM, 445),
+        ]
+        result = rule.evaluate(findings)
+        assert len(result) == 1
+        assert "samba" in result[0].title
+
+    def test_irrelevant_port_does_not_trigger(self):
+        rule = ExposedVulnerableService()
+        findings = [
+            _make_finding_with_package("PKG-001-001", "cups installed", Severity.MEDIUM, "cups"),
+            _make_finding_with_port("NET-001-001", "ssh", Severity.MEDIUM, 22),
+        ]
+        result = rule.evaluate(findings)
+        assert result == []
+
+    def test_multiple_exposed_services(self):
+        rule = ExposedVulnerableService()
+        findings = [
+            _make_finding_with_package("PKG-001-001", "cups installed", Severity.MEDIUM, "cups"),
+            _make_finding_with_package("PKG-001-002", "samba installed", Severity.MEDIUM, "samba"),
+            _make_finding_with_port("NET-001-001", "ipp", Severity.MEDIUM, 631),
+            _make_finding_with_port("NET-001-002", "smb", Severity.MEDIUM, 445),
+        ]
+        result = rule.evaluate(findings)
+        assert len(result) == 1
+        assert "cups" in result[0].title
+        assert "samba" in result[0].title
+
+    def test_mitre_mapping_present(self):
+        rule = ExposedVulnerableService()
+        findings = [
+            _make_finding_with_package("PKG-001-001", "cups installed", Severity.MEDIUM, "cups"),
+            _make_finding_with_port("NET-001-001", "ipp", Severity.MEDIUM, 631),
+        ]
+        result = rule.evaluate(findings)
+        assert "T1190" in result[0].mitre_attack_ids
+
+
 class TestCorrelationEngineIntegration:
     def test_full_pipeline_with_all_rules(self):
         engine = CorrelationEngine()
@@ -294,4 +453,40 @@ def _make_finding_with_promiscuous(
         remediation="Test remediation",
         source="TestCheck",
         evidence=FileEvidence(path="/sys/class/net/eth0/flags", content="0x1003"),
+    )
+
+
+def _make_finding_with_ww_file(
+    finding_id: str, title: str, severity: Severity, path: str
+) -> Finding:
+    return Finding(
+        id=finding_id,
+        check_id=finding_id.rsplit("-", 1)[0],
+        category=CheckCategory.PERMISSIONS,
+        severity=severity,
+        risk_score=severity.score,
+        title=title,
+        description="Test world-writable finding",
+        rationale="Test rationale",
+        remediation="Test remediation",
+        source="TestCheck",
+        evidence=FileEvidence(path=path, permission="0o777"),
+    )
+
+
+def _make_finding_with_package(
+    finding_id: str, title: str, severity: Severity, pkg_name: str
+) -> Finding:
+    return Finding(
+        id=finding_id,
+        check_id=finding_id.rsplit("-", 1)[0],
+        category=CheckCategory.PACKAGES,
+        severity=severity,
+        risk_score=severity.score,
+        title=title,
+        description="Test package finding",
+        rationale="Test rationale",
+        remediation="Test remediation",
+        source="TestCheck",
+        evidence=PackageEvidence(name=pkg_name, version="1.0"),
     )

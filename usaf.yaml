@@ -1,0 +1,26 @@
+suid_allowlist:
+  # ntfs-3g - NTFS filesystem mount helper (needs root for mounting)
+  - /bin/ntfs-3g
+  - /sbin/mount.ntfs
+  - /sbin/mount.ntfs-3g
+  - /usr/bin/ntfs-3g
+  - /usr/sbin/mount.ntfs
+  - /usr/sbin/mount.ntfs-3g
+
+  # sudo-rs - Rust implementation of sudo (sudo, su, sudoedit)
+  - /bin/su-rs
+  - /bin/sudo-rs
+  - /bin/sudoedit
+  - /bin/sudoedit-rs
+  - /usr/bin/su-rs
+  - /usr/bin/sudo-rs
+  - /usr/bin/sudoedit
+  - /usr/bin/sudoedit-rs
+
+  # sudo (system version)
+  - /bin/sudo.ws
+  - /usr/bin/sudo.ws
+
+  # pppd - Point-to-Point Protocol daemon
+  - /sbin/pppd
+  - /usr/sbin/pppd

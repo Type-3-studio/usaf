@@ -16,8 +16,6 @@ from usaf.collectors.registry import collector_registry
 from usaf.config.loader import load_config
 from usaf.core.exceptions import PluginDependencyError
 from usaf.core.registry import registry
-from usaf.models.result import CheckResult, ScanMetadata, ScanResult
-from usaf.models.severity import CheckCategory
 
 # Phase 2 components
 from usaf.correlation.engine import (
@@ -26,15 +24,20 @@ from usaf.correlation.engine import (
 )
 from usaf.correlation.rules import (
     DataExfilSurface,
+    DefenseEvasionIndicators,
+    ExposedVulnerableService,
     SSHBruteForceSurface,
+    SuidArmingChain,
     SuspiciousPersistence,
     UnauthorizedService,
 )
-from usaf.severity.engine import SeverityContextEngine
 from usaf.knowledge.base import KnowledgeBase
+from usaf.models.result import CheckResult, ScanMetadata, ScanResult
+from usaf.models.severity import CheckCategory
 
 # Optional imports (graceful fallback if not available)
 from usaf.scoring.engine import ScoringEngine
+from usaf.severity.engine import SeverityContextEngine
 
 
 class ScanRunner:
@@ -71,6 +74,9 @@ class ScanRunner:
         engine.register(SuspiciousPersistence())
         engine.register(UnauthorizedService())
         engine.register(DataExfilSurface())
+        engine.register(SuidArmingChain())
+        engine.register(DefenseEvasionIndicators())
+        engine.register(ExposedVulnerableService())
         return engine
 
     def _setup_collectors(self) -> None:
@@ -328,7 +334,7 @@ class ScanRunner:
         """Inject correlated findings as a synthetic check result."""
         if not correlated:
             return
-        from usaf.models.severity import CheckCategory, Severity
+        from usaf.models.severity import CheckCategory
 
         corr_result = CheckResult(
             check_id="CORRELATION",

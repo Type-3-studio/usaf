@@ -20,6 +20,7 @@ class UbuntuVersionCheck(AuditCheck):
         "20.04": "Standard support ended April 2025; ESM available",
         "22.04": "Supported until April 2027",
         "24.04": "Supported until April 2029",
+        "26.04": "Supported until April 2029",
     }
 
     def _run_check(self, collectors: dict) -> list:
@@ -50,7 +51,7 @@ class UbuntuVersionCheck(AuditCheck):
                 evidence=RegistryEvidence(
                     key="VERSION_ID",
                     value=version,
-                    expected="20.04, 22.04, or 24.04",
+                    expected="20.04, 22.04, 24.04, or 26.04",
                     source="/etc/os-release",
                 ),
                 detected_value=version,

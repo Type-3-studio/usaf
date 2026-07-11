@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import subprocess
 from pathlib import Path
 
@@ -39,7 +40,8 @@ def get_package_for_file(filepath: str) -> str | None:
     global _file_owner_cache
     if _file_owner_cache is None:
         _file_owner_cache = _build_file_owner_cache()
-    return _file_owner_cache.get(filepath.rstrip("/"))
+    real_path = os.path.realpath(filepath)
+    return _file_owner_cache.get(real_path.rstrip("/"))
 
 
 @register_collector

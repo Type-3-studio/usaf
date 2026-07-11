@@ -39,6 +39,7 @@ class SystemdCollector(BaseCollector):
                 check=False,
             )
             for line in result.stdout.splitlines():
+                line = line.lstrip("\u25cf ").lstrip()
                 parts = line.split(maxsplit=4)
                 if len(parts) >= 4:
                     units.append(

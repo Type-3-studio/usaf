@@ -302,6 +302,9 @@
 | TD-011 | CMP-001 (Ubuntu version check) missing `mitre_attack_ids` entirely | MEDIUM | ✅ |
 | TD-012 | `scoring/__init__.py` and `models/__init__.py` were empty (no exports) | LOW | ✅ |
 | TD-013 | 9 checks missing `reference` URL in findings | MEDIUM | ✅ |
+| TD-014 | Systemd collector doesn't strip `●` bullet char → service names corrupted for failed/degraded units | HIGH | ✅ |
+| TD-015 | `get_package_for_file()` doesn't resolve symlinks → `/bin/*` and `/sbin/*` show "Not owned by any installed package" (merged-usr layout) | HIGH | ✅ |
+| TD-016 | CMP-001 supported versions hardcoded to 20.04/22.04/24.04 → 26.04 flagged as unsupported | MEDIUM | ✅ |
 
 ---
 
@@ -372,7 +375,7 @@ src/usaf/
 | Knowledge YAML coverage | 16/25 (64%) → **25/25 (100%)** | 100% | ✅ (9 missing files created) |
 | Knowledge enrichment in pipeline | Off → **Enabled** | Enabled | ✅ (wired into runner Phase 3.8) |
 | Severity pipeline dead data | Yes → **Fixed** | Fixed | ✅ (adjustments now applied to findings) |
-| False positive rate (SUID) | ~80% → ~30% → **~5%** | <10% | ✅ (known-safe package allowlist: 60 packages auto-allowlisted) |
+| False positive rate (SUID) | ~80% → ~30% → **~5% → ~3%** | <10% | ✅ (known-safe allowlist + symlink resolution for merged-usr) |
 | Confidence scoring | Applied | Applied | ✅ |
 | Correlation rules | 4 | 4+ | ✅ |
 | Baseline support | Full | Full + timeline | ◐ |

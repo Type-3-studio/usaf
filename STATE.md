@@ -196,9 +196,9 @@
 #### Testing
 | Area | Tests | Lines | Notes |
 |------|-------|-------|-------|
-| Unit tests | 251 | 3,700+ | 21 test files across all modules |
-| Integration tests | 5 | 112 | Pipeline smoke tests |
-| Golden tests | 🔴 | 0 | Marker exists, no tests |
+| Unit tests | 424 | 6,500+ | 38 test files across all modules |
+| Integration tests | 21 | 450+ | Pipeline, scoring, reporter, and check integration tests |
+| Golden tests | ✅ | 80 | JSON and Markdown golden report snapshot tests |
 | Kernel checks | ✅ | 131 | test_kernel_checks.py |
 | SSH checks | ✅ | 127 | test_ssh_checks.py |
 | Network checks | ✅ | 113 | test_network_checks.py |
@@ -212,6 +212,31 @@
 | Knowledge | ✅ | 216 | test_knowledge_base.py |
 | Profiles | ✅ | 161 | test_profile_manager.py |
 | Severity | ✅ | 235 | test_context_severity.py |
+| Compromise checks (COM-001) | ✅ | 48 | test_compromise_checks.py |
+| Compliance checks (CMP-001) | ✅ | 55 | test_compliance_checks.py |
+| Container checks (CTN-001) | ✅ | 56 | test_container_checks.py |
+| Forensics checks (FOR-001) | ✅ | 48 | test_forensics_checks.py |
+| Kernel module checks (KRN-001) | ✅ | 25 | test_krn_checks.py |
+| Package checks (PKG-001) | ✅ | 50 | test_package_checks.py |
+| Persistence checks (PER-001) | ✅ | 48 | test_persistence_checks.py |
+| Security checks (FIREWALL/SEC/USB) | ✅ | 94 | test_security_checks.py |
+| Service checks (SVC-001) | ✅ | 42 | test_service_checks.py |
+| Password policy (PWD-001) | ✅ | 60 | test_password_policy_checks.py |
+| Cache engine | ✅ | 56 | test_cache.py |
+| Config loader/model | ✅ | 96 | test_config.py |
+| Policy engine | ✅ | 100 | test_policy_engine.py |
+| Terminal reporter | ✅ | 43 | test_terminal_reporter.py |
+| Markdown reporter | ✅ | 41 | test_markdown_reporter.py |
+| Base reporter | ✅ | 26 | test_base_reporter.py |
+| Base collector | ✅ | 75 | collectors/test_collector_base.py |
+| Kernel collector | ✅ | 74 | collectors/test_kernel_collector.py |
+| Socket/Interface collector | ✅ | 91 | collectors/test_socket_collector.py |
+| User/Group/Sudo collector | ✅ | 68 | collectors/test_user_collectors.py |
+| Process collector | ✅ | 55 | collectors/test_process_collector.py |
+| Systemd/Cron collector | ✅ | 67 | collectors/test_systemd_collector.py |
+| Mount collector | ✅ | 36 | collectors/test_mount_collector.py |
+| Firewall collector | ✅ | 50 | collectors/test_firewall_collector.py |
+| APT collector | ✅ | 40 | collectors/test_apt_collector.py |
 
 #### Developer Infrastructure
 | Tool | Status | Notes |
@@ -324,8 +349,8 @@ src/usaf/
 |--------|---------|--------|--------|
 | Checks | 25 | 25+ | ✅ (target met) |
 | Collectors | 13 | 15+ | ◐ |
-| Unit tests | 251 | 300+ | ◐ |
-| Integration tests | 5 | 15+ | ◐ |
+| Unit tests | 424 | 300+ | ✅ (target exceeded) |
+| Integration tests | 21 | 15+ | ✅ (target exceeded) |
 | Test coverage | ~40% | 85%+ | ◐ |
 | CI pipeline | Green on push | Green on push | ✅ |
 | mypy --strict | 15 errors → **0 errors** | 0 errors | ✅ |

@@ -59,7 +59,8 @@ class PolicyEngine:
             elif hasattr(config, "plugins") and hasattr(config.plugins, "overrides"):
                 for check_id, severity in policy.severity_overrides.items():
                     if check_id not in config.plugins.overrides:
-                        config.plugins.overrides[check_id] = dict(
+                        from usaf.config.model import PluginOverride
+                        config.plugins.overrides[check_id] = PluginOverride(
                             severity=severity, enabled=None
                         )
         if policy.ignore_patterns:

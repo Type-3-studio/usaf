@@ -411,6 +411,112 @@ class OldImagesCheck(AuditCheck):
 
 
 @register_check
+class DockerDaemonSecurityCheck(AuditCheck):
+    id = "CTN-302"
+    name = "Docker Daemon Security Configuration"
+    category = CheckCategory.CONTAINERS
+    severity = Severity.MEDIUM
+    description = "Checks Docker daemon config for missing security hardening options"
+    depends = []
+    tags = ["containers", "docker", "daemon", "hardening"]
+
+    RECOMMENDED_CONFIG: dict[str, tuple[str, str, str]] = {
+        "userns-remap": ("default", "User namespace remapping", "Prevents root inside containers from mapping to root on host"),
+        "live-restore": ("true", "Live restore", "Keeps containers running when dockerd restarts"),
+        "no-new-privileges": ("true", "No new privileges", "Prevents privilege escalation via setuid binaries"),
+        "icc": ("false", "Inter-container communication", "Prevents all container-to-container traffic by default"),
+        "log-driver": ("journald", "Log driver", "Ensures container logs go to journald for audit trail"),
+        "userland-proxy": ("false", "Userland proxy", "Disables the userland proxy (uses hairpin NAT instead)"),
+        "iptables": ("true", "iptables management", "Ensures Docker manages iptables rules"),
+    }
+
+    def _run_check(self, collectors: dict) -> list:
+        findings: list = []
+        config = self._read_daemon_config()
+        if config is None:
+            return findings
+
+        for key, (expected, name, rationale) in self.RECOMMENDED_CONFIG.items():
+            actual = config.get(key)
+            actual_str = str(actual).lower() if actual is not None else "not set"
+
+            if key == "userns-remap" and actual is not None:
+                continue
+            if actual_str == expected:
+                continue
+
+            findings.append(
+                self.finding(
+                    finding_id="001",
+                    title=f"Docker daemon missing security option: {name}",
+                    description=(
+                        f"Docker daemon config '{key}' is set to '{actual_str}' "
+                        f"(expected '{expected}'). {rationale}."
+                    ),
+                    rationale=(
+                        f"{rationale}. Docker's default configuration prioritizes "
+                        "ease-of-use over security. Each missing hardening option "
+                        "increases the blast radius of a container compromise."
+                    ),
+                    remediation=(
+                        f"Add '{key}: {expected}' to /etc/docker/daemon.json "
+                        f"and restart: 'systemctl restart docker'"
+                    ),
+                    evidence=FileEvidence(
+                        path="/etc/docker/daemon.json",
+                        content=f"{key}: {actual_str} (expected: {expected})",
+                    ),
+                    detected_value=f"{key}: {actual_str}",
+                    expected_value=f"{key}: {expected}",
+                    affected_component="docker-daemon",
+                    confidence=Confidence.MEDIUM,
+                    false_positive_probability=0.2,
+                    mitre_attack_ids=["T1610"],
+                    cis_benchmarks=["CIS Docker 1.6: 1.1", "CIS Docker 1.6: 5.1"],
+                    tags=["containers", "docker", "hardening"],
+                )
+            )
+
+        if not config.get("log-opts"):
+            findings.append(
+                self.finding(
+                    finding_id="002",
+                    title="Docker daemon missing log shipping configuration",
+                    description="Docker daemon has no log-opts configured for log shipping and rotation.",
+                    rationale="Without log rotation or shipping, container logs can fill up disk space "
+                    "and forensic evidence may be lost. Centralized logging is critical for incident response.",
+                    remediation="Add log shipping to daemon.json: "
+                    '"log-driver": "journald" or "log-driver": "syslog". '
+                    "Configure log rotation with max-size and max-file options.",
+                    evidence=FileEvidence(
+                        path="/etc/docker/daemon.json",
+                        content="log-opts: not configured",
+                    ),
+                    detected_value="No log-opts configured",
+                    expected_value="log-opts with max-size and/or log driver",
+                    affected_component="docker-daemon",
+                    confidence=Confidence.LOW,
+                    false_positive_probability=0.3,
+                    mitre_attack_ids=["T1610"],
+                    tags=["containers", "docker", "logging"],
+                )
+            )
+
+        return findings
+
+    @staticmethod
+    def _read_daemon_config() -> dict | None:
+        import json
+        daemon_json = Path("/etc/docker/daemon.json")
+        if not daemon_json.exists():
+            return None
+        try:
+            return json.loads(daemon_json.read_text())
+        except (json.JSONDecodeError, OSError):
+            return {}
+
+
+@register_check
 class UnsignedImagesCheck(AuditCheck):
     id = "CTN-402"
     name = "Container Images Without Signing Verification"

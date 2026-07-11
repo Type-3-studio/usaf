@@ -1,0 +1,31 @@
+id: LOG-301
+title: Missing Log Periods (Tamper Detection)
+threat: Attackers delete or modify log entries to hide their activities after gaining access.
+exploit: 'After compromising a system, attacker runs: journalctl --rotate && rm -rf /var/log/journal/*. This creates a gap in log history.'
+impact: Inability to determine the timeline of an attack, identify the entry point, or assess the scope of compromise.
+fix: 'Investigate log gaps. Send logs to a remote syslog server for immutable audit trail. Use AIDE or Tripwire to monitor log file integrity.'
+breakage: Log rotation during normal operation creates expected gaps that must be distinguished from tampering.
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N (6.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Newly provisioned systems with short uptime"
+  - "Systems that were offline for maintenance"
+  - "Log rotation creating temporary gaps"
+related_findings:
+  - "FOR-101"
+  - "LOG-101"
+severity_override: null
+tags:
+  - "forensics"
+  - "logging"
+  - "tamper"
+  - "timeline"
+mitre_mappings:
+  - "T1070"
+  - "T1562.002"
+  - "T1654"

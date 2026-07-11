@@ -1,0 +1,28 @@
+id: LOG-302
+title: Log File Permissions
+threat: World-readable log files expose sensitive information including IP addresses, usernames, and system activity.
+exploit: 'cat /var/log/auth.log — any user on the system can read authentication logs containing usernames, timestamps, and remote IPs.'
+impact: Information disclosure enabling targeted attacks, privilege escalation, and user activity profiling.
+fix: 'Set log file permissions to 640 (owner/group read): chmod 640 /var/log/*.log. Ensure umask is restrictive for logging processes.'
+breakage: Monitoring tools running as non-root users may lose access to log files if permissions are too restrictive.
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N (3.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Shared syslog groups (adm, systemd-journal) need read access"
+  - "Container hosts with deliberately permissive logging"
+related_findings:
+  - "PRM-201"
+severity_override: null
+tags:
+  - "forensics"
+  - "logging"
+  - "permissions"
+  - "tamper"
+mitre_mappings:
+  - "T1070"
+  - "T1562.002"

@@ -1,0 +1,29 @@
+id: LOG-501
+title: Auditd Rule Coverage Gaps
+threat: Missing audit rules create blind spots where attacker activities go undetected.
+exploit: 'Attacker checks audit rules: auditctl -l. If no rule for /etc/shadow, they can modify users without detection.'
+impact: Undetected privilege escalation, persistence, and data exfiltration due to missing audit coverage of critical paths.
+fix: 'Deploy comprehensive audit rules. Use CIS benchmark or STIG rule sets. Enable rules for time changes, user/group mgmt, network config, kernel modules, and login events.'
+breakage: Comprehensive audit rules generate significant log volume. Ensure adequate disk space and log rotation.
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N (6.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Systems with very specific compliance requirements using targeted rules"
+  - "Systems forwarding audit events to SIEM with different rule sets"
+related_findings:
+  - "FOR-101"
+  - "LOG-502"
+severity_override: null
+tags:
+  - "auditing"
+  - "rules"
+  - "coverage"
+  - "compliance"
+mitre_mappings:
+  - "T1070"
+  - "T1562"

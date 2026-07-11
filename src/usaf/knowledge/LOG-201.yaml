@@ -1,0 +1,29 @@
+id: LOG-201
+title: Journald Log Rotation / Persistence
+threat: Logs stored only in volatile memory are lost on reboot, preventing forensic investigation.
+exploit: 'After gaining initial access, attacker reboots the system or triggers a crash to wipe volatile journal logs, covering their tracks.'
+impact: Complete loss of system logs on reboot, inability to investigate past incidents, compliance violations.
+fix: 'Enable persistent logging: mkdir -p /var/log/journal && systemctl restart systemd-journald.'
+breakage: Persistent logging uses disk space. Systems with limited disk may need centralized logging instead.
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L (5.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.02
+known_exceptions:
+  - "Ephemeral containers and cloud instances with centralized logging"
+  - "Embedded systems with read-only filesystems"
+related_findings:
+  - "LOG-101"
+  - "LOG-301"
+severity_override: null
+tags:
+  - "logging"
+  - "journald"
+  - "persistence"
+  - "rotation"
+mitre_mappings:
+  - "T1070"
+  - "T1562.002"

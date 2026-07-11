@@ -1,0 +1,28 @@
+id: LOG-101
+title: Journald Max Size / Retention
+threat: Unbounded journal logs filling disk and causing denial of service, or no logs at all.
+exploit: 'An attacker fills disk by triggering verbose logging, causing service failures. Without retention limits, logs grow unbounded.'
+impact: Disk exhaustion causing service failures, or complete loss of forensic evidence when logging is disabled.
+fix: 'Set SystemMaxUse=4G and MaxRetentionSec=1month in /etc/systemd/journald.conf. Set Storage=auto or persistent.'
+breakage: Setting overly aggressive limits may cause logs to be rotated too aggressively, losing useful data.
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L (5.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Containers and ephemeral systems that don't need persistent logging"
+  - "Systems forwarding logs to a centralized log server"
+related_findings:
+  - "LOG-201"
+severity_override: null
+tags:
+  - "logging"
+  - "journald"
+  - "retention"
+  - "disk-space"
+mitre_mappings:
+  - "T1070"
+  - "T1562.002"

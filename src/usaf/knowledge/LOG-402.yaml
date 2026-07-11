@@ -1,0 +1,31 @@
+id: LOG-402
+title: Repeated SSH Authentication Failures
+threat: SSH brute force attacks attempting to gain unauthorized remote access.
+exploit: 'Using hydra or medusa: hydra -l root -P passwords.txt ssh://target — automated SSH password guessing.'
+impact: Successful SSH brute force leads to remote code execution, system compromise, and use as a pivot point for network attacks.
+fix: 'Configure auditd or fail2ban for SSH monitoring. Disable password authentication for SSH. Use SSH keys or certificates. Implement rate limiting.'
+breakage: fail2ban may block legitimate users who mistype passwords. SSH key-only auth may break automated scripts.
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Legitimate users with multiple failed login attempts"
+  - "Automated monitoring systems testing credentials"
+related_findings:
+  - "SSH-101"
+  - "SSH-102"
+  - "LOG-401"
+severity_override: null
+tags:
+  - "auditing"
+  - "ssh"
+  - "brute-force"
+  - "authentication"
+mitre_mappings:
+  - "T1070"
+  - "T1110"
+  - "T1190"

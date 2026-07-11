@@ -84,7 +84,7 @@
 | `SecretsCollector` | ✅ | Credential scanning: AWS/GCP keys, GitHub tokens, API keys, .env files, DB creds |
 | `SnapCollector` | ✅ | Snap package inventory, file→package resolution |
 
-#### Checks (101 total)
+#### Checks (109 total)
 | Check | Status | Severity | Evidence |
 |-------|--------|----------|----------|
 | KERN-101 (ASLR) | ✅ | HIGH | RegistryEvidence |
@@ -140,6 +140,14 @@
 | COM-101 (Bad Processes) | ✅ | HIGH | ProcessEvidence |
 | CTN-101 (Docker Socket) | ✅ | HIGH | FileEvidence |
 | FOR-101 (Audit Logs) | ✅ | MEDIUM | FileEvidence |
+| LOG-101 (Journal Max Size) | ✅ | MEDIUM | RegistryEvidence |
+| LOG-201 (Log Rotation) | ✅ | MEDIUM | FileEvidence / RegistryEvidence |
+| LOG-301 (Log Tamper Detection) | ✅ | HIGH | LogEvidence |
+| LOG-302 (Log File Perms) | ✅ | MEDIUM | FileEvidence |
+| LOG-401 (Sudo Failures) | ✅ | HIGH | RegistryEvidence |
+| LOG-402 (SSH Failures) | ✅ | HIGH | RegistryEvidence |
+| LOG-501 (Audit Rule Gaps) | ✅ | MEDIUM | RegistryEvidence |
+| LOG-502 (Audit Log Exhaustion) | ✅ | MEDIUM | FileEvidence / RegistryEvidence |
 | PER-201 (Unauth Services) | ✅ | HIGH | FileEvidence |
 | SEC-101 (AppArmor) | ✅ | HIGH | FileEvidence |
 | SECR-101 (AWS Keys) | ✅ | CRITICAL | FileEvidence |
@@ -251,7 +259,7 @@
 | Compliance | ✅ | 335 | CIS 27 controls, NIST 6 controls, gap analysis |
 | Profiles | ✅ | 451 | Desktop/server reference profiles, auto-detect |
 | Context Severity | ✅ | 201 | SSH, file perms, users, network context evaluators |
-| Knowledge Base | ✅ | 171 + 77 YAML | YAML for all 77 checks with threat/exploit/impact/fix/CVSS; KB wired into runner pipeline |
+| Knowledge Base | ✅ | 171 + 85 YAML | YAML for all 85 checks with threat/exploit/impact/fix/CVSS; KB wired into runner pipeline |
 | Trust Scoring | ✅ | 106 | Evidence-quality adjusted confidence |
 | Policies | ✅ | 86 | YAML policy loading, check overrides, severity overrides |
 
@@ -597,17 +605,17 @@ The goal is **~500 checks** organized into **20+ categories**, with a **correlat
 | CTN-401 | Image age (>30 days) | `containers` |
 | CTN-402 | Unsigned images | `containers` |
 
-#### Logs & Forensics (8 checks)
-| ID | Name | Depends |
-|----|------|---------|
-| LOG-101 | Journal max size / retention | `journald` |
-| LOG-201 | Log rotation gaps | `journald` |
-| LOG-301 | Missing log periods (tampering) | `journald` |
-| LOG-302 | Log file permissions | `filesystem` |
-| LOG-401 | Repeated sudo failures | `auditd` |
-| LOG-402 | Repeated SSH auth failures | `auditd` |
-| LOG-501 | Auditd rule coverage gaps | `auditd` |
-| LOG-502 | Auditd log exhaustion risk | `auditd` |
+#### Logs & Forensics (8 checks) — ✅ COMPLETE
+| ID | Name | Depends | Status |
+|----|------|---------|--------|
+| LOG-101 | Journal max size / retention | `journald` | ✅ |
+| LOG-201 | Log rotation / persistence | `journald` | ✅ |
+| LOG-301 | Log tamper detection (timeline gaps) | `journald` | ✅ |
+| LOG-302 | Log file permissions | (none) | ✅ |
+| LOG-401 | Repeated sudo failures | `auditd` | ✅ |
+| LOG-402 | Repeated SSH auth failures | `auditd` | ✅ |
+| LOG-501 | Auditd rule coverage gaps | `auditd` | ✅ |
+| LOG-502 | Auditd log exhaustion risk | `auditd` | ✅ |
 
 _Secrets completed in Phase 4a above._
 
@@ -619,7 +627,7 @@ _Secrets completed in Phase 4a above._
 | CORR-403 | Active breach (log gaps + auth failures + new service + new user) |
 | CORR-404 | Exposed attack surface (many listening services + weak TLS + no auditd) |
 
-**Exit criteria:** 26 new checks, 4 new rules.
+**Exit criteria:** 26 new checks, 4 new rules. **Phase 4a (Secrets) ✅, Phase 4b (Logs) ✅.**
 
 ---
 
@@ -715,7 +723,7 @@ _Secrets completed in Phase 4a above._
 | Services | 8 | 8 | 8 | 8 | 8 | 30 |
 | Persistence | 26 | 26 | 26 | 26 | 26 | 40 |
 | Containers | 1 | 1 | 9 | 9 | 9 | 25 |
-| Logs & Forensics | 1 | 1 | 9 | 9 | 9 | 25 |
+| Logs & Forensics | 9 | 9 | 9 | 9 | 9 | 25 |
 | Secrets | 10 | 10 | 10 | 10 | 10 | 20 |
 | Cloud | 0 | 0 | 0 | 6 | 6 | 20 |
 | Compliance | 1 | 1 | 1 | 11 | 11 | 20 |
@@ -723,7 +731,7 @@ _Secrets completed in Phase 4a above._
 | Security (AppArmor/USB) | 2 | 2 | 2 | 2 | 2 | 10 |
 | Compromise | 1 | 1 | 1 | 1 | 1 | 15 |
 | Password | 1 | 1 | 1 | 1 | 1 | 10 |
-| **Total checks** | **101** | **119** | **135** | **135** | **135** | **~450** |
+| **Total checks** | **109** | **119** | **135** | **135** | **135** | **~450** |
 | **Correlation rules** | 12 | 17 | 21 | 24 | 24 | **50+** |
 
 ---
@@ -804,7 +812,7 @@ src/usaf/
 ├── compliance/framework.py    # CIS + NIST mappings
 ├── profiles/manager.py        # Profile matching
 ├── severity/engine.py         # Context-aware severity
-├── knowledge/                 # KB + 77 YAML entries (one per check)
+├── knowledge/                 # KB + 85 YAML entries (one per check)
 ├── policies/engine.py         # Policy loading + overrides
 ├── config/                    # YAML config loading
 └── cache/engine.py            # In-memory cache
@@ -816,7 +824,7 @@ src/usaf/
 
 | Metric | Current | Short-term (P3) | Medium-term (P4) | Long-term (P6) |
 |--------|---------|-----------------|-------------------|-----------------|
-| Checks | 101 | 119 | 135 | 135 → **450+** |
+| Checks | 109 | 119 | 135 | 135 → **450+** |
 | Collectors | 25 | 24 | 28 | 30 |
 | Correlation rules | 12 | 17 | 21 | 24 → **50+** |
 | Unit tests | 900+ | 1,500+ | 2,000+ | 3,000+ |

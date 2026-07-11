@@ -1,0 +1,29 @@
+id: LOG-401
+title: Repeated Sudo Authentication Failures
+threat: Brute force attacks against sudo to gain root privileges on the system.
+exploit: 'for i in $(cat wordlist.txt); do echo "$i" | sudo -S whoami; done — attacker tries thousands of passwords via sudo.'
+impact: Successful password guessing leads to root privilege escalation, full system compromise, and lateral movement.
+fix: 'Configure auditd to monitor sudo events. Use fail2ban for active blocking. Enforce strong passwords and sudo timing. Consider sudo_logsrvd for centralized sudo logging.'
+breakage: Audit rules for sudo generate additional log volume. fail2ban may lock out legitimate users.
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.02
+known_exceptions:
+  - "Legitimate users mistyping passwords"
+  - "Automated scripts with incorrect sudo credentials"
+related_findings:
+  - "FOR-101"
+  - "LOG-402"
+severity_override: null
+tags:
+  - "auditing"
+  - "sudo"
+  - "brute-force"
+  - "authentication"
+mitre_mappings:
+  - "T1070"
+  - "T1110"

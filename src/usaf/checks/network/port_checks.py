@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import os
+from pathlib import Path
+
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
-from usaf.models.evidence import NetworkEvidence
+from usaf.models.evidence import NetworkEvidence, ProcessEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
 KNOWN_SAFE_PORTS: dict[int, str] = {
@@ -97,6 +100,113 @@ class UnexpectedListeningPortsCheck(AuditCheck):
             )
 
         return findings
+
+
+@register_check
+class ProcessToPortMappingCheck(AuditCheck):
+    id = "NET-550"
+    name = "Listening Port to Process Mapping"
+    category = CheckCategory.NETWORK
+    severity = Severity.MEDIUM
+    description = "Maps each listening port to the process that owns it"
+    depends = ["sockets"]
+    tags = ["network", "listening-ports", "processes", "forensics"]
+
+    def _run_check(self, collectors: dict) -> list:
+        findings: list = []
+        sockets_data = self._get_data(collectors, "sockets")
+        inode_map = self._build_socket_inode_map()
+
+        all_listeners: list[dict] = []
+        for proto in ("tcp", "tcp6", "udp", "udp6"):
+            for sock in sockets_data.get(proto, []):
+                if sock.get("state") in ("LISTEN", None):
+                    all_listeners.append(sock)
+
+        for sock in all_listeners:
+            inode = sock.get("inode")
+            port = sock.get("local_port", 0)
+            addr = sock.get("local_address", "")
+            protocol = sock.get("protocol", "?")
+
+            proc_info = inode_map.get(inode)
+            proc_name = proc_info["name"] if proc_info else "unknown"
+            proc_pid = proc_info["pid"] if proc_info else 0
+
+            findings.append(
+                self.finding(
+                    finding_id="001",
+                    title=f"Listening port {port}/{protocol} → {proc_name} (PID {proc_pid})",
+                    description=(
+                        f"Port {port}/{protocol} on {addr} is owned by process "
+                        f"'{proc_name}' (PID {proc_pid}). "
+                        f"{'No process found — socket may be orphaned' if not proc_info else ''}"
+                    ),
+                    rationale=(
+                        "Every listening port should be attributable to a known, authorized process. "
+                        "Unknown or unexpected process-to-port associations can indicate backdoors, "
+                        "coin miners, reverse shells, or unauthorized services. If a listening socket "
+                        "has no owning process (orphaned), it suggests a kernel-level or container "
+                        "network namespace issue."
+                    ),
+                    remediation=(
+                        f"Investigate PID {proc_pid} ('{proc_name}') on port {port}. "
+                        "Verify it's an authorized service. "
+                        "Check binary: 'ls -la /proc/{proc_pid}/exe'. "
+                        "If unauthorized: 'systemctl stop <service>' or 'kill {proc_pid}'."
+                    ),
+                    evidence=NetworkEvidence(
+                        protocol=protocol,
+                        local_address=addr,
+                        local_port=port,
+                        state=sock.get("state") or "LISTEN",
+                        pid=proc_pid,
+                        process_name=proc_name,
+                        inode=inode,
+                    ),
+                    detected_value=f"Port {port}: process '{proc_name}' (PID {proc_pid})",
+                    expected_value="Attributable to known authorized process",
+                    affected_component=f"Port {port}/{protocol}",
+                    confidence=Confidence.HIGH if proc_info else Confidence.LOW,
+                    false_positive_probability=0.05 if proc_info else 0.5,
+                    mitre_attack_ids=["T1043", "T1505"],
+                    tags=["network", "process-mapping", "forensics"],
+                )
+            )
+
+        return findings
+
+    @staticmethod
+    def _build_socket_inode_map() -> dict[int, dict]:
+        proc = Path("/proc")
+        inode_map: dict[int, dict] = {}
+        for entry in proc.iterdir():
+            if not entry.name.isdigit():
+                continue
+            pid = entry.name
+            fd_dir = entry / "fd"
+            if not fd_dir.is_dir():
+                continue
+            try:
+                for fd_entry in fd_dir.iterdir():
+                    try:
+                        link = os.readlink(str(fd_entry))
+                    except OSError:
+                        continue
+                    if link.startswith("socket:["):
+                        try:
+                            inode = int(link[8:-1])
+                        except ValueError:
+                            continue
+                        if inode not in inode_map:
+                            try:
+                                comm = (entry / "comm").read_text().strip()
+                            except OSError:
+                                comm = "?"
+                            inode_map[inode] = {"pid": int(pid), "name": comm}
+            except (OSError, PermissionError):
+                continue
+        return inode_map
 
 
 @register_check

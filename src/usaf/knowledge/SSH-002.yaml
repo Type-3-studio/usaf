@@ -1,0 +1,29 @@
+id: SSH-002
+title: SSH Root Login Not Restricted
+threat: Permitting direct root SSH login removes the audit trail (no record of who logged in as root) and presents a single high-value target for brute-force attacks.
+exploit: "An attacker enumerates valid usernames, then launches a dictionary attack directly against the root account. Unlike a regular user account, root login grants immediate full system access without privilege escalation."
+impact: Complete system compromise from a single successful brute-force. No accountability (all root actions attributed to 'root', not the individual). Privilege escalation bypass.
+fix: "Set 'PermitRootLogin prohibit-password' or 'PermitRootLogin no' in /etc/ssh/sshd_config:
+  sed -i 's/^#*PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+  systemctl restart sshd"
+breakage: "Automation scripts that SSH directly as root without sudo will break. Migrate to sudo-based privilege escalation for all administrative tasks."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.02
+known_exceptions:
+  - "Some provisioning systems (Puppet, Ansible) need root SSH for initial setup"
+  - "Use 'prohibit-password' (key-only) as a compromise"
+related_findings:
+  - "SSH-001"
+  - "SSH-003"
+severity_override: null
+tags:
+  - "ssh"
+  - "authentication"
+  - "privilege-escalation"
+mitre_mappings:
+  - "T1110"
+  - "T1078"

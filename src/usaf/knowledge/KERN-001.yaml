@@ -1,0 +1,30 @@
+id: KERN-001
+title: Kernel ASLR Disabled
+threat: Without ASLR, attackers can predict memory addresses of running processes, making buffer overflow and code injection exploits significantly more reliable.
+exploit: "A local attacker exploits a buffer overflow in a SUID binary, knowing the exact location of libc functions because ASLR is disabled (kernel.randomize_va_space=0). This enables ret2libc or ROP chains with near 100% reliability."
+impact: Complete bypass of memory protection. All exploit techniques that rely on address prediction become trivially effective. System-wide compromise possible from any local unprivileged user.
+fix: "Set kernel.randomize_va_space=2 in /etc/sysctl.conf or /etc/sysctl.d/:
+  echo 'kernel.randomize_va_space=2' >> /etc/sysctl.conf
+  sysctl -w kernel.randomize_va_space=2"
+breakage: "Some proprietary applications and old binary-only games may fail with full ASLR. Disable per-process with 'setarch x86_64 -R <binary>'."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.01
+known_exceptions:
+  - "Containers inherit kernel ASLR setting, cannot be changed per-container"
+  - "Some real-time kernels disable ASLR intentionally for determinism"
+related_findings:
+  - "KERN-002"
+  - "KERN-003"
+severity_override: null
+tags:
+  - "memory-protection"
+  - "aslr"
+  - "kernel-hardening"
+  - "exploit-mitigation"
+mitre_mappings:
+  - "T1204.002"
+  - "T1574"

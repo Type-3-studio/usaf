@@ -1,0 +1,30 @@
+id: USR-003
+title: Passwords Not Shadowed
+threat: Password hashes stored in /etc/passwd (world-readable) are exposed to all users on the system, enabling offline password cracking attacks.
+exploit: "A local attacker reads /etc/passwd, extracts the password hashes, and runs hashcat or John the Ripper against them. Weak or common passwords are cracked within minutes to hours."
+impact: Offline password cracking leads to credential disclosure. Once cracked, the attacker can log in as the affected user, escalate privileges, and move laterally.
+fix: "Move password hashes to /etc/shadow:
+  pwconv           # Converts passwd to shadow passwords
+  Verify no hashes remain in /etc/passwd's second field"
+breakage: "Very old authentication systems (NIS, some LDAP) may not support shadow passwords. Modern systems should all use shadow."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.01
+known_exceptions:
+  - "NIS-based authentication may keep hashes in passwd"
+  - "Container images sometimes omit /etc/shadow"
+related_findings:
+  - "USR-001"
+  - "USR-002"
+severity_override: null
+tags:
+  - "users"
+  - "authentication"
+  - "password-policy"
+  - "credential-security"
+mitre_mappings:
+  - "T1003"
+  - "T1552"

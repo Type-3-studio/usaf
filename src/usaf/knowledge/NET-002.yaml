@@ -1,0 +1,32 @@
+id: NET-002
+title: Promiscuous Mode Network Interface
+threat: Network interfaces in promiscuous mode capture all network traffic on the segment, not just traffic addressed to the host. This is a primary indicator of packet sniffing.
+exploit: "An attacker with root access enables promiscuous mode on eth0, then runs tcpdump or a custom sniffer to capture unencrypted traffic — including internal DNS queries, NFS traffic, HTTP cookies, and database connections."
+impact: Bulk traffic capture enables credential harvesting, data exfiltration, and reconnaissance. Promiscuous mode is often the first step in network-based lateral movement discovery.
+fix: "Disable promiscuous mode:
+  ip link set <interface> -arp
+  Or restart the network service: systemctl restart networking
+  Investigate the process that enabled it: 'which tcpdump tshark wireshark'"
+breakage: "Network monitoring tools (Nagios, Zabbix, packet analyzers) legitimately use promiscuous mode. Document all authorized monitoring systems."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:H/I:N/A:N (4.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.20
+known_exceptions:
+  - "Network monitoring / IDS systems (Snort, Suricata, Zeek)"
+  - "DHCP clients and network bridges"
+  - "Virtualization hosts (bridged networking)"
+related_findings:
+  - "NET-001"
+  - "PRM-002"
+severity_override: null
+tags:
+  - "network"
+  - "sniffing"
+  - "promiscuous"
+  - "monitoring"
+mitre_mappings:
+  - "T1040"
+  - "T1205"

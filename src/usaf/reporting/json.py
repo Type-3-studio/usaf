@@ -45,13 +45,8 @@ class JSONReporter(BaseReporter):
             output["score"] = score.model_dump()
 
         if result.findings:
-            findings_data = []
-            for f in result.findings:
-                finding_data = f.model_dump()
-                if f.evidence:
-                    finding_data["evidence"] = f.evidence.model_dump()
-                findings_data.append(finding_data)
-            output["findings"] = findings_data
+            enriched = self.enrich_findings(result.findings)
+            output["findings"] = enriched
 
         if result.collectors_data:
             output["collectors"] = {k: v for k, v in result.collectors_data.items() if v}

@@ -1,0 +1,31 @@
+id: PRM-002
+title: World-Writable System Files
+threat: Critical system files with world-writable permissions allow any user to modify configuration, executables, or security policies — leading to privilege escalation or system compromise.
+exploit: "An attacker finds /etc/cron.d/backup is world-writable and adds a malicious cron job. The job runs as root, giving the attacker a reverse shell with full privileges. Alternatively, a world-writable script in PATH is replaced with a backdoor."
+impact: Privilege escalation, persistent backdoor, configuration tampering. World-writable system files violate the principle of least privilege and are a common misconfiguration exploited by attackers.
+fix: "Restrict permissions on world-writable system files:
+  chmod o-w <path>
+  Scan for all world-writable files: 'find / -perm -0002 -type f'"
+breakage: "Some system directories (/tmp, /dev/shm) are intentionally world-writable. These are excluded from the check."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.25
+known_exceptions:
+  - "/tmp, /dev/shm, /var/tmp are intentionally world-writable"
+  - "Some application caches require world-writable directories"
+  - "Desktop environments have X11 socket directories"
+related_findings:
+  - "PRM-001"
+  - "NET-002"
+severity_override: null
+tags:
+  - "permissions"
+  - "world-writable"
+  - "privilege-escalation"
+mitre_mappings:
+  - "T1548"
+  - "T1574"
+  - "T1053"

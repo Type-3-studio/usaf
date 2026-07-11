@@ -1,0 +1,31 @@
+id: NET-001
+title: Unexpected Listening Ports
+threat: Unauthorized services listening on network ports expand the attack surface and may indicate backdoors, rogue applications, or misconfigured legitimate services.
+exploit: "An attacker deploys a reverse shell listening on a high port (>1024). Since the port is unexpected, it bypasses monitoring. The attacker connects from a remote host and maintains persistent access."
+impact: Undetected remote access, data exfiltration channel, or command-and-control communication. Each unexpected port is a potential entry point for network-based attacks.
+fix: "Identify the process: 'ss -tlnp | grep <port>'
+  Verify the binary: 'dpkg -S $(which <process>)'
+  Stop and disable unauthorized services: 'systemctl stop <service> && systemctl disable <service>'"
+breakage: "Some legitimate services use non-standard ports for operational reasons. Document all intentional port usage in a service baseline."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N (6.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Application servers with custom port configurations"
+  - "Container host-port mappings"
+  - "Development environments with extra services"
+related_findings:
+  - "NET-002"
+  - "PRM-001"
+severity_override: null
+tags:
+  - "network"
+  - "listening-ports"
+  - "attack-surface"
+mitre_mappings:
+  - "T1043"
+  - "T1190"
+  - "T1505"

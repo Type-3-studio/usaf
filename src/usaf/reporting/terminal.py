@@ -160,6 +160,19 @@ class TerminalReporter(BaseReporter):
         if finding.mitre_attack_ids:
             console.print(f"    [dim]MITRE:[/] {', '.join(finding.mitre_attack_ids)}")
 
+        # Knowledge Base enrichment (P3-2)
+        kb = self.enrich_finding(finding)
+        if kb:
+            if kb.get("kb_cvss"):
+                console.print(f"    [dim]CVSS:[/] {kb['kb_cvss']}")
+            if kb.get("kb_exploit"):
+                console.print(f"    [dim]Exploit:[/] {kb['kb_exploit']}")
+            if kb.get("kb_breakage"):
+                console.print(f"    [dim]Breakage:[/] {kb['kb_breakage']}")
+            if kb.get("kb_known_exceptions"):
+                exceptions = kb["kb_known_exceptions"]
+                console.print(f"    [dim]Exceptions ({len(exceptions)}):[/] {exceptions[0]}")
+
         console.print(f"    [bold]Why:[/] {finding.rationale}")
         console.print(f"    [bold]Fix:[/] {finding.remediation}")
 

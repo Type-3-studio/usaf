@@ -1,0 +1,29 @@
+id: SSH-001
+title: SSH Protocol 1 Still Enabled
+threat: SSH protocol version 1 has known cryptographic weaknesses including CRC-32 compensation attack, weak integrity checking, and no strong authentication. It is trivially interceptable.
+exploit: "A man-in-the-middle attacker downgrades the SSH connection to protocol 1, then exploits the CRC-32 weakness to recover plaintext session traffic — including passwords and session content."
+impact: Complete session compromise. All traffic encrypted with protocol 1 can be decrypted by a network-level attacker. Credential theft, session hijacking, and data interception.
+fix: "Set 'Protocol 2' in /etc/ssh/sshd_config:
+  echo 'Protocol 2' >> /etc/ssh/sshd_config
+  systemctl restart sshd"
+breakage: "Extremely old SSH clients (pre-2001) cannot connect. These should be upgraded or replaced."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N (9.1)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.01
+known_exceptions:
+  - "Legacy systems with pre-OpenSSH 2.x clients"
+  - "Default Ubuntu configurations are secure (Protocol 2 only)"
+related_findings:
+  - "SSH-002"
+  - "SSH-003"
+severity_override: null
+tags:
+  - "ssh"
+  - "cryptography"
+  - "protocol-hardening"
+mitre_mappings:
+  - "T1190"
+  - "T1040"

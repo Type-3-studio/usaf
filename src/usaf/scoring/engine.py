@@ -5,6 +5,7 @@ from usaf.models.finding import Finding
 from usaf.models.result import ScanResult
 from usaf.models.score import CategoryScore, ScanScore
 from usaf.models.severity import CheckCategory, Severity
+from usaf.scoring.trust import TrustScorer
 
 
 class ScoringEngine(ScoringEngineInterface):
@@ -14,7 +15,8 @@ class ScoringEngine(ScoringEngineInterface):
       - 0.0 = perfect (no findings)
       - 10.0 = worst possible security posture
       - Score is driven by severity, confidence, false-positive probability,
-        and finding count — each finding contributes proportionally to its trustworthiness
+        evidence quality, and finding count
+      - Trust scoring (P3-3) adjusts confidence based on evidence quality
     """
 
     # Severity weights: critical findings penalise more per-unit than low
@@ -49,6 +51,9 @@ class ScoringEngine(ScoringEngineInterface):
         CheckCategory.FORENSICS: 1.0,
         CheckCategory.GENERAL: 0.5,
     }
+
+    def __init__(self, use_trust_scoring: bool = True) -> None:
+        self.trust_scorer = TrustScorer() if use_trust_scoring else None
 
     def calculate(self, result: ScanResult) -> ScanScore:
         all_findings = result.findings
@@ -89,7 +94,14 @@ class ScoringEngine(ScoringEngineInterface):
             for f in cat_findings:
                 sev_weight = self.SEVERITY_WEIGHTS.get(f.severity, 0.5)
                 base_penalty = f.severity.score * sev_weight
-                confidence_factor = f.confidence.multiplier
+
+                # Apply trust scoring (P3-3) if enabled — uses evidence quality
+                if self.trust_scorer:
+                    _, effective_confidence = self.trust_scorer.score(f)
+                    confidence_factor = effective_confidence
+                else:
+                    confidence_factor = f.confidence.multiplier
+
                 fp_factor = 1.0 - f.false_positive_probability
                 effective_penalty = base_penalty * confidence_factor * fp_factor
                 total_penalty += effective_penalty

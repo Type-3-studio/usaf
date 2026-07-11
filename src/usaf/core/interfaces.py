@@ -133,3 +133,26 @@ class ComplianceFrameworkInterface(ABC):
 
     @abstractmethod
     def get_coverage(self, framework_id: str, result: Any) -> Any: ...
+
+
+class KnowledgeBaseInterface(ABC):
+    """Interface for knowledge base lookups."""
+
+    @abstractmethod
+    def get(self, check_id: str) -> Any | None: ...
+
+    @abstractmethod
+    def lookup_finding(self, finding: Any) -> Any | None: ...
+
+    @abstractmethod
+    def evaluate_finding_confidence(self, finding: Any) -> Any: ...
+
+
+class TrustScorerInterface(ABC):
+    """Interface for trust scoring."""
+
+    @abstractmethod
+    def score(self, finding: Any) -> Any: ...
+
+    @abstractmethod
+    def score_many(self, findings: list[Any]) -> dict[str, Any]: ...

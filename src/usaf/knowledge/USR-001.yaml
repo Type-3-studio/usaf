@@ -1,0 +1,29 @@
+id: USR-001
+title: Duplicate UID 0 Accounts
+threat: Any account with UID 0 has full root privileges. Duplicate UID 0 accounts bypass audit controls — actions attributed to the secondary account cannot be easily traced to the actual user.
+exploit: "An attacker who compromises a service account with UID 0 gains root-equivalent access immediately. Unlike 'root', this account may not trigger the same monitoring alerts or login notifications."
+impact: Complete system compromise without triggering root-specific monitoring. Backdoor persistence via a hidden root-equivalent account. Violation of separation-of-duties and audit requirements.
+fix: "Remove or reassign UID for non-root accounts with UID 0:
+  usermod -u <new_uid> <username>
+  Or remove the account: userdel -r <username>"
+breakage: "File ownership conflicts may occur after UID reassignment. Use 'find / -user <old_uid>' to identify and chown affected files."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.01
+known_exceptions:
+  - "Containers may share host UID namespace"
+  - "Some LDAP/NIS setups may show remote UID 0 users"
+related_findings:
+  - "USR-002"
+  - "USR-003"
+severity_override: null
+tags:
+  - "users"
+  - "privilege-escalation"
+  - "authentication"
+mitre_mappings:
+  - "T1098"
+  - "T1078"

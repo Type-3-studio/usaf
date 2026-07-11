@@ -1,0 +1,30 @@
+id: KERN-002
+title: Kernel Pointer Restriction Disabled
+threat: Without kptr_restrict, /proc/kallsyms exposes kernel symbol addresses to unprivileged users, providing critical information for kernel exploit development.
+exploit: "A local attacker reads /proc/kallsyms to find the address of commit_creds() and prepare_kernel_cred(), then uses a kernel vulnerability to call them with known offsets — bypassing KASLR entirely."
+impact: Information disclosure that enables targeted kernel exploitation. KASLR bypass. Combined with a kernel memory corruption bug, leads to full root compromise.
+fix: "Set kernel.kptr_restrict=2 and kernel.dmesg_restrict=1 in /etc/sysctl.d/:
+  echo 'kernel.kptr_restrict=2' >> /etc/sysctl.d/99-security.conf
+  echo 'kernel.dmesg_restrict=1' >> /etc/sysctl.d/99-security.conf
+  sysctl -p /etc/sysctl.d/99-security.conf"
+breakage: "Some profiling tools (perf, systemtap) require kernel pointers. Use CAP_SYSLOG or sudo for these tools rather than disabling the restriction."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N (6.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.02
+known_exceptions:
+  - "Containers cannot change kernel parameters"
+  - "Some debugging environments set kptr_restrict=0 intentionally"
+related_findings:
+  - "KERN-001"
+  - "KERN-003"
+severity_override: null
+tags:
+  - "kernel-hardening"
+  - "information-disclosure"
+  - "kaslr"
+mitre_mappings:
+  - "T1592"
+  - "T1083"

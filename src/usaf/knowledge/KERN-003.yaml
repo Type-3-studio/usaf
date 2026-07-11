@@ -1,0 +1,30 @@
+id: KERN-003
+title: Core Dumps Not Restricted
+threat: Unrestricted core dumps can leak sensitive data from process memory — including passwords, encryption keys, and confidential data — to any user who can trigger a crash in a target process.
+exploit: "An attacker induces a crash in a privileged process (e.g., via a format string bug), then reads the resulting core dump from /var/crash or coredumpctl to extract secrets from the crashed process's memory image."
+impact: Sensitive data disclosure from process memory. Core dumps of SUID programs may contain privileged information readable by the crashing user. Debug symbols aid exploit development.
+fix: "Set fs.suid_dumpable=0 and limit core dump size in /etc/security/limits.conf:
+  echo 'fs.suid_dumpable=0' >> /etc/sysctl.d/99-security.conf
+  echo '* hard core 0' >> /etc/security/limits.conf
+  sysctl -p /etc/sysctl.d/99-security.conf"
+breakage: "Developers and crash-analysis tools (systemd-coredump, abrt) need core dumps. Set fs.suid_dumpable=2 for developers, or use systemd-coredump with access controls."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N (6.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Development systems may require core dumps for debugging"
+  - "systemd-coredump provides controlled core dump handling"
+related_findings:
+  - "KERN-001"
+  - "KERN-002"
+severity_override: null
+tags:
+  - "kernel-hardening"
+  - "information-disclosure"
+  - "core-dump"
+mitre_mappings:
+  - "T1083"
+  - "T1552.001"

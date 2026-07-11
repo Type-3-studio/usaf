@@ -1,0 +1,29 @@
+id: USR-002
+title: Empty Password Accounts
+threat: Accounts with empty passwords allow authentication without any credential. Any user can log in as that account by simply pressing Enter at the password prompt.
+exploit: "An attacker runs 'su <username>' for accounts with empty passwords, gaining access without knowing any password. Combined with sudo access, this leads to privilege escalation."
+impact: Complete account takeover with zero authentication. If the account has sudo privileges or is in the sudo group, immediate root access is achieved. Lateral movement vector.
+fix: "Lock empty-password accounts or set a password:
+  passwd -l <username>    # Lock the account
+  passwd <username>       # Set a strong password"
+breakage: "Service accounts may rely on empty passwords for automation. Use SSH keys or sudo rules instead of empty passwords for such cases."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (8.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.01
+known_exceptions:
+  - "root account with '!' or '*' in shadow password field — these indicate locked accounts, not empty passwords"
+  - "Service accounts intentionally created without login capability"
+related_findings:
+  - "USR-001"
+  - "USR-003"
+severity_override: null
+tags:
+  - "users"
+  - "authentication"
+  - "password-policy"
+mitre_mappings:
+  - "T1078"
+  - "T1110"

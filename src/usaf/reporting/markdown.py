@@ -91,6 +91,16 @@ class MarkdownReporter(BaseReporter):
                 if finding.mitre_attack_ids:
                     lines.append(f"| **MITRE ATT&CK** | {', '.join(finding.mitre_attack_ids)} |")
 
+                # Knowledge Base enrichment (P3-2)
+                kb = self.enrich_finding(finding)
+                if kb:
+                    if kb.get("kb_cvss"):
+                        lines.append(f"| **CVSS** | {kb['kb_cvss']} |")
+                    if kb.get("kb_exploit"):
+                        lines.append(f"| **Exploit Scenario** | {kb['kb_exploit']} |")
+                    if kb.get("kb_breakage"):
+                        lines.append(f"| **Potential Breakage** | {kb['kb_breakage']} |")
+
                 lines.append("")
                 lines.append(f"**Description:** {finding.description}")
                 lines.append("")

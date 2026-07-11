@@ -1,0 +1,31 @@
+id: PRM-001
+title: Unexpected SUID Binaries
+threat: SUID root binaries execute with elevated privileges regardless of the calling user. An unexpected SUID binary is a primary vector for local privilege escalation.
+exploit: "An attacker discovers /usr/bin/custom-backup with SUID root permissions. The binary calls a helper script using a relative path — the attacker creates a malicious 'tar' earlier in PATH, and the SUID binary executes it with root privileges."
+impact: Local privilege escalation from any user to root. SUID backdoors provide persistent root access that survives reboots. Rootkit and backdoor authors frequently deploy SUID binaries.
+fix: "Remove SUID bit from unauthorized binaries:
+  chmod u-s <path>
+  Find all SUID root binaries: 'find / -perm -4000 -user root'"
+breakage: "Legitimate SUID binaries (sudo, ping, passwd) are required for normal system operation. Verify against package manager: 'dpkg -S <path>'"
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.10
+known_exceptions:
+  - "Canonical's snap packages mount SUID binaries in /snap/*"
+  - "Some display managers and authentication helpers require SUID"
+related_findings:
+  - "PRM-002"
+  - "NET-001"
+severity_override: null
+tags:
+  - "permissions"
+  - "privilege-escalation"
+  - "suid"
+  - "backdoor"
+mitre_mappings:
+  - "T1548.001"
+  - "T1548"
+  - "T1505"

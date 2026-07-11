@@ -1,0 +1,29 @@
+id: SSH-003
+title: Weak SSH Key Exchange Algorithms
+threat: Weak key exchange algorithms like diffie-hellman-group1-sha1 and diffie-hellman-group14-sha1 use small prime groups and outdated hash functions, making them vulnerable to discrete-log attacks.
+exploit: "A well-resourced attacker (nation-state) performs a Logjam attack, downgrading the SSH key exchange to export-grade DH using the small 512-bit group, then decrypts the session in real-time."
+impact: Passive decryption of SSH sessions. Attacker can recover session keys and decrypt all traffic — including passwords, session data, and forwarded credentials — without breaking per-session keys.
+fix: "Remove weak KEX algorithms from /etc/ssh/sshd_config:
+  echo 'KexAlgorithms curve25519-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512' >> /etc/ssh/sshd_config
+  systemctl restart sshd"
+breakage: "Very old SSH clients (OpenSSH < 6.2, PuTTY < 0.68) may fail to connect. Check client versions before deploying."
+cvss: "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N (5.9)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.03
+known_exceptions:
+  - "Interoperability with legacy SSH implementations"
+  - "Default Ubuntu configs include some weak algorithms for compatibility"
+related_findings:
+  - "SSH-001"
+  - "SSH-002"
+severity_override: null
+tags:
+  - "ssh"
+  - "cryptography"
+  - "key-exchange"
+mitre_mappings:
+  - "T1190"
+  - "T1573"

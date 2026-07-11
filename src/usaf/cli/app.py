@@ -163,7 +163,8 @@ def scan(
 
     # Generate report content
     if fmt == "terminal":
-        reporter.print_to_console(result, score, verbose=verbose, show_passed=show_passed)
+        if hasattr(reporter, "print_to_console"):
+            reporter.print_to_console(result, score, verbose=verbose, show_passed=show_passed)  # type: ignore[union-attr]
         report_content = reporter.generate(result, score, verbose=verbose, show_passed=show_passed)
     else:
         report_content = reporter.generate(result, score, verbose=verbose, show_passed=show_passed)

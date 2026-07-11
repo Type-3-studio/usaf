@@ -28,7 +28,7 @@ class ProcessCollector(BaseCollector):
             info = self._get_process_info(pid)
             if info:
                 processes.append(info)
-        return sorted(processes, key=lambda p: p["pid"])  # type: ignore[typeddict-item]
+        return sorted(processes, key=lambda p: int(str(p["pid"])))
 
     def _get_process_info(self, pid: int) -> dict[str, str | int | None] | None:
         proc_dir = Path(f"/proc/{pid}")

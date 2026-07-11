@@ -36,7 +36,7 @@ class UnnecessaryPackagesCheck(AuditCheck):
     def _run_check(self, collectors: dict) -> list:
         apt_data = self._get_data(collectors, "apt")
         packages = apt_data.get("packages", [])
-        findings = []
+        findings: list = []
 
         installed_names = {p.get("name", "") for p in packages}
         for pkg_name, reason in self.RISKY_PACKAGES.items():

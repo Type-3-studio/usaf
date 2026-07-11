@@ -17,6 +17,7 @@ from usaf.config.loader import load_config
 from usaf.core.exceptions import PluginDependencyError
 from usaf.core.registry import registry
 from usaf.models.result import CheckResult, ScanMetadata, ScanResult
+from usaf.models.severity import CheckCategory
 
 # Phase 2 components
 from usaf.correlation.engine import (
@@ -138,7 +139,7 @@ class ScanRunner:
                     return CheckResult(
                         check_id=check_id,
                         name=check_id,
-                        category="GENERAL",
+                        category=CheckCategory.GENERAL,
                         passed=False,
                         error=str(e),
                         execution_time_ms=0.0,
@@ -147,7 +148,7 @@ class ScanRunner:
                     return CheckResult(
                         check_id=check_id,
                         name=check_id,
-                        category="GENERAL",
+                        category=CheckCategory.GENERAL,
                         passed=False,
                         error=f"{type(e).__name__}: {e}",
                         execution_time_ms=0.0,
@@ -171,7 +172,7 @@ class ScanRunner:
                             CheckResult(
                                 check_id=cid,
                                 name=cid,
-                                category="GENERAL",
+                                category=CheckCategory.GENERAL,
                                 passed=False,
                                 error=f"ExecutorError: {e}",
                                 execution_time_ms=0.0,
@@ -191,7 +192,7 @@ class ScanRunner:
                         CheckResult(
                             check_id=check_id,
                             name=check_id,
-                            category="GENERAL",
+                            category=CheckCategory.GENERAL,
                             passed=False,
                             error=str(e),
                             execution_time_ms=0.0,
@@ -202,7 +203,7 @@ class ScanRunner:
                         CheckResult(
                             check_id=check_id,
                             name=check_id,
-                            category="GENERAL",
+                            category=CheckCategory.GENERAL,
                             passed=False,
                             error=f"{type(e).__name__}: {e}",
                             execution_time_ms=0.0,
@@ -304,9 +305,7 @@ class ScanRunner:
             name="Cross-Check Correlation Analysis",
             category=CheckCategory.COMPROMISE,
             passed=len(correlated) == 0,
-            findings=[  # type: ignore[arg-type]
-                f for f in correlated
-            ],
+            findings=[f for f in correlated],
         )
         results.append(corr_result)
 

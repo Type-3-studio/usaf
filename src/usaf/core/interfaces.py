@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, ClassVar
 
 from usaf.models.result import CheckResult, ScanResult
 from usaf.models.score import ScanScore
@@ -10,13 +10,13 @@ from usaf.models.score import ScanScore
 class AuditCheckInterface(ABC):
     """Interface every audit check plugin must implement."""
 
-    id: str
-    name: str
-    category: str
-    severity: str
-    description: str
-    depends: list[str]
-    tags: list[str]
+    id: ClassVar[str]
+    name: ClassVar[str]
+    category: ClassVar[str]
+    severity: ClassVar[str]
+    description: ClassVar[str]
+    depends: ClassVar[list[str]]
+    tags: ClassVar[list[str]]
     timeout: int = 60
 
     @abstractmethod

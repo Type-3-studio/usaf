@@ -12,7 +12,7 @@ from usaf.core.exceptions import PolicyError
 class Policy(BaseModel):
     name: str
     description: str = ""
-    check_overrides: dict[str, dict] = Field(default_factory=dict)
+    check_overrides: dict[str, dict[str, Any]] = Field(default_factory=dict)
     ignore_patterns: list[str] = Field(default_factory=list)
     severity_overrides: dict[str, str] = Field(default_factory=dict)
 

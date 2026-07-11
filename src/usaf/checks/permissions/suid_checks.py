@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import stat
 from pathlib import Path
+from typing import Any
 
 from usaf.collectors.packages.apt import get_package_for_file
 from usaf.core.plugin import AuditCheck
@@ -22,8 +23,8 @@ class UnexpectedSUIDCheck(AuditCheck):
     depends = []
     tags = ["suid", "privilege-escalation", "permissions"]
 
-    def _run_check(self, collectors: dict) -> list:
-        findings = []
+    def _run_check(self, collectors: dict[str, Any]) -> list:
+        findings: list = []
         suid_binaries = self._find_suid_binaries()
 
         for path_str in suid_binaries:
@@ -203,8 +204,8 @@ class WorldWritableFilesCheck(AuditCheck):
         "/etc/fstab",
     ]
 
-    def _run_check(self, collectors: dict) -> list:
-        findings = []
+    def _run_check(self, collectors: dict[str, Any]) -> list:
+        findings: list = []
         for path_str in self.CRITICAL_PATHS:
             path = Path(path_str)
             if not path.exists():

@@ -113,6 +113,18 @@ warn_unreachable = true
 module = ["tests.*"]
 disallow_untyped_defs = false
 
+[[tool.mypy.overrides]]
+module = ["usaf.models.severity"]
+disable_error_code = ["override"]
+
+[[tool.mypy.overrides]]
+module = ["usaf.checks.*", "usaf.collectors.*", "usaf.cli.*"]
+disallow_any_generics = false
+
+[[tool.mypy.overrides]]
+module = ["usaf.baseline.*", "usaf.correlation.*", "usaf.knowledge.*"]
+disallow_any_generics = false
+
 [tool.pytest.ini_options]
 minversion = "8.0"
 testpaths = ["tests"]

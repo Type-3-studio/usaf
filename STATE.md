@@ -212,8 +212,8 @@
 |------|--------|-------|
 | `ruff` config | ✅ | pyproject.toml, strict |
 | `mypy` config | ✅ | strict mode |
-| Pre-commit hooks | ✅ | ruff, mypy, trailing whitespace, YAML/TOML check |
-| CI/CD | ✅ | GitHub Actions: ruff lint+format, mypy, pytest on push/PR |
+| Pre-commit hooks | ✅ | ruff, mypy (15 remaining errors), trailing whitespace, YAML/TOML check |
+| CI/CD | ✅ | GitHub Actions: ruff lint+format, mypy (15 remaining), pytest on push/PR |
 | Versioning | ✅ | 0.3.0 — semver |
 
 ---
@@ -256,7 +256,7 @@
 | TD-004 | ~~Scoring ignores confidence~~ → **Fixed** (P1-1 + P3-3) | HIGH | ✅ |
 | TD-005 | Collectors hardcoded in runner → **Fixed** (auto-discovered) | MEDIUM | ✅ |
 | TD-006 | No parallel execution despite `parallel=True` in config | LOW | ✅ |
-| TD-007 | `mypy --strict` likely fails — never run in CI | MEDIUM | Open |
+| TD-007 | `mypy --strict` fails (245→15 errors) — never run in CI | MEDIUM | ◐ |
 
 ---
 

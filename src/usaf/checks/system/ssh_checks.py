@@ -21,7 +21,7 @@ class SSHProtocolCheck(AuditCheck):
     tags = ["ssh", "authentication", "cryptography"]
 
     def _run_check(self, collectors: dict) -> list:
-        findings = []
+        findings: list = []
         config = self._parse_ssh_config()
 
         if not config:
@@ -100,7 +100,7 @@ class SSHRootLoginCheck(AuditCheck):
     tags = ["ssh", "authentication", "privilege-escalation"]
 
     def _run_check(self, collectors: dict) -> list:
-        findings = []
+        findings: list = []
         config = self._parse_ssh_config()
         if not config:
             return findings
@@ -176,7 +176,7 @@ class SSHKeyExchangeCheck(AuditCheck):
     tags = ["ssh", "cryptography", "tls"]
 
     def _run_check(self, collectors: dict) -> list:
-        findings = []
+        findings: list = []
         config = self._parse_ssh_config()
         if not config:
             return findings

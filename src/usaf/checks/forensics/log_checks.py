@@ -290,8 +290,97 @@ class LogTamperCheck(AuditCheck):
                         false_positive_probability=0.15,
                         mitre_attack_ids=["T1070", "T1562.002", "T1654"],
                         tags=["forensics", "timeline", "recent-activity"],
-                    )
                 )
+            )
+        return findings
+
+
+@register_check
+class AuditdMitreAttackCoverageCheck(AuditCheck):
+    id = "LOG-503"
+    name = "Auditd MITRE ATT&CK Coverage Gaps"
+    category = CheckCategory.AUDIT
+    severity = Severity.MEDIUM
+    description = "Maps audit rules to MITRE ATT&CK techniques and identifies coverage gaps"
+    depends = ["auditd"]
+    tags = ["auditing", "mitre-attack", "coverage", "detection"]
+
+    TECHNIQUE_RULES: dict[str, dict[str, str | list[str]]] = {
+        "T1078": {"name": "Valid Accounts", "patterns": ["-w /etc/passwd", "-w /etc/shadow", "-w /etc/group"]},
+        "T1098": {"name": "Account Manipulation", "patterns": ["-w /etc/passwd", "-w /etc/shadow", "-w /etc/sudoers", "-w /etc/group"]},
+        "T1548": {"name": "Abuse Elevation Control Mechanism", "patterns": ["-w /etc/sudoers", "-w /etc/sudoers.d"]},
+        "T1053": {"name": "Scheduled Task/Job", "patterns": ["-w /etc/crontab", "-w /etc/cron", "cron"]},
+        "T1543": {"name": "Create/Modify System Process", "patterns": ["-w /usr/lib/systemd", "-w /etc/systemd", "systemctl"]},
+        "T1070": {"name": "Indicator Removal", "patterns": ["-w /var/log", "log"]},
+        "T1562": {"name": "Impair Defenses", "patterns": ["-w /etc/audit", "-w /etc/apparmor", "-w /etc/selinux"]},
+        "T1554": {"name": "Compromise Client Software Binary", "patterns": ["-w /usr/bin", "-w /usr/sbin"]},
+        "T1505": {"name": "Server Software Component", "patterns": ["-w /etc/ssh", "sshd"]},
+        "T1195": {"name": "Supply Chain Compromise", "patterns": ["-a always,exit -S open", "apt", "dpkg"]},
+        "T1565": {"name": "Data Manipulation", "patterns": ["-w /etc/hosts", "-w /etc/resolv"]},
+        "T1610": {"name": "Deploy Container", "patterns": ["-w /etc/docker", "-w /var/lib/docker", "docker"]},
+        "T1059": {"name": "Command and Scripting", "patterns": ["execve", "-S exec"]},
+        "T1095": {"name": "Non-Application Layer Protocol", "patterns": ["-S connect", "-S bind"]},
+        "T1043": {"name": "Commonly Used Port", "patterns": ["-S bind"]},
+    }
+
+    def _run_check(self, collectors: dict[str, Any]) -> list:
+        findings: list = []
+        audit_data = self._get_data(collectors, "auditd")
+        status = audit_data.get("status", {})
+        rules = audit_data.get("rules", [])
+
+        if not status.get("running", False):
+            return findings
+
+        rule_text = " ".join(r.get("rule", "") for r in rules)
+        if not rule_text:
+            return findings
+
+        uncovered: list[str] = []
+        for tid, info in self.TECHNIQUE_RULES.items():
+            patterns = info["patterns"]
+            covered = any(p in rule_text for p in patterns)
+            if not covered:
+                uncovered.append(f"{tid} ({info['name']})")
+
+        if uncovered:
+            findings.append(
+                self.finding(
+                    finding_id="001",
+                    title=f"Audit rules missing coverage for {len(uncovered)} MITRE ATT&CK techniques",
+                    description=(
+                        f"The following {len(uncovered)} MITRE ATT&CK technique(s) have no matching "
+                        f"audit rules: {', '.join(uncovered)}."
+                    ),
+                    rationale=(
+                        "MITRE ATT&CK provides a comprehensive framework for adversary behavior. "
+                        "When audit rules don't cover key techniques, attackers can operate "
+                        "without generating audit events, creating blind spots in detection "
+                        "and forensic investigation. Each uncovered technique represents a "
+                        "gap in the detection coverage."
+                    ),
+                    remediation=(
+                        "Add audit rules for uncovered techniques. "
+                        "See: https://github.com/Neo23x0/auditd"
+                        "/tree/master/auditd/rules for technique-specific rules. "
+                        "Consider installing CIS or STIG audit rule sets."
+                    ),
+                    evidence=RegistryEvidence(
+                        key="auditd.mitre_uncovered",
+                        value=", ".join(uncovered),
+                        expected="All techniques covered",
+                        source="auditctl -l",
+                    ),
+                    detected_value=f"Uncovered: {', '.join(uncovered)}",
+                    expected_value="All MITRE ATT&CK techniques covered",
+                    affected_component="/etc/audit/rules.d/",
+                    confidence=Confidence.MEDIUM,
+                    false_positive_probability=0.2,
+                    mitre_attack_ids=["T1070", "T1562"],
+                    tags=["auditing", "mitre-attack", "detection", "coverage"],
+                )
+            )
+
         return findings
 
 

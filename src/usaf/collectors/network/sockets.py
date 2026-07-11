@@ -3,8 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from usaf.collectors.base import BaseCollector
+from usaf.collectors.registry import register_collector
 
 
+@register_collector
 class SocketCollector(BaseCollector):
     """Collects listening sockets and connection information from /proc/net."""
 
@@ -132,16 +134,19 @@ class SocketCollector(BaseCollector):
             parts = line.split()
             if len(parts) < 7:
                 continue
-            sockets.append({
-                "protocol": "UNIX",
-                "local_address": parts[6] if len(parts) > 7 else "",
-                "state": parts[4] if len(parts) > 4 else None,
-                "inode": int(parts[6]) if parts[6].isdigit() else None,
-            })
+            sockets.append(
+                {
+                    "protocol": "UNIX",
+                    "local_address": parts[6] if len(parts) > 7 else "",
+                    "state": parts[4] if len(parts) > 4 else None,
+                    "inode": int(parts[6]) if parts[6].isdigit() else None,
+                }
+            )
 
         return sockets
 
 
+@register_collector
 class InterfaceCollector(BaseCollector):
     """Collects network interface information."""
 
@@ -149,9 +154,7 @@ class InterfaceCollector(BaseCollector):
     description = "Network interfaces, IP addresses, and flags"
 
     def _do_collect(self) -> dict[str, list[dict[str, str | list[str] | bool | None]]]:
-        interfaces: dict[str, list[dict[str, str | list[str] | bool | None]]] = {
-            "interfaces": []
-        }
+        interfaces: dict[str, list[dict[str, str | list[str] | bool | None]]] = {"interfaces": []}
 
         net_path = Path("/sys/class/net")
         if not net_path.exists():
@@ -167,13 +170,13 @@ class InterfaceCollector(BaseCollector):
 
         return interfaces
 
-    def _get_interface_info(
-        self, name: str
-    ) -> dict[str, str | list[str] | bool | None] | None:
+    def _get_interface_info(self, name: str) -> dict[str, str | list[str] | bool | None] | None:
         base = Path(f"/sys/class/net/{name}")
         try:
             operstate = (base / "operstate").read_text().strip()
-            carrier = int((base / "carrier").read_text().strip()) if (base / "carrier").exists() else 0
+            carrier = (
+                int((base / "carrier").read_text().strip()) if (base / "carrier").exists() else 0
+            )
             address = (base / "address").read_text().strip()
             mtu = int((base / "mtu").read_text().strip())
             flags_str = (base / "flags").read_text().strip()

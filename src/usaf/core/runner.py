@@ -4,26 +4,19 @@ import platform
 import sys
 import time
 import uuid
-from datetime import datetime, timezone
-from pathlib import Path
+from datetime import UTC, datetime
 from typing import Any
 
+import usaf.__about__ as about
+import usaf.checks  # noqa: F401 - Trigger plugin registration
 from usaf.cache.engine import CacheEngine
 from usaf.collectors.manager import CollectorManager
-from usaf.collectors.network.sockets import InterfaceCollector, SocketCollector
-from usaf.collectors.packages.apt import APTCollector
-from usaf.collectors.processes.procfs import ProcessCollector
-from usaf.collectors.services.systemd import CronCollector, SystemdCollector
-from usaf.collectors.system.kernel import KernelCollector, KernelParametersCollector
-from usaf.collectors.users.passwd import GroupCollector, SudoCollector, UserCollector
+from usaf.collectors.registry import collector_registry
 from usaf.config.loader import load_config
 from usaf.core.exceptions import PluginDependencyError
 from usaf.core.registry import registry
 from usaf.models.result import CheckResult, ScanMetadata, ScanResult
 from usaf.scoring.engine import ScoringEngine
-
-import usaf.__about__ as about
-import usaf.checks  # noqa: F401 - Trigger plugin registration
 
 
 class ScanRunner:
@@ -38,26 +31,19 @@ class ScanRunner:
         self._setup_collectors()
 
     def _setup_collectors(self) -> None:
-        """Register default collectors."""
-        collectors = [
-            KernelCollector(),
-            KernelParametersCollector(),
-            SocketCollector(),
-            InterfaceCollector(),
-            ProcessCollector(),
-            UserCollector(),
-            GroupCollector(),
-            SudoCollector(),
-            APTCollector(),
-            SystemdCollector(),
-            CronCollector(),
-        ]
-        for c in collectors:
-            self.collector_manager.add(c)
+        """Auto-discover and register all collectors.
+
+        Walks the usaf.collectors namespace, imports every module (which
+        triggers @register_collector decorators), then instantiates all
+        registered collector classes into the CollectorManager.
+        """
+        collector_registry.discover()
+        for instance in collector_registry.create_all_instances():
+            self.collector_manager.add(instance)
 
     def run(self, check_ids: list[str] | None = None, verbose: bool = False) -> ScanResult:
         start_time = time.time()
-        scan_start_dt = datetime.now(timezone.utc)
+        scan_start_dt = datetime.now(UTC)
         scan_id = str(uuid.uuid4())
 
         metadata = ScanMetadata(
@@ -72,7 +58,7 @@ class ScanRunner:
         )
 
         if verbose:
-            print(f"[*] Collecting system data...")
+            print("[*] Collecting system data...")
 
         # Phase 1: Collect data
         collectors_data: dict[str, dict[str, Any]] = {}
@@ -89,7 +75,7 @@ class ScanRunner:
         metadata.collector_count = self.collector_manager.count
 
         if verbose:
-            print(f"[*] Running security checks...")
+            print("[*] Running security checks...")
 
         # Phase 2: Resolve check dependencies and filter
         all_check_ids = registry.get_all_ids()
@@ -110,23 +96,27 @@ class ScanRunner:
                 result = self._apply_ignore_list(result)
                 results.append(result)
             except PluginDependencyError as e:
-                results.append(CheckResult(
-                    check_id=check_id,
-                    name=check_id,
-                    category="GENERAL",
-                    passed=False,
-                    error=str(e),
-                    execution_time_ms=0.0,
-                ))
+                results.append(
+                    CheckResult(
+                        check_id=check_id,
+                        name=check_id,
+                        category="GENERAL",
+                        passed=False,
+                        error=str(e),
+                        execution_time_ms=0.0,
+                    )
+                )
             except Exception as e:
-                results.append(CheckResult(
-                    check_id=check_id,
-                    name=check_id,
-                    category="GENERAL",
-                    passed=False,
-                    error=f"{type(e).__name__}: {e}",
-                    execution_time_ms=0.0,
-                ))
+                results.append(
+                    CheckResult(
+                        check_id=check_id,
+                        name=check_id,
+                        category="GENERAL",
+                        passed=False,
+                        error=f"{type(e).__name__}: {e}",
+                        execution_time_ms=0.0,
+                    )
+                )
 
         # Phase 4: Build result
         metadata.end_time = scan_start_dt
@@ -182,8 +172,10 @@ class ScanRunner:
             return result
 
         import fnmatch
+
         result.findings = [
-            f for f in result.findings
+            f
+            for f in result.findings
             if not any(fnmatch.fnmatch(f.id, pattern) for pattern in ignore_patterns)
         ]
         result.passed = len(result.findings) == 0

@@ -4,8 +4,10 @@ import subprocess
 from pathlib import Path
 
 from usaf.collectors.base import BaseCollector
+from usaf.collectors.registry import register_collector
 
 
+@register_collector
 class SystemdCollector(BaseCollector):
     """Collects systemd unit information."""
 
@@ -23,20 +25,31 @@ class SystemdCollector(BaseCollector):
         units: list[dict[str, str | bool]] = []
         try:
             result = subprocess.run(
-                ["systemctl", "list-units", "--type=" + unit_type, "--all",
-                 "--no-pager", "--no-legend"],
-                capture_output=True, text=True, timeout=30, check=False,
+                [
+                    "systemctl",
+                    "list-units",
+                    "--type=" + unit_type,
+                    "--all",
+                    "--no-pager",
+                    "--no-legend",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                check=False,
             )
             for line in result.stdout.splitlines():
                 parts = line.split(maxsplit=4)
                 if len(parts) >= 4:
-                    units.append({
-                        "name": parts[0],
-                        "load": parts[1],
-                        "active": parts[2],
-                        "sub": parts[3],
-                        "description": parts[4] if len(parts) > 4 else "",
-                    })
+                    units.append(
+                        {
+                            "name": parts[0],
+                            "load": parts[1],
+                            "active": parts[2],
+                            "sub": parts[3],
+                            "description": parts[4] if len(parts) > 4 else "",
+                        }
+                    )
         except (OSError, subprocess.SubprocessError):
             pass
         return units
@@ -56,6 +69,7 @@ class SystemdCollector(BaseCollector):
         return None
 
 
+@register_collector
 class CronCollector(BaseCollector):
     """Collects cron job configurations."""
 
@@ -76,18 +90,25 @@ class CronCollector(BaseCollector):
                 line = line.strip()
                 if not line or line.startswith("#"):
                     continue
-                entries.append({
-                    "file": path,
-                    "content": line,
-                })
+                entries.append(
+                    {
+                        "file": path,
+                        "content": line,
+                    }
+                )
         except OSError:
             pass
         return entries
 
     def _parse_cron_dirs(self) -> list[dict[str, str | None]]:
         entries: list[dict[str, str | None]] = []
-        cron_dirs = ["/etc/cron.hourly", "/etc/cron.daily", "/etc/cron.weekly",
-                     "/etc/cron.monthly", "/etc/cron.d"]
+        cron_dirs = [
+            "/etc/cron.hourly",
+            "/etc/cron.daily",
+            "/etc/cron.weekly",
+            "/etc/cron.monthly",
+            "/etc/cron.d",
+        ]
         for cron_dir in cron_dirs:
             d = Path(cron_dir)
             if d.is_dir():
@@ -98,10 +119,12 @@ class CronCollector(BaseCollector):
                                 content = f.read_text()
                             except OSError:
                                 content = ""
-                            entries.append({
-                                "file": str(f),
-                                "content": content,
-                            })
+                            entries.append(
+                                {
+                                    "file": str(f),
+                                    "content": content,
+                                }
+                            )
                 except PermissionError:
                     pass
         return entries
@@ -117,10 +140,12 @@ class CronCollector(BaseCollector):
                             content = f.read_text()
                         except OSError:
                             content = ""
-                        entries.append({
-                            "file": str(f),
-                            "content": content,
-                        })
+                        entries.append(
+                            {
+                                "file": str(f),
+                                "content": content,
+                            }
+                        )
             except PermissionError:
                 pass
         return entries

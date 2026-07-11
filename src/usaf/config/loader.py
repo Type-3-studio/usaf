@@ -45,13 +45,9 @@ def load_config(path: str | Path | None = None) -> USAFConfig:
                 overrides = yaml.safe_load(f) or {}
             _deep_merge(config_data, overrides)
         except yaml.YAMLError as e:
-            raise ConfigurationError(
-                f"Invalid YAML in {config_path}: {e}"
-            ) from e
+            raise ConfigurationError(f"Invalid YAML in {config_path}: {e}") from e
         except OSError as e:
-            raise ConfigurationError(
-                f"Cannot read {config_path}: {e}"
-            ) from e
+            raise ConfigurationError(f"Cannot read {config_path}: {e}") from e
 
     return USAFConfig(**config_data)
 

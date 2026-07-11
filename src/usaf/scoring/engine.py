@@ -13,8 +13,18 @@ class ScoringEngine(ScoringEngineInterface):
     Score philosophy:
       - 0.0 = perfect (no findings)
       - 10.0 = worst possible security posture
-      - Score is driven by severity, confidence, and finding count
+      - Score is driven by severity, confidence, false-positive probability,
+        and finding count — each finding contributes proportionally to its trustworthiness
     """
+
+    # Severity weights: critical findings penalise more per-unit than low
+    SEVERITY_WEIGHTS: dict[Severity, float] = {
+        Severity.CRITICAL: 1.0,
+        Severity.HIGH: 0.8,
+        Severity.MEDIUM: 0.6,
+        Severity.LOW: 0.3,
+        Severity.INFO: 0.0,
+    }
 
     # Category weights: compromise and critical infrastructure weighted higher
     CATEGORY_WEIGHTS: dict[CheckCategory, float] = {
@@ -73,42 +83,53 @@ class ScoringEngine(ScoringEngineInterface):
 
         scores: list[CategoryScore] = []
         for category, cat_findings in by_category.items():
-            critical = sum(1 for f in cat_findings if f.severity == Severity.CRITICAL)
-            high = sum(1 for f in cat_findings if f.severity == Severity.HIGH)
-            medium = sum(1 for f in cat_findings if f.severity == Severity.MEDIUM)
-            low = sum(1 for f in cat_findings if f.severity == Severity.LOW)
-            info = sum(1 for f in cat_findings if f.severity == Severity.INFO)
+            critical = high = medium = low = info = 0
+            total_penalty = 0.0
+
+            for f in cat_findings:
+                sev_weight = self.SEVERITY_WEIGHTS.get(f.severity, 0.5)
+                base_penalty = f.severity.score * sev_weight
+                confidence_factor = f.confidence.multiplier
+                fp_factor = 1.0 - f.false_positive_probability
+                effective_penalty = base_penalty * confidence_factor * fp_factor
+                total_penalty += effective_penalty
+
+                if f.severity == Severity.CRITICAL:
+                    critical += 1
+                elif f.severity == Severity.HIGH:
+                    high += 1
+                elif f.severity == Severity.MEDIUM:
+                    medium += 1
+                elif f.severity == Severity.LOW:
+                    low += 1
+                else:
+                    info += 1
 
             max_sev = max(f.severity for f in cat_findings) if cat_findings else None
 
-            # Weighted score: each critical finding contributes more
-            critical_penalty = critical * 10.0 * 1.0
-            high_penalty = high * 7.5 * 0.8
-            medium_penalty = medium * 5.0 * 0.6
-            low_penalty = low * 2.5 * 0.3
-            info_penalty = info * 0.0
-
-            total_penalty = critical_penalty + high_penalty + medium_penalty + low_penalty + info_penalty
-
-            # Normalize: cap at 10.0, divide by number of findings + 1 to reward low counts
+            # Normalize: cap at 10.0, penalise proportionally to finding count
             total_findings = len(cat_findings)
-            normalized = min(10.0, total_penalty / max(1, total_findings) * (1.0 + total_findings * 0.1))
+            normalized = min(
+                10.0, total_penalty / max(1, total_findings) * (1.0 + total_findings * 0.1)
+            )
             score = min(10.0, max(0.0, normalized))
 
             weight = self.CATEGORY_WEIGHTS.get(category, 1.0)
 
-            scores.append(CategoryScore(
-                category=category,
-                score=round(score, 2),
-                finding_count=total_findings,
-                critical_count=critical,
-                high_count=high,
-                medium_count=medium,
-                low_count=low,
-                info_count=info,
-                max_severity=max_sev,
-                weight=weight,
-            ))
+            scores.append(
+                CategoryScore(
+                    category=category,
+                    score=round(score, 2),
+                    finding_count=total_findings,
+                    critical_count=critical,
+                    high_count=high,
+                    medium_count=medium,
+                    low_count=low,
+                    info_count=info,
+                    max_severity=max_sev,
+                    weight=weight,
+                )
+            )
 
         return sorted(scores, key=lambda s: s.score, reverse=True)
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any
+import importlib
+import pkgutil
 
 from usaf.core.exceptions import (
     PluginDependencyError,
@@ -26,13 +27,9 @@ class PluginRegistry:
         """Register a check plugin class."""
         check_id = check_cls.id
         if not check_id:
-            raise PluginRegistrationError(
-                f"Cannot register {check_cls.__name__}: id is empty"
-            )
+            raise PluginRegistrationError(f"Cannot register {check_cls.__name__}: id is empty")
         if check_id in self._checks:
-            raise PluginRegistrationError(
-                f"Check '{check_id}' is already registered"
-            )
+            raise PluginRegistrationError(f"Check '{check_id}' is already registered")
         self._checks[check_id] = check_cls
         self._dependency_graph[check_id] = set(check_cls.depends)
         return check_cls
@@ -82,9 +79,7 @@ class PluginRegistry:
             if cls.category.value == category or cls.category == category
         }
 
-    def resolve_dependencies(
-        self, check_ids: list[str] | None = None
-    ) -> list[str]:
+    def resolve_dependencies(self, check_ids: list[str] | None = None) -> list[str]:
         """Topological sort of checks based on collector dependencies."""
         targets = check_ids or list(self._checks.keys())
         graph: dict[str, set[str]] = {}
@@ -101,9 +96,7 @@ class PluginRegistry:
 
         def visit(cid: str) -> None:
             if cid in temp:
-                raise PluginDependencyError(
-                    f"Circular dependency detected involving '{cid}'"
-                )
+                raise PluginDependencyError(f"Circular dependency detected involving '{cid}'")
             if cid in visited:
                 return
             temp.add(cid)
@@ -125,9 +118,7 @@ class PluginRegistry:
         for check_id, cls in self._checks.items():
             for dep in cls.depends:
                 if dep not in self._checks:
-                    errors.append(
-                        f"Check '{check_id}' depends on unknown check '{dep}'"
-                    )
+                    errors.append(f"Check '{check_id}' depends on unknown check '{dep}'")
         return errors
 
     def count(self) -> int:
@@ -147,4 +138,23 @@ def register_check(cls: type[AuditCheck]) -> type[AuditCheck]:
     return registry.register(cls)
 
 
-__all__ = ["PluginRegistry", "registry", "register_check"]
+def discover_checks(package: str = "usaf.checks") -> None:
+    """Walk a package namespace and import every submodule.
+
+    Importing triggers @register_check decorators, which populate the
+    registry. Safe to call multiple times — duplicate registrations
+    raise, but discovery only runs once per process if guarded by caller.
+    """
+    try:
+        pkg = importlib.import_module(package)
+    except ImportError:
+        return
+
+    for _info in pkgutil.walk_packages(pkg.__path__, prefix=package + ".", onerror=lambda _: None):
+        try:
+            importlib.import_module(_info.name)
+        except Exception:
+            pass
+
+
+__all__ = ["PluginRegistry", "discover_checks", "register_check", "registry"]

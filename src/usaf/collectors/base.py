@@ -19,9 +19,7 @@ class BaseCollector(CollectorInterface):
 
     def __init__(self) -> None:
         if not self.name:
-            raise CollectorError(
-                f"{type(self).__name__} must define a 'name' class variable"
-            )
+            raise CollectorError(f"{type(self).__name__} must define a 'name' class variable")
 
     def collect(self) -> dict[str, Any]:
         """Collect data with timeout support."""
@@ -33,13 +31,9 @@ class BaseCollector(CollectorInterface):
         except CollectorError:
             raise
         except TimeoutError:
-            raise CollectorTimeoutError(
-                f"Collector '{self.name}' timed out after {self.timeout}s"
-            )
+            raise CollectorTimeoutError(f"Collector '{self.name}' timed out after {self.timeout}s")
         except Exception as e:
-            raise CollectorError(
-                f"Collector '{self.name}' failed: {e}"
-            ) from e
+            raise CollectorError(f"Collector '{self.name}' failed: {e}") from e
         elapsed = time.perf_counter() - start
         self._data = self._data or {}
         self._data["_collector_meta"] = {
@@ -50,8 +44,7 @@ class BaseCollector(CollectorInterface):
         return self._data
 
     @abc.abstractmethod
-    def _do_collect(self) -> dict[str, Any]:
-        ...
+    def _do_collect(self) -> dict[str, Any]: ...
 
     def get_data(self) -> dict[str, Any]:
         if self._data is None:

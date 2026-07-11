@@ -4,13 +4,11 @@ from datetime import datetime
 from typing import Any
 
 from usaf.models.evidence import (
-    CommandEvidence,
     FileEvidence,
     NetworkEvidence,
     ProcessEvidence,
     UserEvidence,
 )
-from usaf.models.finding import Finding
 from usaf.models.result import ScanResult
 from usaf.models.score import ScanScore
 from usaf.models.severity import Severity
@@ -28,8 +26,8 @@ class MarkdownReporter(BaseReporter):
         verbose = kwargs.get("verbose", False)
         show_passed = kwargs.get("show_passed", False)
 
-        lines.append(f"# USAF Security Audit Report")
-        lines.append(f"")
+        lines.append("# USAF Security Audit Report")
+        lines.append("")
         lines.append(f"- **Scan:** {result.metadata.scan_name}")
         lines.append(f"- **Date:** {result.metadata.start_time.strftime('%Y-%m-%d %H:%M:%S UTC')}")
         lines.append(f"- **Host:** {result.metadata.hostname}")
@@ -40,13 +38,15 @@ class MarkdownReporter(BaseReporter):
         if score:
             lines.append(f"- **Overall Score:** {score.overall_score}/10 ({score.overall_grade})")
             lines.append(f"- **Total Findings:** {result.total_findings}")
-            lines.append(f"  - Critical: {score.critical_count} | High: {score.high_count} | "
-                         f"Medium: {score.medium_count} | Low: {score.low_count} | "
-                         f"Info: {score.info_count}")
+            lines.append(
+                f"  - Critical: {score.critical_count} | High: {score.high_count} | "
+                f"Medium: {score.medium_count} | Low: {score.low_count} | "
+                f"Info: {score.info_count}"
+            )
 
-        lines.append(f"")
-        lines.append(f"---")
-        lines.append(f"")
+        lines.append("")
+        lines.append("---")
+        lines.append("")
 
         findings = result.findings
 
@@ -57,23 +57,31 @@ class MarkdownReporter(BaseReporter):
             lines.append("")
             return "\n".join(lines)
 
-        lines.append(f"## Findings by Severity")
-        lines.append(f"")
+        lines.append("## Findings by Severity")
+        lines.append("")
 
-        for severity in [Severity.CRITICAL, Severity.HIGH, Severity.MEDIUM, Severity.LOW, Severity.INFO]:
+        for severity in [
+            Severity.CRITICAL,
+            Severity.HIGH,
+            Severity.MEDIUM,
+            Severity.LOW,
+            Severity.INFO,
+        ]:
             sev_findings = [f for f in findings if f.severity == severity]
             if not sev_findings:
                 continue
 
             emoji = {"CRITICAL": "🔴", "HIGH": "🟠", "MEDIUM": "🟡", "LOW": "🔵", "INFO": "⚪"}
-            lines.append(f"### {emoji.get(severity.value, '')} {severity.value} ({len(sev_findings)})")
-            lines.append(f"")
+            lines.append(
+                f"### {emoji.get(severity.value, '')} {severity.value} ({len(sev_findings)})"
+            )
+            lines.append("")
 
             for finding in sev_findings:
                 lines.append(f"#### {finding.id}: {finding.title}")
-                lines.append(f"")
-                lines.append(f"| Field | Value |")
-                lines.append(f"|---|---|")
+                lines.append("")
+                lines.append("| Field | Value |")
+                lines.append("|---|---|")
                 lines.append(f"| **Severity** | {finding.severity.value} |")
                 lines.append(f"| **Risk Score** | {finding.risk_score}/10 |")
                 lines.append(f"| **Confidence** | {finding.confidence.value} |")
@@ -83,13 +91,13 @@ class MarkdownReporter(BaseReporter):
                 if finding.mitre_attack_ids:
                     lines.append(f"| **MITRE ATT&CK** | {', '.join(finding.mitre_attack_ids)} |")
 
-                lines.append(f"")
+                lines.append("")
                 lines.append(f"**Description:** {finding.description}")
-                lines.append(f"")
+                lines.append("")
                 lines.append(f"**Why It Matters:** {finding.rationale}")
-                lines.append(f"")
+                lines.append("")
                 lines.append(f"**Remediation:** {finding.remediation}")
-                lines.append(f"")
+                lines.append("")
 
                 if finding.detected_value:
                     lines.append(f"> **Detected:** `{finding.detected_value}`")
@@ -98,10 +106,10 @@ class MarkdownReporter(BaseReporter):
 
                 if finding.evidence:
                     ev = finding.evidence
-                    lines.append(f"")
-                    lines.append(f"**Evidence:**")
-                    lines.append(f"")
-                    lines.append(f"```")
+                    lines.append("")
+                    lines.append("**Evidence:**")
+                    lines.append("")
+                    lines.append("```")
                     if isinstance(ev, FileEvidence):
                         lines.append(f"  File: {ev.path}")
                         if ev.permission:
@@ -133,41 +141,43 @@ class MarkdownReporter(BaseReporter):
                             lines.append(f"  Groups: {', '.join(ev.groups)}")
                     else:
                         lines.append(f"  {ev.model_dump()}")
-                    lines.append(f"```")
+                    lines.append("```")
 
-                lines.append(f"")
-                lines.append(f"---")
-                lines.append(f"")
+                lines.append("")
+                lines.append("---")
+                lines.append("")
 
         # Category breakdown
         if score and score.categories:
-            lines.append(f"## Category Scores")
-            lines.append(f"")
-            lines.append(f"| Category | Score | Findings | Critical | High | Medium |")
-            lines.append(f"|---|---|---|---|---|---|")
+            lines.append("## Category Scores")
+            lines.append("")
+            lines.append("| Category | Score | Findings | Critical | High | Medium |")
+            lines.append("|---|---|---|---|---|---|")
             for cat in sorted(score.categories, key=lambda c: c.score, reverse=True):
                 lines.append(
                     f"| {cat.category.value} | {cat.score}/10 | {cat.finding_count} | "
                     f"{cat.critical_count} | {cat.high_count} | {cat.medium_count} |"
                 )
-            lines.append(f"")
+            lines.append("")
 
         # Checks summary
         if verbose or show_passed:
-            lines.append(f"## Checks Summary")
-            lines.append(f"")
-            lines.append(f"| Check | Status | Findings | Time |")
-            lines.append(f"|---|---|---|---|")
+            lines.append("## Checks Summary")
+            lines.append("")
+            lines.append("| Check | Status | Findings | Time |")
+            lines.append("|---|---|---|---|")
             for check_result in sorted(result.results, key=lambda r: r.check_id):
                 status = "✅" if check_result.passed else "❌"
                 lines.append(
                     f"| {check_result.check_id} | {status} | {check_result.finding_count} | "
                     f"{check_result.execution_time_ms:.0f}ms |"
                 )
-            lines.append(f"")
+            lines.append("")
 
-        lines.append(f"---")
-        lines.append(f"*Report generated by USAF v{result.metadata.usaf_version or '0.1.0'} "
-                     f"at {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC*")
+        lines.append("---")
+        lines.append(
+            f"*Report generated by USAF v{result.metadata.usaf_version or '0.1.0'} "
+            f"at {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC*"
+        )
 
         return "\n".join(lines)

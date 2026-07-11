@@ -3,8 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from usaf.collectors.base import BaseCollector
+from usaf.collectors.registry import register_collector
 
 
+@register_collector
 class UserCollector(BaseCollector):
     """Collects user account information from /etc/passwd and /etc/shadow."""
 
@@ -25,15 +27,17 @@ class UserCollector(BaseCollector):
                     continue
                 parts = line.split(":")
                 if len(parts) >= 7:
-                    users.append({
-                        "username": parts[0],
-                        "password": parts[1],
-                        "uid": int(parts[2]),
-                        "gid": int(parts[3]),
-                        "gecos": parts[4],
-                        "home": parts[5],
-                        "shell": parts[6],
-                    })
+                    users.append(
+                        {
+                            "username": parts[0],
+                            "password": parts[1],
+                            "uid": int(parts[2]),
+                            "gid": int(parts[3]),
+                            "gecos": parts[4],
+                            "home": parts[5],
+                            "shell": parts[6],
+                        }
+                    )
         except OSError:
             pass
         return users
@@ -68,6 +72,7 @@ class UserCollector(BaseCollector):
         return accounts
 
 
+@register_collector
 class GroupCollector(BaseCollector):
     """Collects group information from /etc/group."""
 
@@ -86,17 +91,20 @@ class GroupCollector(BaseCollector):
                 parts = line.split(":")
                 if len(parts) >= 4:
                     members = parts[3].split(",") if parts[3] else []
-                    groups.append({
-                        "name": parts[0],
-                        "password": parts[1],
-                        "gid": int(parts[2]),
-                        "members": members,
-                    })
+                    groups.append(
+                        {
+                            "name": parts[0],
+                            "password": parts[1],
+                            "gid": int(parts[2]),
+                            "members": members,
+                        }
+                    )
         except OSError:
             pass
         return groups
 
 
+@register_collector
 class SudoCollector(BaseCollector):
     """Collects sudo configuration."""
 
@@ -126,13 +134,17 @@ class SudoCollector(BaseCollector):
                     line = line.strip()
                     if not line or line.startswith("#"):
                         continue
-                    entries.append({
-                        "file": path_str,
-                        "content": line,
-                    })
+                    entries.append(
+                        {
+                            "file": path_str,
+                            "content": line,
+                        }
+                    )
             except OSError:
-                entries.append({
-                    "file": path_str,
-                    "content": None,
-                })
+                entries.append(
+                    {
+                        "file": path_str,
+                        "content": None,
+                    }
+                )
         return entries

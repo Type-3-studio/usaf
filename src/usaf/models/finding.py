@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -21,16 +21,28 @@ class Finding(BaseModel):
     evidence: Evidence | None = Field(default=None, description="Supporting evidence")
     detected_value: str | None = Field(default=None, description="Actual value detected")
     expected_value: str | None = Field(default=None, description="Expected/correct value")
-    affected_component: str | None = Field(default=None, description="Affected file, process, socket, etc.")
+    affected_component: str | None = Field(
+        default=None, description="Affected file, process, socket, etc."
+    )
     remediation: str = Field(description="How to fix this finding")
-    reference: str | None = Field(default=None, description="URL or document reference for more information")
-    confidence: Confidence = Field(default=Confidence.HIGH, description="Confidence in this finding")
-    false_positive_probability: float = Field(default=0.0, ge=0.0, le=1.0, description="Estimated false positive probability")
+    reference: str | None = Field(
+        default=None, description="URL or document reference for more information"
+    )
+    confidence: Confidence = Field(
+        default=Confidence.HIGH, description="Confidence in this finding"
+    )
+    false_positive_probability: float = Field(
+        default=0.0, ge=0.0, le=1.0, description="Estimated false positive probability"
+    )
     source: str = Field(description="Plugin class name that generated this finding")
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), description="When this finding was created")
+    timestamp: datetime = Field(
+        default_factory=lambda: datetime.now(UTC), description="When this finding was created"
+    )
     cve_ids: list[str] = Field(default_factory=list, description="Related CVE identifiers")
     cis_benchmarks: list[str] = Field(default_factory=list, description="CIS Benchmark mappings")
-    mitre_attack_ids: list[str] = Field(default_factory=list, description="MITRE ATT&CK technique IDs")
+    mitre_attack_ids: list[str] = Field(
+        default_factory=list, description="MITRE ATT&CK technique IDs"
+    )
     owasp_ids: list[str] = Field(default_factory=list, description="OWASP mappings")
     tags: list[str] = Field(default_factory=list, description="Arbitrary tags for filtering")
 

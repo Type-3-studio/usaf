@@ -3,8 +3,7 @@ from __future__ import annotations
 import json
 
 from usaf.models.finding import Finding
-from usaf.models.result import CheckResult, ScanMetadata, ScanResult
-from usaf.models.score import ScanScore
+from usaf.models.result import CheckResult, ScanResult
 from usaf.models.severity import CheckCategory, Severity
 from usaf.reporting.json import JSONReporter
 from usaf.scoring.engine import ScoringEngine

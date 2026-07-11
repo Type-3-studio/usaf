@@ -1,0 +1,298 @@
+
+╭──────────────────────────────────────────────────────────╮
+│ [1;36mUSAF - Ubuntu Security Audit Framework[0m                   │
+╰──────────────────────────────────────────────────────────╯
+  Scan:   [1musaf-scan[0m
+  Host:   tufg
+  OS:     Ubuntu [1;36m26.04[0m LTS
+  Kernel: [1;36m7.0[0m.[1;36m0[0m-[1;36m27[0m-generic
+  Time:   [1;36m2026[0m-[1;36m07[0m-[1;36m11[0m [1;92m05:05:41[0m UTC
+  Duration: [1;36m0.[0m7s
+
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Overall Score: [1;31m9.41/10[0m  [1;31mF-[0m                                                                                                                           │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+  Total Findings: [1;36m18[0m | 🔴 Critical: [1;36m0[0m | 🟠 High: [1;36m18[0m | 🟡 Medium: [1;36m0[0m | 🔵 Low: [1;36m0[0m | ⚪ Info: [1;36m0[0m
+
+[1;38;5;172m━━━ HIGH [0m[1;38;5;172m([0m[1;38;5;172m18[0m[1;38;5;172m)[0m[1;38;5;172m ━━━[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /bin/ntfs-3g[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/bin/[0m[95mntfs-3g[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/bin/ntfs-3g'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /bin/ntfs-3g'[0m. If the software was recently installed, review 
+the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/bin/[0m[95mntfs-3g[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/bin/[0m[95mntfs-3g[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /bin/su-rs[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/bin/[0m[95msu-rs[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/bin/su-rs'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /bin/su-rs'[0m. If the software was recently installed, review the 
+package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/bin/[0m[95msu-rs[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/bin/[0m[95msu-rs[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /bin/sudo-rs[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/bin/[0m[95msudo-rs[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/bin/sudo-rs'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /bin/sudo-rs'[0m. If the software was recently installed, review 
+the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/bin/[0m[95msudo-rs[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/bin/[0m[95msudo-rs[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /bin/sudo.ws[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/bin/[0m[95msudo.ws[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/bin/sudo.ws'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /bin/sudo.ws'[0m. If the software was recently installed, review 
+the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/bin/[0m[95msudo.ws[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/bin/[0m[95msudo.ws[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /bin/sudoedit[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/bin/[0m[95msudoedit[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/bin/sudoedit'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /bin/sudoedit'[0m. If the software was recently installed, 
+review the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/bin/[0m[95msudoedit[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/bin/[0m[95msudoedit[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /bin/sudoedit-rs[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/bin/[0m[95msudoedit-rs[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/bin/sudoedit-rs'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /bin/sudoedit-rs'[0m. If the software was recently installed,
+review the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/bin/[0m[95msudoedit-rs[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/bin/[0m[95msudoedit-rs[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /sbin/mount.ntfs[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/sbin/[0m[95mmount.ntfs[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/sbin/mount.ntfs'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /sbin/mount.ntfs'[0m. If the software was recently installed,
+review the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/sbin/[0m[95mmount.ntfs[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/sbin/[0m[95mmount.ntfs[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /sbin/mount.ntfs-3g[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/sbin/[0m[95mmount.ntfs-3g[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/sbin/mount.ntfs-3g'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /sbin/mount.ntfs-3g'[0m. If the software was recently 
+installed, review the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/sbin/[0m[95mmount.ntfs-3g[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/sbin/[0m[95mmount.ntfs-3g[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /sbin/pppd[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/sbin/[0m[95mpppd[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/sbin/pppd'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /sbin/pppd'[0m. If the software was recently installed, review the 
+package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/sbin/[0m[95mpppd[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/sbin/[0m[95mpppd[0m
+      Permissions: 0o4754
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /usr/bin/ntfs-3g[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/usr/bin/[0m[95mntfs-3g[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/usr/bin/ntfs-3g'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /usr/bin/ntfs-3g'[0m. If the software was recently installed,
+review the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/usr/bin/[0m[95mntfs-3g[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/usr/bin/[0m[95mntfs-3g[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /usr/bin/su-rs[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/usr/bin/[0m[95msu-rs[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/usr/bin/su-rs'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /usr/bin/su-rs'[0m. If the software was recently installed, 
+review the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/usr/bin/[0m[95msu-rs[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/usr/bin/[0m[95msu-rs[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /usr/bin/sudo-rs[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/usr/bin/[0m[95msudo-rs[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/usr/bin/sudo-rs'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /usr/bin/sudo-rs'[0m. If the software was recently installed,
+review the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/usr/bin/[0m[95msudo-rs[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/usr/bin/[0m[95msudo-rs[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /usr/bin/sudo.ws[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/usr/bin/[0m[95msudo.ws[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/usr/bin/sudo.ws'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /usr/bin/sudo.ws'[0m. If the software was recently installed,
+review the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/usr/bin/[0m[95msudo.ws[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/usr/bin/[0m[95msudo.ws[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /usr/bin/sudoedit[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/usr/bin/[0m[95msudoedit[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/usr/bin/sudoedit'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /usr/bin/sudoedit'[0m. If the software was recently 
+installed, review the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/usr/bin/[0m[95msudoedit[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/usr/bin/[0m[95msudoedit[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /usr/bin/sudoedit-rs[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/usr/bin/[0m[95msudoedit-rs[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/usr/bin/sudoedit-rs'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /usr/bin/sudoedit-rs'[0m. If the software was recently 
+installed, review the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/usr/bin/[0m[95msudoedit-rs[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/usr/bin/[0m[95msudoedit-rs[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /usr/sbin/mount.ntfs[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/usr/sbin/[0m[95mmount.ntfs[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/usr/sbin/mount.ntfs'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /usr/sbin/mount.ntfs'[0m. If the software was recently 
+installed, review the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/usr/sbin/[0m[95mmount.ntfs[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/usr/sbin/[0m[95mmount.ntfs[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /usr/sbin/mount.ntfs-3g[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/usr/sbin/[0m[95mmount.ntfs-3g[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/usr/sbin/mount.ntfs-3g'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /usr/sbin/mount.ntfs-3g'[0m. If the software was 
+recently installed, review the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/usr/sbin/[0m[95mmount.ntfs-3g[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/usr/sbin/[0m[95mmount.ntfs-3g[0m
+      Permissions: 0o4755
+      Owner: [1;36m0[0m
+
+  [orange3]PRM-001-001[/] [1;38;5;172mUnexpected SUID binary: /usr/sbin/pppd[0m
+    [2mScore:[0m [1;36m7.5[0m  [2mConfidence:[0m MEDIUM  [2mCategory:[0m PERMISSIONS  [2mComponent:[0m [35m/usr/sbin/[0m[95mpppd[0m
+    [2mMITRE:[0m T1548.[1;36m001[0m
+    [1mWhy:[0m SUID [1m([0mSet User ID[1m)[0m binaries execute with the privileges of the file owner [1m([0musually root[1m)[0m. Each unexpected SUID binary is a potential privilege 
+escalation vector. Attackers may plant SUID binaries as backdoors or legitimate software installations may add SUID binaries that weren't reviewed. 
+Every SUID binary should be justified and tracked.
+    [1mFix:[0m Investigate why [32m'/usr/sbin/pppd'[0m has the SUID bit set. If unauthorized: [32m'chmod u-s /usr/sbin/pppd'[0m. If the software was recently installed, 
+review the package's security posture.
+    [1;31mDetected:[0m SUID bit set on [35m/usr/sbin/[0m[95mpppd[0m
+    [1;32mExpected:[0m No SUID bit
+    [2mEvidence:[0m
+      File: [35m/usr/sbin/[0m[95mpppd[0m
+      Permissions: 0o4754
+      Owner: [1;36m0[0m
+
+
+[3m                       Category Scores                       [0m
+╭─────────────┬───────┬──────────┬──────────┬──────┬────────╮
+│[1m [0m[1mCategory   [0m[1m [0m│[1m [0m[1mScore[0m[1m [0m│[1m [0m[1mFindings[0m[1m [0m│[1m [0m[1mCritical[0m[1m [0m│[1m [0m[1mHigh[0m[1m [0m│[1m [0m[1mMedium[0m[1m [0m│
+├─────────────┼───────┼──────────┼──────────┼──────┼────────┤
+│[36m [0m[36mPERMISSIONS[0m[36m [0m│  [31m9.41[0m │       18 │[31m [0m[31m       0[0m[31m [0m│[38;5;172m [0m[38;5;172m  18[0m[38;5;172m [0m│[33m [0m[33m     0[0m[33m [0m│
+╰─────────────┴───────┴──────────┴──────────┴──────┴────────╯
+
+[2mReport generated by USAF v0.[0m[1;2;36m1.0[0m[2m.dev1 at [0m[1;2;36m2026[0m[2m-[0m[1;2;36m07[0m[2m-[0m[1;2;36m11[0m[2m [0m[1;2;92m05:05:42[0m[2m UTC[0m
+

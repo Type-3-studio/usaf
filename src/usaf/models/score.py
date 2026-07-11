@@ -24,7 +24,9 @@ class CategoryScore(BaseModel):
 
 
 class ScanScore(BaseModel):
-    overall_score: float = Field(ge=0.0, le=10.0, description="Overall security posture score (0=perfect, 10=worst)")
+    overall_score: float = Field(
+        ge=0.0, le=10.0, description="Overall security posture score (0=perfect, 10=worst)"
+    )
     overall_grade: str = Field(default="A+", description="Letter grade")
     categories: list[CategoryScore] = Field(default_factory=list)
     total_findings: int = Field(default=0)

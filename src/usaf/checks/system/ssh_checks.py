@@ -4,7 +4,7 @@ from pathlib import Path
 
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
-from usaf.models.evidence import FileEvidence, RegistryEvidence
+from usaf.models.evidence import RegistryEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
 
@@ -182,8 +182,11 @@ class SSHKeyExchangeCheck(AuditCheck):
             return findings
 
         kex_line = config.get("KexAlgorithms", "")
-        weak_kex = ["diffie-hellman-group1-sha1", "diffie-hellman-group-exchange-sha1",
-                     "diffie-hellman-group14-sha1"]
+        weak_kex = [
+            "diffie-hellman-group1-sha1",
+            "diffie-hellman-group-exchange-sha1",
+            "diffie-hellman-group14-sha1",
+        ]
 
         if kex_line:
             configured_kex = kex_line.strip().split(",")

@@ -19,9 +19,7 @@ class CollectorManager:
     def add(self, collector: BaseCollector) -> None:
         """Register a collector."""
         if collector.name in self._collectors:
-            raise CollectorError(
-                f"Collector '{collector.name}' is already registered"
-            )
+            raise CollectorError(f"Collector '{collector.name}' is already registered")
         self._collectors[collector.name] = collector
 
     def get(self, name: str) -> dict[str, Any] | None:
@@ -68,9 +66,7 @@ class CollectorManager:
             if name not in all_names:
                 return
             if name in temp:
-                raise CollectorError(
-                    f"Circular dependency in collectors involving '{name}'"
-                )
+                raise CollectorError(f"Circular dependency in collectors involving '{name}'")
             if name in visited:
                 return
             temp.add(name)

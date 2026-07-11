@@ -20,8 +20,7 @@ class AuditCheckInterface(ABC):
     timeout: int = 60
 
     @abstractmethod
-    def evaluate(self, collectors: dict[str, dict[str, Any]]) -> CheckResult:
-        ...
+    def evaluate(self, collectors: dict[str, dict[str, Any]]) -> CheckResult: ...
 
 
 class CollectorInterface(ABC):
@@ -33,8 +32,7 @@ class CollectorInterface(ABC):
     timeout: int = 30
 
     @abstractmethod
-    def collect(self) -> dict[str, Any]:
-        ...
+    def collect(self) -> dict[str, Any]: ...
 
 
 class ReporterInterface(ABC):
@@ -44,12 +42,12 @@ class ReporterInterface(ABC):
     description: str = ""
 
     @abstractmethod
-    def generate(self, result: ScanResult, score: ScanScore | None = None, **kwargs: Any) -> str:
-        ...
+    def generate(
+        self, result: ScanResult, score: ScanScore | None = None, **kwargs: Any
+    ) -> str: ...
 
     @abstractmethod
-    def write(self, content: str, path: str) -> None:
-        ...
+    def write(self, content: str, path: str) -> None: ...
 
 
 class ParserInterface(ABC):
@@ -59,37 +57,30 @@ class ParserInterface(ABC):
     description: str = ""
 
     @abstractmethod
-    def parse(self, content: str) -> Any:
-        ...
+    def parse(self, content: str) -> Any: ...
 
     @abstractmethod
-    def parse_file(self, path: str) -> Any:
-        ...
+    def parse_file(self, path: str) -> Any: ...
 
 
 class ScoringEngineInterface(ABC):
     """Interface for the scoring engine."""
 
     @abstractmethod
-    def calculate(self, result: ScanResult) -> ScanScore:
-        ...
+    def calculate(self, result: ScanResult) -> ScanScore: ...
 
 
 class CacheEngineInterface(ABC):
     """Interface for caching."""
 
     @abstractmethod
-    def get(self, key: str) -> Any | None:
-        ...
+    def get(self, key: str) -> Any | None: ...
 
     @abstractmethod
-    def set(self, key: str, value: Any, ttl: int = 300) -> None:
-        ...
+    def set(self, key: str, value: Any, ttl: int = 300) -> None: ...
 
     @abstractmethod
-    def invalidate(self, key: str) -> None:
-        ...
+    def invalidate(self, key: str) -> None: ...
 
     @abstractmethod
-    def clear(self) -> None:
-        ...
+    def clear(self) -> None: ...

@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-import os
 import platform
 from pathlib import Path
 
 from usaf.collectors.base import BaseCollector
+from usaf.collectors.registry import register_collector
 
 
+@register_collector
 class KernelCollector(BaseCollector):
     """Collects kernel and system information."""
 
@@ -83,6 +84,7 @@ class KernelCollector(BaseCollector):
         return {}
 
 
+@register_collector
 class KernelParametersCollector(BaseCollector):
     """Collects security-relevant kernel parameters."""
 

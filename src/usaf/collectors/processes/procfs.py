@@ -3,8 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from usaf.collectors.base import BaseCollector
+from usaf.collectors.registry import register_collector
 
 
+@register_collector
 class ProcessCollector(BaseCollector):
     """Collects running process information from /proc."""
 

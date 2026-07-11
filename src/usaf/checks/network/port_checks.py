@@ -5,7 +5,6 @@ from usaf.core.registry import register_check
 from usaf.models.evidence import NetworkEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
-
 KNOWN_SAFE_PORTS: dict[int, str] = {
     22: "SSH",
     53: "DNS",

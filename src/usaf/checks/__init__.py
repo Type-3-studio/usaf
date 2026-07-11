@@ -1,9 +1,12 @@
 # Check plugins are auto-discovered via the registry.
-# Import check modules to trigger registration.
-# Explicit imports ensure plugins are available before CLI runs.
+# Importing every submodule in usaf.checks triggers @register_check
+# decorators, populating the plugin registry.
+#
+# If a new check is not being discovered, verify:
+#   1. It has @register_check decorator
+#   2. The module is inside usaf.checks (or a subdirectory)
+#  No __init__.py edits needed.
 
-from usaf.checks.system import kernel_checks
-from usaf.checks.system import ssh_checks
-from usaf.checks.users import user_checks
-from usaf.checks.network import port_checks
-from usaf.checks.permissions import suid_checks
+from usaf.core.registry import discover_checks
+
+discover_checks()

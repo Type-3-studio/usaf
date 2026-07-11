@@ -4,7 +4,7 @@ import pytest
 
 from usaf.core.exceptions import PluginDependencyError, PluginNotFoundError, PluginRegistrationError
 from usaf.core.plugin import AuditCheck
-from usaf.core.registry import PluginRegistry, register_check
+from usaf.core.registry import PluginRegistry
 from usaf.models.severity import CheckCategory, Severity
 
 
@@ -35,9 +35,12 @@ class TestPluginRegistry:
             category = CheckCategory.SYSTEM
             severity = Severity.MEDIUM
             description = "First"
-            def _run_check(self, collectors): return []
+
+            def _run_check(self, collectors):
+                return []
 
         with pytest.raises(PluginRegistrationError):
+
             @empty_registry.register
             class Check2(AuditCheck):
                 id = "DUP-001"
@@ -45,7 +48,9 @@ class TestPluginRegistry:
                 category = CheckCategory.SYSTEM
                 severity = Severity.MEDIUM
                 description = "Second"
-                def _run_check(self, collectors): return []
+
+                def _run_check(self, collectors):
+                    return []
 
     def test_get_nonexistent_check(self, empty_registry: PluginRegistry):
         with pytest.raises(PluginNotFoundError):
@@ -59,7 +64,9 @@ class TestPluginRegistry:
             category = CheckCategory.SYSTEM
             severity = Severity.LOW
             description = "Test getting instance"
-            def _run_check(self, collectors): return []
+
+            def _run_check(self, collectors):
+                return []
 
         instance = empty_registry.get_instance("INST-001")
         assert instance.id == "INST-001"
@@ -73,7 +80,9 @@ class TestPluginRegistry:
             category = CheckCategory.SYSTEM
             severity = Severity.LOW
             description = "Test instance caching"
-            def _run_check(self, collectors): return []
+
+            def _run_check(self, collectors):
+                return []
 
         i1 = empty_registry.get_instance("CACHE-001")
         i2 = empty_registry.get_instance("CACHE-001")
@@ -89,7 +98,9 @@ class TestPluginRegistry:
             category = CheckCategory.SYSTEM
             severity = Severity.LOW
             description = "A"
-            def _run_check(self, collectors): return []
+
+            def _run_check(self, collectors):
+                return []
 
         @empty_registry.register
         class B(AuditCheck):
@@ -98,7 +109,9 @@ class TestPluginRegistry:
             category = CheckCategory.SYSTEM
             severity = Severity.LOW
             description = "B"
-            def _run_check(self, collectors): return []
+
+            def _run_check(self, collectors):
+                return []
 
         ids = empty_registry.get_all_ids()
         assert "A-001" in ids
@@ -113,7 +126,9 @@ class TestPluginRegistry:
             category = CheckCategory.SYSTEM
             severity = Severity.LOW
             description = "System check"
-            def _run_check(self, collectors): return []
+
+            def _run_check(self, collectors):
+                return []
 
         @empty_registry.register
         class NetCheck(AuditCheck):
@@ -122,7 +137,9 @@ class TestPluginRegistry:
             category = CheckCategory.NETWORK
             severity = Severity.LOW
             description = "Network check"
-            def _run_check(self, collectors): return []
+
+            def _run_check(self, collectors):
+                return []
 
         sys_checks = empty_registry.get_by_category("SYSTEM")
         assert "CAT-SYS" in sys_checks
@@ -137,7 +154,9 @@ class TestPluginRegistry:
             severity = Severity.LOW
             description = "A"
             depends = ["kernel_params"]
-            def _run_check(self, collectors): return []
+
+            def _run_check(self, collectors):
+                return []
 
         @empty_registry.register
         class DepB(AuditCheck):
@@ -147,7 +166,9 @@ class TestPluginRegistry:
             severity = Severity.LOW
             description = "B"
             depends = ["kernel_params"]
-            def _run_check(self, collectors): return []
+
+            def _run_check(self, collectors):
+                return []
 
         order = empty_registry.resolve_dependencies(["DEP-A", "DEP-B"])
         assert "DEP-A" in order
@@ -163,7 +184,9 @@ class TestPluginRegistry:
             severity = Severity.LOW
             description = "A"
             depends = ["CIRC-B"]
-            def _run_check(self, collectors): return []
+
+            def _run_check(self, collectors):
+                return []
 
         @empty_registry.register
         class CircB(AuditCheck):
@@ -173,7 +196,9 @@ class TestPluginRegistry:
             severity = Severity.LOW
             description = "B"
             depends = ["CIRC-A"]
-            def _run_check(self, collectors): return []
+
+            def _run_check(self, collectors):
+                return []
 
         with pytest.raises(PluginDependencyError):
             empty_registry.resolve_dependencies(["CIRC-A", "CIRC-B"])
@@ -187,7 +212,9 @@ class TestPluginRegistry:
             severity = Severity.LOW
             description = "Has missing dependency"
             depends = ["NONEXISTENT_COLLECTOR"]
-            def _run_check(self, collectors): return []
+
+            def _run_check(self, collectors):
+                return []
 
         errors = empty_registry.validate_dependencies()
         assert len(errors) > 0
@@ -195,11 +222,14 @@ class TestPluginRegistry:
 
     def test_class_missing_required_attributes(self):
         with pytest.raises(PluginRegistrationError):
+
             class BadCheck(AuditCheck):
                 id = ""
                 name = ""
                 description = ""
-                def _run_check(self, collectors): return []
+
+                def _run_check(self, collectors):
+                    return []
 
     def test_count(self, empty_registry: PluginRegistry):
         assert empty_registry.count() == 0
@@ -211,7 +241,9 @@ class TestPluginRegistry:
             category = CheckCategory.SYSTEM
             severity = Severity.LOW
             description = "Count test"
-            def _run_check(self, collectors): return []
+
+            def _run_check(self, collectors):
+                return []
 
         assert empty_registry.count() == 1
 
@@ -223,7 +255,9 @@ class TestPluginRegistry:
             category = CheckCategory.SYSTEM
             severity = Severity.LOW
             description = "Clear test"
-            def _run_check(self, collectors): return []
+
+            def _run_check(self, collectors):
+                return []
 
         assert empty_registry.count() == 1
         empty_registry.clear()
@@ -238,8 +272,33 @@ class TestPluginRegistry:
             category = CheckCategory.SYSTEM
             severity = Severity.LOW
             description = "Unregister test"
-            def _run_check(self, collectors): return []
+
+            def _run_check(self, collectors):
+                return []
 
         assert empty_registry.count() == 1
         empty_registry.unregister("UNREG-001")
         assert empty_registry.count() == 0
+
+
+def test_discover_checks_does_not_crash_on_missing_package():
+    from usaf.core.registry import discover_checks
+
+    discover_checks("usaf.does_not_exist")  # Should not raise
+
+
+def test_discover_checks_discovers_existing_checks():
+    from usaf.core.registry import discover_checks, registry
+
+    before = registry.count()
+    # Re-discover (safe — existing checks are already registered)
+    discover_checks("usaf.checks")
+    after = registry.count()
+    # Should not lose any checks
+    assert after >= before
+    # Known checks should be present
+    assert "KERN-001" in registry.get_all_ids()
+    assert "SSH-001" in registry.get_all_ids()
+    assert "USR-001" in registry.get_all_ids()
+    assert "NET-001" in registry.get_all_ids()
+    assert "PRM-001" in registry.get_all_ids()

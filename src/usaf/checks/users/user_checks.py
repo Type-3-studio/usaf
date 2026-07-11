@@ -85,8 +85,7 @@ class EmptyPasswordCheck(AuditCheck):
         findings = []
 
         empty_password_users = [
-            s for s in shadow_data
-            if s.get("password_hash") in ("", None, "NP")
+            s for s in shadow_data if s.get("password_hash") in ("", None, "NP")
         ]
 
         passwd_map = {u["username"]: u for u in passwd_data if u.get("username")}
@@ -166,12 +165,14 @@ class ShadowedPasswordsCheck(AuditCheck):
                             "by root and the shadow group."
                         ),
                         remediation=(
-                            f"Run 'pwconv' to migrate passwords to /etc/shadow. "
-                            f"Verify with 'pwck' afterwards."
+                            "Run 'pwconv' to migrate passwords to /etc/shadow. "
+                            "Verify with 'pwck' afterwards."
                         ),
                         evidence=RegistryEvidence(
                             key=f"/etc/passwd:{user['username']}",
-                            value=password_field[:20] + "..." if len(password_field) > 20 else password_field,
+                            value=password_field[:20] + "..."
+                            if len(password_field) > 20
+                            else password_field,
                             expected="x",
                             source="/etc/passwd",
                         ),

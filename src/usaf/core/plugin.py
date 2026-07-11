@@ -52,8 +52,7 @@ class AuditCheck(AuditCheckInterface):
         return result
 
     @abc.abstractmethod
-    def _run_check(self, collectors: dict[str, dict[str, Any]]) -> list[Finding]:
-        ...
+    def _run_check(self, collectors: dict[str, dict[str, Any]]) -> list[Finding]: ...
 
     def finding(
         self,
@@ -101,14 +100,10 @@ class AuditCheck(AuditCheckInterface):
             tags=tags or [],
         )
 
-    def _get_data(
-        self, collectors: dict[str, dict[str, Any]], name: str
-    ) -> dict[str, Any]:
+    def _get_data(self, collectors: dict[str, dict[str, Any]], name: str) -> dict[str, Any]:
         data = collectors.get(name)
         if data is None:
-            raise PluginError(
-                f"Check '{self.id}' requires collector '{name}' which was not found"
-            )
+            raise PluginError(f"Check '{self.id}' requires collector '{name}' which was not found")
         return data
 
     def _get_optional_data(

@@ -58,12 +58,14 @@ class TestCollectorManager:
     def test_dependency_resolution(self, collector_manager: CollectorManager):
         class DepA(BaseCollector):
             name = "dep_a"
+
             def _do_collect(self):
                 return {"a": 1}
 
         class DepB(BaseCollector):
             name = "dep_b"
             depends = ["dep_a"]
+
             def _do_collect(self):
                 return {"b": 2}
 
@@ -78,6 +80,7 @@ class TestCollectorManager:
 
         class CountCollector(BaseCollector):
             name = "counter"
+
             def _do_collect(self):
                 nonlocal call_count
                 call_count += 1
@@ -100,4 +103,5 @@ def _make_collector(col_name: str, data: dict) -> BaseCollector:
                 return dict(data)
 
         return DynamicCollector()
+
     return _create(col_name)

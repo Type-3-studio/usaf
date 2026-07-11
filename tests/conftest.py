@@ -1,17 +1,13 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any
 
 import pytest
 
 from usaf.collectors.base import BaseCollector
 from usaf.collectors.manager import CollectorManager
-from usaf.core.registry import PluginRegistry, register_check
+from usaf.core.registry import PluginRegistry
 from usaf.models.evidence import (
-    FileEvidence,
-    NetworkEvidence,
-    ProcessEvidence,
     RegistryEvidence,
 )
 from usaf.models.finding import Finding
@@ -54,8 +50,22 @@ def fake_collectors() -> dict[str, dict[str, Any]]:
         },
         "users": {
             "users": [
-                {"username": "root", "uid": 0, "gid": 0, "home": "/root", "shell": "/bin/bash", "password": "x"},
-                {"username": "bob", "uid": 1000, "gid": 1000, "home": "/home/bob", "shell": "/bin/bash", "password": "x"},
+                {
+                    "username": "root",
+                    "uid": 0,
+                    "gid": 0,
+                    "home": "/root",
+                    "shell": "/bin/bash",
+                    "password": "x",
+                },
+                {
+                    "username": "bob",
+                    "uid": 1000,
+                    "gid": 1000,
+                    "home": "/home/bob",
+                    "shell": "/bin/bash",
+                    "password": "x",
+                },
             ],
             "shadow": [
                 {"username": "root", "password_hash": "hashed", "locked": False},
@@ -64,8 +74,18 @@ def fake_collectors() -> dict[str, dict[str, Any]]:
         },
         "sockets": {
             "tcp": [
-                {"protocol": "TCP", "local_address": "0.0.0.0", "local_port": 8080, "state": "LISTEN"},
-                {"protocol": "TCP", "local_address": "127.0.0.1", "local_port": 5432, "state": "LISTEN"},
+                {
+                    "protocol": "TCP",
+                    "local_address": "0.0.0.0",
+                    "local_port": 8080,
+                    "state": "LISTEN",
+                },
+                {
+                    "protocol": "TCP",
+                    "local_address": "127.0.0.1",
+                    "local_port": 5432,
+                    "state": "LISTEN",
+                },
             ],
             "tcp6": [],
             "udp": [],
@@ -132,6 +152,7 @@ def sample_check_result() -> CheckResult:
 @pytest.fixture
 def sample_scan_result(sample_check_result: CheckResult) -> ScanResult:
     from usaf.models.result import ScanMetadata
+
     return ScanResult(
         metadata=ScanMetadata(
             hostname="test-host",

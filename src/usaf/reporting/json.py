@@ -20,8 +20,12 @@ class JSONReporter(BaseReporter):
             "scan": {
                 "name": result.metadata.scan_name,
                 "id": result.metadata.scan_id,
-                "start_time": result.metadata.start_time.isoformat() if result.metadata.start_time else None,
-                "end_time": result.metadata.end_time.isoformat() if result.metadata.end_time else None,
+                "start_time": result.metadata.start_time.isoformat()
+                if result.metadata.start_time
+                else None,
+                "end_time": result.metadata.end_time.isoformat()
+                if result.metadata.end_time
+                else None,
                 "duration_seconds": result.metadata.duration_seconds,
             },
             "system": {
@@ -50,9 +54,6 @@ class JSONReporter(BaseReporter):
             output["findings"] = findings_data
 
         if result.collectors_data:
-            output["collectors"] = {
-                k: v for k, v in result.collectors_data.items()
-                if v
-            }
+            output["collectors"] = {k: v for k, v in result.collectors_data.items() if v}
 
         return json.dumps(output, indent=2, default=str)

@@ -1,6 +1,6 @@
-from usaf.reporting.terminal import TerminalReporter
 from usaf.reporting.json import JSONReporter
 from usaf.reporting.markdown import MarkdownReporter
+from usaf.reporting.terminal import TerminalReporter
 
 REPORTERS: dict[str, type[TerminalReporter | JSONReporter | MarkdownReporter]] = {
     "terminal": TerminalReporter,
@@ -8,4 +8,4 @@ REPORTERS: dict[str, type[TerminalReporter | JSONReporter | MarkdownReporter]] =
     "markdown": MarkdownReporter,
 }
 
-__all__ = ["REPORTERS", "TerminalReporter", "JSONReporter", "MarkdownReporter"]
+__all__ = ["REPORTERS", "JSONReporter", "MarkdownReporter", "TerminalReporter"]

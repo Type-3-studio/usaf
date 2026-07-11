@@ -3,17 +3,15 @@ from __future__ import annotations
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 
-from usaf.__about__ import __version__
-from usaf.config.loader import load_config
-from usaf.core.runner import ScanRunner
-from usaf.reporting import REPORTERS
-
 # Import checks to trigger plugin registration
 import usaf.checks  # noqa: F401
+from usaf.__about__ import __version__
+from usaf.core.runner import ScanRunner
+from usaf.reporting import REPORTERS
 
 app = typer.Typer(
     name="usaf",
@@ -38,11 +36,11 @@ def callback(
 @app.command()
 def scan(
     config: Annotated[
-        Optional[str],
+        str | None,
         typer.Option("--config", "-c", help="Path to configuration file"),
     ] = None,
     output: Annotated[
-        Optional[str],
+        str | None,
         typer.Option("--output", "-o", help="Output file path"),
     ] = None,
     fmt: Annotated[
@@ -58,7 +56,7 @@ def scan(
         typer.Option("--show-passed", help="Show passed checks in report"),
     ] = False,
     checks: Annotated[
-        Optional[list[str]],
+        list[str] | None,
         typer.Option("--checks", help="Specific checks to run (e.g., SSH-001 SSH-002)"),
     ] = None,
 ) -> None:
@@ -69,8 +67,10 @@ def scan(
 
     reporter_cls = REPORTERS.get(fmt)
     if reporter_cls is None:
-        print(f"Error: Unknown format '{fmt}'. Available: {', '.join(REPORTERS.keys())}",
-              file=sys.stderr)
+        print(
+            f"Error: Unknown format '{fmt}'. Available: {', '.join(REPORTERS.keys())}",
+            file=sys.stderr,
+        )
         raise typer.Exit(1)
 
     reporter = reporter_cls()
@@ -100,11 +100,11 @@ def scan(
 @app.command()
 def list_checks(
     config: Annotated[
-        Optional[str],
+        str | None,
         typer.Option("--config", "-c", help="Path to configuration file"),
     ] = None,
     category: Annotated[
-        Optional[str],
+        str | None,
         typer.Option("--category", help="Filter by category"),
     ] = None,
 ) -> None:
@@ -117,7 +117,8 @@ def list_checks(
 
     if category:
         all_ids = [
-            cid for cid in all_ids
+            cid
+            for cid in all_ids
             if hasattr(registry.get_class(cid), "category")
             and str(registry.get_class(cid).category.value).upper() == category.upper()
         ]
@@ -141,7 +142,7 @@ def list_checks(
 @app.command()
 def init(
     path: Annotated[
-        Optional[str],
+        str | None,
         typer.Argument(help="Directory to initialize"),
     ] = None,
     force: Annotated[

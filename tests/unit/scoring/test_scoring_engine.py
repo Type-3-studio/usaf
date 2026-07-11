@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from usaf.models.finding import Finding
 from usaf.models.result import CheckResult, ScanResult
-from usaf.models.score import ScanScore
-from usaf.models.severity import CheckCategory, Severity
+from usaf.models.severity import CheckCategory, Confidence, Severity
 from usaf.scoring.engine import ScoringEngine
 
 
@@ -152,3 +151,135 @@ class TestScoringEngine:
         assert ScoringEngine._score_to_grade(6.0) == "D"
         assert ScoringEngine._score_to_grade(8.0) == "F"
         assert ScoringEngine._score_to_grade(10.0) == "F-"
+
+    def test_confidence_low_reduces_score(self):
+        engine = ScoringEngine()
+        result = ScanResult(
+            results=[
+                CheckResult(
+                    check_id="TEST-001",
+                    name="Test",
+                    category=CheckCategory.SYSTEM,
+                    passed=False,
+                    findings=[
+                        Finding(
+                            id="TEST-001-001",
+                            check_id="TEST-001",
+                            category=CheckCategory.SYSTEM,
+                            severity=Severity.CRITICAL,
+                            risk_score=10.0,
+                            title="Critical",
+                            description="Critical finding",
+                            rationale="Test",
+                            remediation="Fix",
+                            source="TestCheck",
+                            confidence=Confidence.LOW,
+                        )
+                    ],
+                )
+            ]
+        )
+        score = engine.calculate(result)
+        assert score.critical_count == 1
+        assert score.total_findings == 1
+        # LOW confidence (0.4x) should produce a lower score than HIGH (1.0x)
+        assert score.overall_score < 5.0
+
+    def test_confidence_high_equals_baseline(self):
+        engine = ScoringEngine()
+        result = ScanResult(
+            results=[
+                CheckResult(
+                    check_id="TEST-001",
+                    name="Test",
+                    category=CheckCategory.SYSTEM,
+                    passed=False,
+                    findings=[
+                        Finding(
+                            id="TEST-001-001",
+                            check_id="TEST-001",
+                            category=CheckCategory.SYSTEM,
+                            severity=Severity.CRITICAL,
+                            risk_score=10.0,
+                            title="Critical",
+                            description="Critical finding",
+                            rationale="Test",
+                            remediation="Fix",
+                            source="TestCheck",
+                            confidence=Confidence.HIGH,
+                        )
+                    ],
+                )
+            ]
+        )
+        score = engine.calculate(result)
+        # HIGH confidence (1.0x) should produce the same score as default
+        # Default confidence is HIGH, multiplier = 1.0
+        assert score.overall_score > 5.0
+
+    def test_false_positive_probability_reduces_score(self):
+        engine = ScoringEngine()
+        result = ScanResult(
+            results=[
+                CheckResult(
+                    check_id="TEST-001",
+                    name="Test",
+                    category=CheckCategory.SYSTEM,
+                    passed=False,
+                    findings=[
+                        Finding(
+                            id="TEST-001-001",
+                            check_id="TEST-001",
+                            category=CheckCategory.SYSTEM,
+                            severity=Severity.CRITICAL,
+                            risk_score=10.0,
+                            title="Critical",
+                            description="Critical finding",
+                            rationale="Test",
+                            remediation="Fix",
+                            source="TestCheck",
+                            confidence=Confidence.HIGH,
+                            false_positive_probability=0.8,
+                        )
+                    ],
+                )
+            ]
+        )
+        score = engine.calculate(result)
+        assert score.total_findings == 1
+        # 80% FP probability should significantly reduce the score
+        assert score.overall_score < 3.0
+
+    def test_confidence_and_fp_compound(self):
+        engine = ScoringEngine()
+        result = ScanResult(
+            results=[
+                CheckResult(
+                    check_id="TEST-001",
+                    name="Test",
+                    category=CheckCategory.SYSTEM,
+                    passed=False,
+                    findings=[
+                        Finding(
+                            id="TEST-001-001",
+                            check_id="TEST-001",
+                            category=CheckCategory.SYSTEM,
+                            severity=Severity.CRITICAL,
+                            risk_score=10.0,
+                            title="Critical",
+                            description="Critical finding",
+                            rationale="Test",
+                            remediation="Fix",
+                            source="TestCheck",
+                            confidence=Confidence.LOW,
+                            false_positive_probability=0.5,
+                        )
+                    ],
+                )
+            ]
+        )
+        score = engine.calculate(result)
+        assert score.total_findings == 1
+        # LOW confidence (0.4x) * (1 - 0.5 FP) = 0.2x effective
+        # 10.0 * 1.0 * 0.4 * 0.5 = 2.0 base → 2.0 * 1.1 = 2.2 normalized
+        assert score.overall_score == 2.2

@@ -341,6 +341,10 @@ class UdevRulesPersistenceCheck(AuditCheck):
                 fp = os.path.join(udev_dir, entry)
                 if not os.path.isfile(fp):
                     continue
+
+                if udev_dir.startswith("/usr/lib/"):
+                    continue
+
                 try:
                     with open(fp) as f:
                         content = f.read()

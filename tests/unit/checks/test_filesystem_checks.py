@@ -240,6 +240,37 @@ class TestDeletedBinaryRunningCheck:
         result = check.evaluate(collectors)
         assert result.passed
 
+    def test_skips_kernel_threads(self, monkeypatch):
+        monkeypatch.setattr(Path, "exists", lambda _: False)
+        check = DeletedBinaryRunningCheck()
+        collectors = {
+            "processes": {
+                "processes": [
+                    {"pid": 2, "name": "kthreadd", "binary": "/proc/2/exe", "ppid": 0, "cmdline": ""},
+                    {"pid": 3, "name": "kworker/0:0", "binary": "/proc/3/exe", "ppid": 2, "cmdline": ""},
+                    {"pid": 14, "name": "ksoftirqd/0", "binary": "/proc/14/exe", "ppid": 2, "cmdline": ""},
+                    {"pid": 22, "name": "cpuhp/0", "binary": "/proc/22/exe", "ppid": 2, "cmdline": ""},
+                ],
+            },
+        }
+        result = check.evaluate(collectors)
+        assert result.passed
+
+    def test_still_detects_real_deleted_binary(self, monkeypatch):
+        monkeypatch.setattr(Path, "exists", lambda _: False)
+        check = DeletedBinaryRunningCheck()
+        collectors = {
+            "processes": {
+                "processes": [
+                    {"pid": 1000, "name": "sshd", "binary": "/usr/sbin/sshd", "ppid": 1, "cmdline": "/usr/sbin/sshd"},
+                    {"pid": 2000, "name": "malware", "binary": "/tmp/.hidden/malware", "ppid": 1000, "cmdline": "/tmp/.hidden/malware"},
+                ],
+            },
+        }
+        result = check.evaluate(collectors)
+        assert not result.passed
+        assert len(result.findings) == 2
+
 
 class TestUnexpectedSymlinksInEtcCheck:
     def test_passes_with_no_symlinks(self):

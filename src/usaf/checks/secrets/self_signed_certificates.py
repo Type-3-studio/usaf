@@ -19,6 +19,11 @@ class SelfSignedCertificatesCheck(AuditCheck):
     depends = ["certificates"]
     tags = ["secrets", "certificates", "tls", "self-signed"]
 
+    _SYSTEM_CA_PREFIXES: tuple[str, ...] = (
+        "/etc/ssl/certs/",
+        "/usr/share/ca-certificates/",
+    )
+
     def _run_check(self, collectors: dict[str, Any]) -> list:
         findings: list = []
         cert_data = self._get_data(collectors, "certificates")
@@ -36,6 +41,8 @@ class SelfSignedCertificatesCheck(AuditCheck):
                 continue
             seen_paths.add(cpath)
             if not cpath:
+                continue
+            if cpath.startswith(self._SYSTEM_CA_PREFIXES):
                 continue
             result = self._check_self_signed(cpath)
             if result is not None:

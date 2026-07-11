@@ -11,41 +11,63 @@ from usaf.core.registry import register_check
 from usaf.models.evidence import FileEvidence, NetworkEvidence, ProcessEvidence, RegistryEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
+KNOWN_SAFE_SERVICE_PREFIXES: tuple[str, ...] = (
+    "snap.",
+)
+
 KNOWN_SAFE_SERVICES: set[str] = {
     "accounts-daemon", "acpid", "acpi-support", "adduser",
-    "anacron", "apache2", "apparmor", "apport", "apt-cacher",
+    "alsa-restore", "alsa-state", "anacron", "apache2",
+    "apparmor", "apport", "apt-cacher",
     "apt-daily", "apt-daily-upgrade", "atd",
-    "avahi-daemon", "bluetooth", "brltty", "casper",
+    "auditd", "avahi-daemon", "bluetooth", "brltty", "casper",
     "chrony", "colord", "console-setup", "containerd",
     "cron", "cups", "cups-browsed", "dbus", "dirmngr",
-    "docker", "dovecot", "e2scrub_all", "ebtables",
-    "friendly-recovery", "gdm3", "getty", "glances",
+    "docker", "dovecot", "dracut-shutdown",
+    "e2scrub_all", "ebtables",
+    "friendly-recovery", "fwupd", "fwupd-refresh",
+    "gdm", "gdm3", "geoclue", "getty", "glances",
     "grafana-server", "grub-common", "haveged", "hddtemp",
     "hp-systray", "hplip", "htpdate", "irqbalance",
-    "isc-dhcp-client", "isc-dhcp-server", "kbd", "kmod",
+    "isc-dhcp-client", "isc-dhcp-server", "kbd",
+    "kdump-tools", "keyboard-setup", "kmod", "kmod-static-nodes",
     "lightdm", "lm-sensors", "lvm2", "lxd-containers",
-    "mdadm", "mysql", "nginx", "NetworkManager",
+    "mdadm", "ModemManager", "mongod", "mysql",
+    "netplan-configure", "networkd-dispatcher",
     "networking", "nfs-common", "nfs-kernel-server",
-    "nftables", "nscd", "ntp", "ntpsec", "openvpn",
-    "os-prober", "php7.4-fpm", "php8.1-fpm", "php8.2-fpm",
-    "php8.3-fpm", "php-fpm", "plymouth", "plymouth-log",
-    "polkit", "postfix", "postgresql", "ppp", "pppd-dns",
+    "nftables", "nginx", "NetworkManager",
+    "NetworkManager-wait-online", "nscd", "ntp", "ntpsec",
+    "nvidia-persistenced", "ollama",
+    "openvpn", "os-prober",
+    "php7.4-fpm", "php8.1-fpm", "php8.2-fpm",
+    "php8.3-fpm", "php-fpm",
+    "plymouth", "plymouth-log", "plymouth-quit-wait",
+    "plymouth-read-write", "plymouth-start",
+    "polkit", "postfix", "postgresql",
+    "power-profiles-daemon", "ppp", "pppd-dns",
     "procps", "prometheus-node-exporter", "prometheus-server",
-    "psensor", "pulseaudio", "rpcbind", "rsync",
-    "rsyslog", "sanedsnapd", "screen-cleanup", "serial-getty",
-    "snapd", "snapd.apparmor", "spice-vdagent", "ssh",
-    "sshd", "sslh", "systemd-binfmt", "systemd-fsck",
+    "psensor", "pulseaudio",
+    "rpcbind", "rsync", "rsyslog", "rtkit-daemon",
+    "sanedsnapd", "screen-cleanup", "serial-getty",
+    "setvtrgb", "snapd", "snapd.apparmor", "snapd.seeded",
+    "spice-vdagent", "ssh", "sshd", "sslh",
+    "switcheroo-control", "sysstat",
+    "systemd-backlight", "systemd-binfmt", "systemd-coredump",
+    "systemd-fsck", "systemd-homed", "systemd-hostnamed",
     "systemd-hwdb-update", "systemd-journald",
-    "systemd-journal-flush", "systemd-logind",
-    "systemd-modules-load", "systemd-pstore",
+    "systemd-journal-flush", "systemd-localed",
+    "systemd-logind", "systemd-machined",
+    "systemd-modules-load", "systemd-networkd",
+    "systemd-oomd", "systemd-pstore",
     "systemd-random-seed", "systemd-remount-fs",
     "systemd-resolved", "systemd-sysctl",
     "systemd-sysusers", "systemd-timedated",
     "systemd-timesyncd", "systemd-tmpfiles",
     "systemd-udevd", "systemd-update-utmp",
     "systemd-userdbd", "systemd-user-sessions",
-    "thermald", "timidity", "tlp", "ufw",
-    "unattended-upgrades", "uuidd", "vgauth",
+    "thermald", "timidity", "tlp",
+    "udisks2", "ufw", "unattended-upgrades",
+    "upower", "uuidd", "vgauth",
     "virtualbox", "whoopsie", "wpa_supplicant",
     "x11-common", "xserver-xorg",
 }
@@ -207,6 +229,8 @@ class UnexpectedEnabledServicesCheck(AuditCheck):
 
             short_name = _strip_service_suffix(unit_name)
             if short_name in KNOWN_SAFE_SERVICES:
+                continue
+            if short_name.startswith(KNOWN_SAFE_SERVICE_PREFIXES):
                 continue
 
             findings.append(

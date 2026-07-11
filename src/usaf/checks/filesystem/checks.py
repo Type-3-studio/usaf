@@ -233,13 +233,18 @@ class HiddenFilesInWorldWritableCheck(AuditCheck):
         ".X", ".tmp", ".com.google.Chrome", ".org.chromium",
         ".com.canonical.", ".dde-workspace",
     )
+    _KNOWN_SAFE_HIDDEN_PATH_SUBSTRINGS: tuple[str, ...] = (
+        "/__MACOSX/",
+    )
 
-    def _is_safe_hidden(self, name: str) -> bool:
+    def _is_safe_hidden(self, name: str, path: str) -> bool:
         if name in self._KNOWN_SAFE_HIDDEN_NAMES:
             return True
         if name.startswith(self._KNOWN_SAFE_HIDDEN_PREFIXES):
             return True
-        return False
+        if name.startswith("._"):
+            return True
+        return any(sub in path for sub in self._KNOWN_SAFE_HIDDEN_PATH_SUBSTRINGS)
 
     def _run_check(self, collectors: dict[str, Any]) -> list:
         findings: list = []
@@ -252,8 +257,7 @@ class HiddenFilesInWorldWritableCheck(AuditCheck):
 
             if not name.startswith("."):
                 continue
-            if self._is_safe_hidden(name):
-
+            if self._is_safe_hidden(name, path):
                 continue
 
             findings.append(
@@ -313,6 +317,10 @@ class DeletedBinaryRunningCheck(AuditCheck):
                 continue
 
             if Path(binary).exists():
+                continue
+
+            ppid = proc.get("ppid")
+            if ppid == 2 or binary.startswith("/proc/"):
                 continue
 
             findings.append(
@@ -644,6 +652,17 @@ class WorldWritableDirectoriesCheck(AuditCheck):
         "/var/run/",
     )
 
+    _WW_IGNORED_SUBSTRINGS: tuple[str, ...] = (
+        "/node_modules/",
+    )
+
+    def _is_ww_ignored(self, path: str) -> bool:
+        if path in self.KNOWN_WW_EXCEPTIONS:
+            return True
+        if path.startswith(self._WW_IGNORED_PREFIXES):
+            return True
+        return any(sub in path for sub in self._WW_IGNORED_SUBSTRINGS)
+
     def _run_check(self, collectors: dict[str, Any]) -> list:
         findings: list = []
         fs_data = self._get_data(collectors, "filesystem")
@@ -655,9 +674,7 @@ class WorldWritableDirectoriesCheck(AuditCheck):
 
             path = entry.get("path", "")
 
-            if path in self.KNOWN_WW_EXCEPTIONS:
-                continue
-            if path.startswith(self._WW_IGNORED_PREFIXES):
+            if self._is_ww_ignored(path):
                 continue
 
             findings.append(

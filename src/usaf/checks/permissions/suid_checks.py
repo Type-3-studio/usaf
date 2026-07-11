@@ -94,6 +94,86 @@ class UnexpectedSUIDCheck(AuditCheck):
         "/usr/libexec/dbus-1.0/dbus-daemon-launch-helper",
     }
 
+    # Package-based allowlist: SUID binaries owned by these known-safe packages
+    # are considered expected and get LOW confidence / high false-positive rate.
+    # This eliminates the need for a path-level allowlist entry for every SUID
+    # binary shipped by standard Ubuntu packages.
+    _known_suid_packages: set[str] = {
+        # Core system utilities
+        "coreutils",             # su, passwd, chsh, chfn, newgrp, gpasswd
+        "sudo",                  # sudo, sudoedit
+        "sudo-ldap",             # sudo LDAP variant
+        "shadow",                # login, su, passwd, chfn, chsh, newgrp, expiry, chage
+        "login",                 # login
+        "util-linux",            # mount, umount, wall, write
+        "util-linux-extra",      # wall, write (extra)
+        "bsdutils",              # wall (Debian/Ubuntu)
+        # Authentication / PAM
+        "libpam-modules",        # unix_chkpwd, pam_timestamp_check
+        "libpam-modules-bin",    # unix_chkpwd (binary package)
+        "libpam-ldap",           # PAM LDAP helpers
+        "libpam-krb5",           # PAM Kerberos helpers
+        # SSH
+        "openssh-client",        # ssh-keysign
+        "openssh-server",        # ssh-keysign
+        # Scheduling
+        "cron",                  # crontab
+        "anacron",               # anacron
+        "at",                    # at, batch, atq, atrm
+        # Networking
+        "iputils-ping",          # ping, ping6
+        "iputils-arping",        # arping
+        "iputils-tracepath",     # traceroute6.iputils
+        "fuse3",                 # fusermount3
+        "fuse",                  # fusermount (legacy)
+        "ppp",                   # pppd
+        "pppconfig",             # PPP configuration helpers
+        "wireguard-tools",       # wg-quick
+        # PolicyKit / D-Bus
+        "policykit-1",           # pkexec, polkit-agent-helper-1
+        "dbus",                  # dbus-daemon-launch-helper
+        "dbus-user-session",     # D-Bus session helper
+        # Display / X11
+        "xserver-xorg-core",     # Xorg
+        "xserver-xorg-video-intel",
+        "x11-utils",
+        # Snap / Container
+        "snapd",                 # snap-confine
+        "containerd.io",         # Docker container SUID helpers
+        "docker-ce",             # Docker community edition
+        "docker-ce-cli",
+        "docker.io",             # Docker (Ubuntu package)
+        "runc",                  # Container runtime
+        # Removable media / storage
+        "eject",                 # dmcrypt-get-device
+        "udisks2",               # udisks helpers
+        "udisks",                # udisks (legacy)
+        # Terminal / PTY
+        "utempter",              # utempter terminal recording helper
+        # Virtualization
+        "qemu-kvm",              # QEMU/KVM SUID helpers
+        "qemu-user",             # QEMU user-mode helpers
+        "spice-client-glib-usb-acl-helper",  # SPICE USB redirection
+        "spice-client-gtk",      # SPICE GTK helpers
+        # Mail / Groupware
+        "dovecot-core",          # Dovecot IMAP SUID helpers
+        "dovecot-imapd",
+        "dovecot-pop3d",
+        "postfix",               # Postfix SUID helpers
+        "sendmail-base",         # Sendmail SUID helpers
+        # Printing
+        "cups",                  # CUPS printing helpers
+        "cups-bsd",              # CUPS BSD commands
+        "cups-client",           # CUPS client utilities
+        # System monitoring
+        "rgmanager",             # Resource group manager
+        "irqbalance",            # IRQ balance
+        # Filesystem
+        "dosfstools",            # mkfs.vfat SUID (for removable media)
+        "ntfs-3g",               # NTFS mount helper
+        "exfat-utils",           # exFAT helpers
+    }
+
     def _run_check(self, collectors: dict[str, Any]) -> list:
         findings: list = []
         config_allowlist = self._load_config_allowlist(collectors)
@@ -114,7 +194,10 @@ class UnexpectedSUIDCheck(AuditCheck):
             if is_allowlisted:
                 continue
 
-            if is_package_owned:
+            if is_package_owned and owning_package in self._known_suid_packages:
+                confidence = Confidence.LOW
+                fp_probability = 0.8
+            elif is_package_owned:
                 confidence = Confidence.MEDIUM
                 fp_probability = 0.3
             else:
@@ -170,6 +253,12 @@ class UnexpectedSUIDCheck(AuditCheck):
         return set()
 
     def _build_description(self, path_str: str, owning_package: str | None) -> str:
+        if owning_package and owning_package in self._known_suid_packages:
+            return (
+                f"'{path_str}' has the SUID bit set. It is owned by the known-safe "
+                f"package '{owning_package}' and is likely legitimate. "
+                f"If expected, add to suid_allowlist in usaf.yaml to dismiss."
+            )
         if owning_package:
             return (
                 f"'{path_str}' has the SUID bit set. It is owned by the "
@@ -182,6 +271,13 @@ class UnexpectedSUIDCheck(AuditCheck):
         )
 
     def _build_remediation(self, path_str: str, owning_package: str | None) -> str:
+        if owning_package and owning_package in self._known_suid_packages:
+            return (
+                f"'{path_str}' is from the known-safe package '{owning_package}'. "
+                f"This is likely a false positive. To dismiss: add to "
+                f"suid_allowlist in usaf.yaml. To remove SUID: "
+                f"'chmod u-s {path_str}' (may break functionality)."
+            )
         if owning_package:
             return (
                 f"Review whether '{path_str}' requires SUID. "

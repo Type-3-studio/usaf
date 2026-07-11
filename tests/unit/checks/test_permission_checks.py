@@ -160,3 +160,67 @@ class TestUnexpectedSUIDCheck:
         f = result.findings[0]
         assert f.confidence == Confidence.MEDIUM
         assert f.false_positive_probability == 0.3
+
+    def test_known_safe_package_gets_low_confidence(self, monkeypatch):
+        self._make_mock_fs(monkeypatch, ["/usr/bin/from_coreutils"])
+        check = UnexpectedSUIDCheck()
+        with patch(
+            "usaf.checks.permissions.suid_checks.get_package_for_file",
+            return_value="coreutils",
+        ):
+            result = check.evaluate({})
+        assert not result.passed
+        f = result.findings[0]
+        assert f.confidence == Confidence.LOW
+        assert f.false_positive_probability == 0.8
+
+    def test_known_safe_package_description_mentions_known_safe(self, monkeypatch):
+        self._make_mock_fs(monkeypatch, ["/usr/bin/from_coreutils"])
+        check = UnexpectedSUIDCheck()
+        with patch(
+            "usaf.checks.permissions.suid_checks.get_package_for_file",
+            return_value="coreutils",
+        ):
+            result = check.evaluate({})
+        assert not result.passed
+        f = result.findings[0]
+        assert "known-safe" in f.description
+
+    def test_known_safe_package_remediation_mentions_known_safe(self, monkeypatch):
+        self._make_mock_fs(monkeypatch, ["/usr/bin/from_coreutils"])
+        check = UnexpectedSUIDCheck()
+        with patch(
+            "usaf.checks.permissions.suid_checks.get_package_for_file",
+            return_value="coreutils",
+        ):
+            result = check.evaluate({})
+        assert not result.passed
+        f = result.findings[0]
+        assert "known-safe" in f.remediation
+
+    def test_path_allowlist_overrides_known_package(self, monkeypatch):
+        self._make_mock_fs(monkeypatch, ["/usr/bin/from_coreutils"])
+        check = UnexpectedSUIDCheck()
+        collectors = {
+            "_usaf_config": {
+                "suid_allowlist": ["/usr/bin/from_coreutils"],
+            },
+        }
+        with patch(
+            "usaf.checks.permissions.suid_checks.get_package_for_file",
+            return_value="coreutils",
+        ):
+            result = check.evaluate(collectors)
+        assert result.passed  # Path allowlist overrides everything
+
+    def test_non_package_binary_description_indicates_suspicious(self, monkeypatch):
+        self._make_mock_fs(monkeypatch, ["/usr/bin/unknown"])
+        check = UnexpectedSUIDCheck()
+        with patch(
+            "usaf.checks.permissions.suid_checks.get_package_for_file",
+            return_value=None,
+        ):
+            result = check.evaluate({})
+        assert not result.passed
+        f = result.findings[0]
+        assert "highly suspicious" in f.description

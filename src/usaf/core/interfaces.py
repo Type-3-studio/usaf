@@ -84,3 +84,52 @@ class CacheEngineInterface(ABC):
 
     @abstractmethod
     def clear(self) -> None: ...
+
+
+class CorrelationRuleInterface(ABC):
+    """Interface for correlation rules."""
+
+    id: str
+    name: str
+    description: str
+    severity: str
+    requires: list[str]
+
+    @abstractmethod
+    def evaluate(self, findings: list[Any]) -> list[Any]: ...
+
+
+class BaselineManagerInterface(ABC):
+    """Interface for baseline management."""
+
+    @abstractmethod
+    def store(self, name: str, snapshot: Any) -> str: ...
+
+    @abstractmethod
+    def load(self, name: str) -> Any: ...
+
+    @abstractmethod
+    def diff(self, baseline: Any, current: Any) -> Any: ...
+
+    @abstractmethod
+    def list_baselines(self) -> list[str]: ...
+
+
+class ProfileManagerInterface(ABC):
+    """Interface for profile management."""
+
+    @abstractmethod
+    def match(self, collector_data: dict[str, Any], profile_name: str | None = None) -> Any: ...
+
+    @abstractmethod
+    def get_profile(self, name: str) -> Any: ...
+
+
+class ComplianceFrameworkInterface(ABC):
+    """Interface for compliance framework queries."""
+
+    @abstractmethod
+    def get_findings_for(self, framework_id: str, findings: list[Any]) -> list[Any]: ...
+
+    @abstractmethod
+    def get_coverage(self, framework_id: str, result: Any) -> Any: ...

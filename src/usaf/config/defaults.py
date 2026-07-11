@@ -42,4 +42,23 @@ reporting:
   show_passed: false
 
 policies: []
+
+# Phase 2: Professional-Grade Features
+correlation:
+  enabled: true
+  rules: ["*"]
+
+severity_context:
+  enabled: true
+  rules: {}
+
+compliance:
+  enabled: false
+  frameworks:
+    - cis
+
+profile:
+  name: null
+  auto_detect: true
+  path: null
 """

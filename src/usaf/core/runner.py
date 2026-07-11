@@ -16,11 +16,34 @@ from usaf.config.loader import load_config
 from usaf.core.exceptions import PluginDependencyError
 from usaf.core.registry import registry
 from usaf.models.result import CheckResult, ScanMetadata, ScanResult
+
+# Phase 2 components
+from usaf.correlation.engine import (
+    CorrelatedFinding,
+    CorrelationEngine,
+)
+from usaf.correlation.rules import (
+    DataExfilSurface,
+    SSHBruteForceSurface,
+    SuspiciousPersistence,
+    UnauthorizedService,
+)
+from usaf.severity.engine import SeverityContextEngine
+
+# Optional imports (graceful fallback if not available)
 from usaf.scoring.engine import ScoringEngine
 
 
 class ScanRunner:
-    """Orchestrates the full security scan lifecycle."""
+    """Orchestrates the full security scan lifecycle.
+
+    Implements a multi-phase pipeline:
+      1. Data collection
+      2. Security check execution
+      3. Correlation (cross-check analysis)
+      4. Context-aware severity adjustment
+      5. Scoring
+    """
 
     def __init__(self, config_path: str | None = None) -> None:
         self.config = load_config(config_path)
@@ -28,7 +51,22 @@ class ScanRunner:
         self.scoring_engine = ScoringEngine()
         self.cache = CacheEngine() if self.config.general.cache else None
 
+        # Phase 2 components
+        self.correlation_engine = self._build_correlation_engine()
+        self.severity_context = SeverityContextEngine()
+        self.baseline_manager: Any = None
+        self.profile_manager: Any = None
+
         self._setup_collectors()
+
+    def _build_correlation_engine(self) -> CorrelationEngine:
+        """Build the correlation engine with all registered rules."""
+        engine = CorrelationEngine()
+        engine.register(SSHBruteForceSurface())
+        engine.register(SuspiciousPersistence())
+        engine.register(UnauthorizedService())
+        engine.register(DataExfilSurface())
+        return engine
 
     def _setup_collectors(self) -> None:
         """Auto-discover and register all collectors.
@@ -85,7 +123,7 @@ class ScanRunner:
         metadata.total_checks = len(all_check_ids)
         metadata.enabled_checks = len(enabled_ids)
 
-        # Phase 3: Execute checks (sequential for now; parallel in future)
+        # Phase 3: Execute checks (sequential; parallel in future)
         results: list[CheckResult] = []
         for check_id in execution_order:
             try:
@@ -117,6 +155,24 @@ class ScanRunner:
                         execution_time_ms=0.0,
                     )
                 )
+
+        # Phase 3.5: Correlation — cross-check analysis
+        if self.config.general.cache:
+            all_findings = [f for r in results for f in r.findings]
+            correlated = self.correlation_engine.evaluate(all_findings)
+            if correlated:
+                self._inject_correlated_findings(results, correlated)
+                if verbose:
+                    print(f"  -> Correlation produced {len(correlated)} synthetic finding(s)")
+
+        # Phase 3.75: Context-aware severity adjustment
+        severity_adjustments = self.severity_context.apply_all(
+            [f for r in results for f in r.findings],
+            collectors_data,
+        )
+        adjustments_count = sum(1 for s in severity_adjustments.values() if s.changed)
+        if adjustments_count and verbose:
+            print(f"  -> Severity adjusted for {adjustments_count} finding(s)")
 
         # Phase 4: Build result
         metadata.end_time = scan_start_dt
@@ -180,6 +236,26 @@ class ScanRunner:
         ]
         result.passed = len(result.findings) == 0
         return result
+
+    @staticmethod
+    def _inject_correlated_findings(
+        results: list[CheckResult], correlated: list[CorrelatedFinding]
+    ) -> None:
+        """Inject correlated findings as a synthetic check result."""
+        if not correlated:
+            return
+        from usaf.models.severity import CheckCategory, Severity
+
+        corr_result = CheckResult(
+            check_id="CORRELATION",
+            name="Cross-Check Correlation Analysis",
+            category=CheckCategory.COMPROMISE,
+            passed=len(correlated) == 0,
+            findings=[  # type: ignore[arg-type]
+                f for f in correlated
+            ],
+        )
+        results.append(corr_result)
 
     @staticmethod
     def _get_os_info() -> str:

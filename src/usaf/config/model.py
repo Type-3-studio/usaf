@@ -54,6 +54,27 @@ class PolicyConfig(BaseModel):
     path: str = ""
 
 
+class CorrelationConfig(BaseModel):
+    enabled: bool = True
+    rules: list[str] = Field(default_factory=lambda: ["*"])
+
+
+class SeverityContextConfig(BaseModel):
+    enabled: bool = True
+    rules: dict[str, dict[str, str]] = Field(default_factory=dict)
+
+
+class ComplianceConfig(BaseModel):
+    enabled: bool = False
+    frameworks: list[str] = Field(default_factory=lambda: ["cis"])
+
+
+class ProfileConfig(BaseModel):
+    name: str | None = None
+    auto_detect: bool = True
+    path: str | None = None
+
+
 class USAFConfig(BaseModel):
     general: GeneralConfig = Field(default_factory=GeneralConfig)
     plugins: PluginConfig = Field(default_factory=PluginConfig)
@@ -62,3 +83,7 @@ class USAFConfig(BaseModel):
     baseline: BaselineConfig = Field(default_factory=BaselineConfig)
     reporting: ReportingConfig = Field(default_factory=ReportingConfig)
     policies: list[PolicyConfig] = Field(default_factory=list)
+    correlation: CorrelationConfig = Field(default_factory=CorrelationConfig)
+    severity_context: SeverityContextConfig = Field(default_factory=SeverityContextConfig)
+    compliance: ComplianceConfig = Field(default_factory=ComplianceConfig)
+    profile: ProfileConfig = Field(default_factory=ProfileConfig)

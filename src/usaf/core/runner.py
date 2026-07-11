@@ -23,10 +23,14 @@ from usaf.correlation.engine import (
     CorrelationEngine,
 )
 from usaf.correlation.rules import (
+    ActiveBreachIndicators,
     BootIntegrityFailure,
+    ContainerEscapePath,
+    CredentialCompromise,
     DataExfilSurface,
     DefenseEvasionIndicators,
     DNSHijacking,
+    ExposedAttackSurface,
     ExposedVulnerableService,
     FileIntegrityBreach,
     RogueServiceDeployment,
@@ -95,6 +99,10 @@ class ScanRunner:
         engine.register(DNSHijacking())
         engine.register(RogueServiceDeployment())
         engine.register(FileIntegrityBreach())
+        engine.register(ContainerEscapePath())
+        engine.register(CredentialCompromise())
+        engine.register(ActiveBreachIndicators())
+        engine.register(ExposedAttackSurface())
         return engine
 
     def _setup_collectors(self) -> None:

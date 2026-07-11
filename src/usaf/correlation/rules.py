@@ -867,11 +867,16 @@ class FileIntegrityBreach(CorrelationRule):
         # Require at least 2 DIFFERENT check types to avoid a single
         # noisy check (e.g. FS-403 with 4000+ findings) always firing
         categories = set()
-        if orphaned: categories.add("FS-403")
-        if symlinks: categories.add("FS-301")
-        if modified_units: categories.add("SVC-402")
-        if deleted_bins: categories.add("FS-202")
-        if unexpected_etc: categories.add("FS-101")
+        if orphaned:
+            categories.add("FS-403")
+        if symlinks:
+            categories.add("FS-301")
+        if modified_units:
+            categories.add("SVC-402")
+        if deleted_bins:
+            categories.add("FS-202")
+        if unexpected_etc:
+            categories.add("FS-101")
         if len(categories) < 2:
             return []
 
@@ -922,5 +927,222 @@ class FileIntegrityBreach(CorrelationRule):
                 severity=Severity.HIGH,
                 tags=["file-integrity", "tampering", "compromise", "persistence"],
                 mitre_attack_ids=["T1070", "T1070.004", "T1565", "T1565.001", "T1505"],
+            )
+        ]
+
+
+class ContainerEscapePath(CorrelationRule):
+    id = "CORR-401"
+    name = "Container Escape Path"
+    description = "Detects container configurations that enable escape to the host"
+    severity = Severity.CRITICAL
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        docker_socket = [f for f in findings if f.check_id == "CTN-101"]
+        suid_bins = [f for f in findings if f.check_id == "PRM-101"]
+        root_svcs = [f for f in findings if f.check_id == "SVC-201"]
+
+        if not docker_socket:
+            return []
+
+        indicators: list[str] = []
+        source_findings: list[Finding] = list(docker_socket[:1])
+
+        if suid_bins:
+            indicators.append(f"{len(suid_bins)} SUID binary finding(s)")
+            source_findings.append(suid_bins[0])
+        if root_svcs:
+            indicators.append(f"{len(root_svcs)} service(s) running as root")
+            source_findings.append(root_svcs[0])
+
+        if not indicators:
+            return []
+
+        sev = Severity.CRITICAL if suid_bins else Severity.HIGH
+
+        return [
+            self._make_finding(
+                finding_id="001",
+                title="Container Escape Path Detected",
+                description=(
+                    f"Docker socket is exposed with {len(indicators)} additional escape "
+                    f"indicator(s): {'; '.join(indicators)}"
+                ),
+                rationale=(
+                    "An exposed Docker socket allows containers to interact with the "
+                    "host Docker daemon. Combined with SUID binaries or root services, "
+                    "this creates a viable container escape path."
+                ),
+                remediation=(
+                    "1. Restrict Docker socket access to trusted users only\n"
+                    "2. Use rootless Docker or Podman\n"
+                    "3. Remove unnecessary SUID binaries\n"
+                    "4. Run containers with minimal privileges"
+                ),
+                source_findings=source_findings,
+                severity=sev,
+                tags=["container-escape", "docker", "privilege-escalation"],
+                mitre_attack_ids=["T1611", "T1548", "T1548.001"],
+            )
+        ]
+
+
+class CredentialCompromise(CorrelationRule):
+    id = "CORR-402"
+    name = "Credential Compromise"
+    description = "Detects systems with multiple exposed credential types"
+    severity = Severity.CRITICAL
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        cloud_creds = [f for f in findings if f.check_id in ("SECR-101", "SECR-102")]
+        ssh_keys = [f for f in findings if f.check_id in ("SECR-301", "SECR-302")]
+        app_creds = [f for f in findings if f.check_id in ("SECR-201", "SECR-202", "SECR-203", "SECR-401")]
+
+        if not cloud_creds and not ssh_keys and not app_creds:
+            return []
+
+        categories_affected = sum(1 for g in [cloud_creds, ssh_keys, app_creds] if g)
+        if categories_affected < 2:
+            return []
+
+        details: list[str] = []
+        source_findings: list[Finding] = []
+        if cloud_creds:
+            details.append(f"{len(cloud_creds)} cloud credential exposure(s)")
+            source_findings.append(cloud_creds[0])
+        if ssh_keys:
+            details.append(f"{len(ssh_keys)} SSH key issue(s)")
+            source_findings.append(ssh_keys[0])
+        if app_creds:
+            details.append(f"{len(app_creds)} application credential exposure(s)")
+            source_findings.append(app_creds[0])
+
+        sev = Severity.CRITICAL if cloud_creds else Severity.HIGH
+        return [
+            self._make_finding(
+                finding_id="001",
+                title="Multiple Credential Types Exposed",
+                description=(
+                    f"System has {categories_affected} different credential categories "
+                    f"exposed: {'; '.join(details)}"
+                ),
+                rationale=(
+                    "Multiple credential types exposed on the same system indicates "
+                    "poor secrets management and significantly increases breach risk."
+                ),
+                remediation=(
+                    "1. Remove all credentials from files and use a secrets manager\n"
+                    "2. Rotate all exposed credentials immediately\n"
+                    "3. Audit file permissions on all credential files"
+                ),
+                source_findings=source_findings,
+                severity=sev,
+                tags=["credentials", "secrets", "compromise", "cloud"],
+                mitre_attack_ids=["T1552", "T1552.001", "T1552.004", "T1525"],
+            )
+        ]
+
+
+class ActiveBreachIndicators(CorrelationRule):
+    id = "CORR-403"
+    name = "Active Breach Indicators"
+    description = "Detects patterns consistent with an active security breach"
+    severity = Severity.CRITICAL
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        log_gaps = [f for f in findings if f.check_id in ("LOG-301", "LOG-302") and f.severity.value in ("HIGH", "CRITICAL")]
+        auth_failures = [f for f in findings if f.check_id in ("LOG-401", "LOG-402")]
+        new_svcs = [f for f in findings if f.check_id == "SVC-401"]
+        failed_svcs = [f for f in findings if f.check_id == "SVC-301"]
+
+        indicators: list[str] = []
+        source_findings: list[Finding] = []
+        total_signals = 0
+
+        for group, label in [(log_gaps, "log gap/tamper"), (auth_failures, "auth failure"),
+                             (new_svcs, "newly installed service"), (failed_svcs, "failed service")]:
+            if group:
+                indicators.append(f"{len(group)} {label}(s)")
+                source_findings.append(group[0])
+                total_signals += 1
+
+        if total_signals < 2:
+            return []
+
+        return [
+            self._make_finding(
+                finding_id="001",
+                title="Active Breach Indicators Detected",
+                description=(
+                    f"Found {total_signals} breach indicator(s): {'; '.join(indicators)}. "
+                    "This pattern is consistent with an active or recent security breach."
+                ),
+                rationale=(
+                    "Log gaps with authentication failures, new services, or failed services "
+                    "form a pattern consistent with an active breach."
+                ),
+                remediation=(
+                    "1. IMMEDIATE: Isolate the affected system from the network\n"
+                    "2. Collect forensic memory and disk images\n"
+                    "3. Investigate all new services and recent logins\n"
+                    "4. Check for unauthorized user accounts and SSH keys\n"
+                    "5. Rotate all credentials used from this system"
+                ),
+                source_findings=source_findings,
+                severity=Severity.CRITICAL,
+                tags=["active-breach", "compromise", "incident-response", "forensics"],
+                mitre_attack_ids=["T1070", "T1110", "T1505", "T1543", "T1562"],
+            )
+        ]
+
+
+class ExposedAttackSurface(CorrelationRule):
+    id = "CORR-404"
+    name = "Exposed Attack Surface"
+    description = "Detects systems with broad exposed attack surface and weak defenses"
+    severity = Severity.HIGH
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        listening_ports = [f for f in findings if f.check_id == "NET-101"]
+        weak_tls = [f for f in findings if f.check_id in ("SECR-501", "SECR-502")]
+        no_audit = [f for f in findings if f.check_id in ("FOR-101", "LOG-501")]
+        firewall_down = [f for f in findings if f.check_id == "FW-101"]
+
+        indicators: list[str] = []
+        source_findings: list[Finding] = []
+        total_signals = 0
+
+        for group, label in [(listening_ports, "listening service"), (weak_tls, "TLS certificate issue"),
+                             (no_audit, "audit/logging gap"), (firewall_down, "firewall down")]:
+            if group:
+                indicators.append(f"{len(group)} {label}(s)" if group != firewall_down or len(group) != 1 else "Firewall is not active")
+                source_findings.append(group[0])
+                total_signals += 1
+
+        if total_signals < 2:
+            return []
+
+        return [
+            self._make_finding(
+                finding_id="001",
+                title="Exposed Attack Surface Detected",
+                description=(
+                    f"System has {total_signals} attack surface indicators: "
+                    f"{'; '.join(indicators)}"
+                ),
+                rationale=(
+                    "Systems with many listening services, weak TLS certificates, "
+                    "missing audit coverage, and no firewall present a large attack surface."
+                ),
+                remediation=(
+                    "1. Audit all listening services and disable unnecessary ones\n"
+                    "2. Replace self-signed/expired certificates with valid CA certs\n"
+                    "3. Enable auditd with comprehensive rules\n"
+                    "4. Enable and configure the firewall (UFW or nftables)"
+                ),
+                source_findings=source_findings,
+                severity=Severity.HIGH,
+                tags=["attack-surface", "exposure", "hardening", "defense-in-depth"],
+                mitre_attack_ids=["T1040", "T1046", "T1588.003", "T1562"],
             )
         ]

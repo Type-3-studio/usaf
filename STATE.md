@@ -619,15 +619,15 @@ The goal is **~500 checks** organized into **20+ categories**, with a **correlat
 
 _Secrets completed in Phase 4a above._
 
-#### Phase 4 Correlation Rules (4 new)
-| Rule ID | What it detects |
-|---------|----------------|
-| CORR-401 | Container escape path (privileged + host net + root + old image) |
-| CORR-402 | Credential compromise (secrets leaked + exposed SSH keys + cloud creds) |
-| CORR-403 | Active breach (log gaps + auth failures + new service + new user) |
-| CORR-404 | Exposed attack surface (many listening services + weak TLS + no auditd) |
+#### Phase 4 Correlation Rules (4 new) — ✅ COMPLETE
+| Rule ID | What it detects | Status |
+|---------|----------------|--------|
+| CORR-401 | Container escape path (Docker socket + SUID/root svcs) | ✅ |
+| CORR-402 | Credential compromise (cloud + SSH + app creds ≥ 2 categories) | ✅ |
+| CORR-403 | Active breach (log gaps + auth failures + new/failed services) | ✅ |
+| CORR-404 | Exposed attack surface (listening ports + weak TLS + no audit/fw) | ✅ |
 
-**Exit criteria:** 26 new checks, 4 new rules. **Phase 4a (Secrets) ✅, Phase 4b (Logs) ✅.**
+**Exit criteria:** 26 new checks, 4 new rules. **Phase 4a (Secrets) ✅, Phase 4b (Logs) ✅, Phase 4d (Correlation) ✅.**
 
 ---
 
@@ -732,7 +732,7 @@ _Secrets completed in Phase 4a above._
 | Compromise | 1 | 1 | 1 | 1 | 1 | 15 |
 | Password | 1 | 1 | 1 | 1 | 1 | 10 |
 | **Total checks** | **109** | **119** | **135** | **135** | **135** | **~450** |
-| **Correlation rules** | 12 | 17 | 21 | 24 | 24 | **50+** |
+| **Correlation rules** | 16 | 17 | 21 | 24 | 24 | **50+** |
 
 ---
 
@@ -826,7 +826,7 @@ src/usaf/
 |--------|---------|-----------------|-------------------|-----------------|
 | Checks | 109 | 119 | 135 | 135 → **450+** |
 | Collectors | 25 | 24 | 28 | 30 |
-| Correlation rules | 12 | 17 | 21 | 24 → **50+** |
+| Correlation rules | 16 | 17 | 21 | 24 → **50+** |
 | Unit tests | 900+ | 1,500+ | 2,000+ | 3,000+ |
 | Integration tests | 93+ | 150+ | 300+ | 500+ |
 | Test coverage (stmt) | 85% | 88% | 90% | 92%+ |

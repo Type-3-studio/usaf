@@ -400,6 +400,167 @@ class TestCorrelationEngineIntegration:
         assert len(ids) == len(set(ids)), f"Duplicate rule IDs: {ids}"
 
 
+class TestContainerEscapePath:
+    def test_no_findings_returns_empty(self):
+        from usaf.correlation.rules import ContainerEscapePath
+        rule = ContainerEscapePath()
+        result = rule.evaluate([])
+        assert result == []
+
+    def test_no_docker_socket_returns_empty(self):
+        from usaf.correlation.rules import ContainerEscapePath
+        rule = ContainerEscapePath()
+        findings = [_make_finding("PRM-101-001", "SUID Binary", Severity.HIGH)]
+        result = rule.evaluate(findings)
+        assert result == []
+
+    def test_docker_socket_only_returns_empty(self):
+        from usaf.correlation.rules import ContainerEscapePath
+        rule = ContainerEscapePath()
+        findings = [_make_finding("CTN-101-001", "Docker Socket", Severity.HIGH)]
+        result = rule.evaluate(findings)
+        assert result == []
+
+    def test_docker_socket_with_suid_returns_finding(self):
+        from usaf.correlation.rules import ContainerEscapePath
+        rule = ContainerEscapePath()
+        findings = [
+            _make_finding("CTN-101-001", "Docker Socket Exposed", Severity.HIGH),
+            _make_finding("PRM-101-001", "SUID Binary Found", Severity.HIGH),
+        ]
+        result = rule.evaluate(findings)
+        assert len(result) == 1
+        assert "escape" in result[0].title.lower()
+
+
+class TestCredentialCompromise:
+    def test_no_findings_returns_empty(self):
+        from usaf.correlation.rules import CredentialCompromise
+        rule = CredentialCompromise()
+        result = rule.evaluate([])
+        assert result == []
+
+    def test_single_category_returns_empty(self):
+        from usaf.correlation.rules import CredentialCompromise
+        rule = CredentialCompromise()
+        findings = [
+            _make_finding("SECR-101-001", "AWS Key Found", Severity.CRITICAL),
+        ]
+        result = rule.evaluate(findings)
+        assert result == []
+
+    def test_two_categories_returns_finding(self):
+        from usaf.correlation.rules import CredentialCompromise
+        rule = CredentialCompromise()
+        findings = [
+            _make_finding("SECR-101-001", "AWS Key Found", Severity.CRITICAL),
+            _make_finding("SECR-301-001", "Exposed SSH Key", Severity.CRITICAL),
+        ]
+        result = rule.evaluate(findings)
+        assert len(result) == 1
+
+    def test_three_categories_returns_finding(self):
+        from usaf.correlation.rules import CredentialCompromise
+        rule = CredentialCompromise()
+        findings = [
+            _make_finding("SECR-102-001", "GCP Key Found", Severity.CRITICAL),
+            _make_finding("SECR-301-001", "Exposed SSH Key", Severity.CRITICAL),
+            _make_finding("SECR-401-001", "DB Creds Found", Severity.CRITICAL),
+        ]
+        result = rule.evaluate(findings)
+        assert len(result) == 1
+        assert "credential" in result[0].title.lower()
+
+
+class TestActiveBreachIndicators:
+    def test_no_findings_returns_empty(self):
+        from usaf.correlation.rules import ActiveBreachIndicators
+        rule = ActiveBreachIndicators()
+        result = rule.evaluate([])
+        assert result == []
+
+    def test_single_indicator_returns_empty(self):
+        from usaf.correlation.rules import ActiveBreachIndicators
+        rule = ActiveBreachIndicators()
+        findings = [
+            _make_finding("LOG-401-001", "Sudo Failures", Severity.HIGH),
+        ]
+        result = rule.evaluate(findings)
+        assert result == []
+
+    def test_two_indicators_returns_finding(self):
+        from usaf.correlation.rules import ActiveBreachIndicators
+        rule = ActiveBreachIndicators()
+        findings = [
+            _make_finding("LOG-401-001", "Sudo Failures", Severity.HIGH),
+            _make_finding("SVC-401-001", "New Service", Severity.MEDIUM),
+        ]
+        result = rule.evaluate(findings)
+        assert len(result) == 1
+
+    def test_log_gap_with_auth_failure(self):
+        from usaf.correlation.rules import ActiveBreachIndicators
+        rule = ActiveBreachIndicators()
+        findings = [
+            _make_finding("LOG-301-001", "Log Timeline Gap", Severity.HIGH),
+            _make_finding("LOG-402-001", "SSH Failures", Severity.HIGH),
+            _make_finding("SVC-401-001", "New Service", Severity.MEDIUM),
+        ]
+        result = rule.evaluate(findings)
+        assert len(result) == 1
+        assert "Breach" in result[0].title
+
+
+class TestExposedAttackSurface:
+    def test_no_findings_returns_empty(self):
+        from usaf.correlation.rules import ExposedAttackSurface
+        rule = ExposedAttackSurface()
+        result = rule.evaluate([])
+        assert result == []
+
+    def test_single_indicator_returns_empty(self):
+        from usaf.correlation.rules import ExposedAttackSurface
+        rule = ExposedAttackSurface()
+        findings = [
+            _make_finding("NET-101-001", "Listening Ports", Severity.MEDIUM),
+        ]
+        result = rule.evaluate(findings)
+        assert result == []
+
+    def test_two_indicators_returns_finding(self):
+        from usaf.correlation.rules import ExposedAttackSurface
+        rule = ExposedAttackSurface()
+        findings = [
+            _make_finding("NET-101-001", "Listening Ports", Severity.MEDIUM),
+            _make_finding("SECR-501-001", "Expired Cert", Severity.MEDIUM),
+        ]
+        result = rule.evaluate(findings)
+        assert len(result) == 1
+
+    def test_listening_ports_with_no_audit(self):
+        from usaf.correlation.rules import ExposedAttackSurface
+        rule = ExposedAttackSurface()
+        findings = [
+            _make_finding("NET-101-001", "Many Listening Ports", Severity.MEDIUM),
+            _make_finding("FOR-101-001", "No Audit Logs", Severity.MEDIUM),
+            _make_finding("FW-101-001", "Firewall Disabled", Severity.HIGH),
+        ]
+        result = rule.evaluate(findings)
+        assert len(result) == 1
+        assert "Attack Surface" in result[0].title
+
+    def test_permissive_with_weak_tls(self):
+        from usaf.correlation.rules import ExposedAttackSurface
+        rule = ExposedAttackSurface()
+        findings = [
+            _make_finding("NET-101-001", "Listening Ports", Severity.MEDIUM),
+            _make_finding("SECR-502-001", "Self-Signed Cert", Severity.MEDIUM),
+            _make_finding("LOG-501-001", "No Audit Rules", Severity.MEDIUM),
+        ]
+        result = rule.evaluate(findings)
+        assert len(result) == 1
+
+
 def _make_finding(finding_id: str, title: str, severity: Severity) -> Finding:
     return Finding(
         id=finding_id,

@@ -164,7 +164,7 @@ def scan(
     # Generate report content
     if fmt == "terminal":
         if hasattr(reporter, "print_to_console"):
-            reporter.print_to_console(result, score, verbose=verbose, show_passed=show_passed)  # type: ignore[union-attr]
+            reporter.print_to_console(result, score, verbose=verbose, show_passed=show_passed)
         report_content = reporter.generate(result, score, verbose=verbose, show_passed=show_passed)
     else:
         report_content = reporter.generate(result, score, verbose=verbose, show_passed=show_passed)
@@ -239,12 +239,12 @@ def baseline_update(
     print(f"Baseline '{name}' updated at {path}")
     if diff_result.has_changes:
         print(f"  Changes detected: {diff_result.total_changes}")
-        for section, items in diff_result.added.items():
-            print(f"    + {section}: {len(items)} added")
-        for section, items in diff_result.removed.items():
-            print(f"    - {section}: {len(items)} removed")
-        for section, items in diff_result.modified.items():
-            print(f"    ~ {section}: {len(items)} modified")
+        for section, added_items in diff_result.added.items():
+            print(f"    + {section}: {len(added_items)} added")
+        for section, removed_items in diff_result.removed.items():
+            print(f"    - {section}: {len(removed_items)} removed")
+        for section, modified_items in diff_result.modified.items():
+            print(f"    ~ {section}: {len(modified_items)} modified")
     else:
         print("  No changes detected.")
 
@@ -291,9 +291,9 @@ def baseline_diff(
         for item in items[:10]:
             print(f"      - {item['key']}")
 
-    for section, items in diff_result.modified.items():
-        print(f"\n  [~] {section.upper()} — {len(items)} modified:")
-        for key, change in list(items.items())[:10]:
+    for section, modified_items in diff_result.modified.items():
+        print(f"\n  [~] {section.upper()} — {len(modified_items)} modified:")
+        for key, change in list(modified_items.items())[:10]:
             print(f"      ~ {key}: {change['old']} -> {change['new']}")
 
     print(f"\nTotal changes: {diff_result.total_changes}")

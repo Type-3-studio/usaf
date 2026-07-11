@@ -19,7 +19,7 @@ class KernelModuleLoadingCheck(AuditCheck):
     tags = ["kernel", "hardening", "module-loading"]
 
     def _run_check(self, collectors: dict) -> list:
-        findings = []
+        findings: list = []
         value = self._read_sysctl("kernel.modules_disabled")
         if value == "1":
             return findings

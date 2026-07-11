@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import platform
 from pathlib import Path
+from typing import Any
 
 from usaf.collectors.base import BaseCollector
 from usaf.collectors.registry import register_collector
@@ -14,7 +15,7 @@ class KernelCollector(BaseCollector):
     name = "kernel"
     description = "Kernel version, parameters, and system info"
 
-    def _do_collect(self) -> dict[str, dict[str, str | list[str] | bool]]:
+    def _do_collect(self) -> dict[str, Any]:
         uname = platform.uname()
         sysctl_params = self._read_sysctl()
         cmdline = self._read_cmdline()

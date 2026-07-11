@@ -111,7 +111,7 @@ class SudoCollector(BaseCollector):
     name = "sudo"
     description = "Sudoers configuration and privileges"
 
-    def _do_collect(self) -> dict[str, list[str] | dict[str, list[dict[str, str | None]]]]:
+    def _do_collect(self) -> dict[str, list[str] | list[dict[str, str | None]]]:
         return {
             "sudoers_files": self._find_sudoers_files(),
             "sudoers_entries": self._parse_sudoers(),

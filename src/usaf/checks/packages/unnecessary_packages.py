@@ -42,7 +42,7 @@ class UnnecessaryPackagesCheck(AuditCheck):
         for pkg_name, reason in self.RISKY_PACKAGES.items():
             if pkg_name not in installed_names:
                 continue
-            pkg_info = next((p for p in packages if p.get("name") == pkg_name), {})
+            pkg_info: dict = next((p for p in packages if p.get("name") == pkg_name), {})
             findings.append(
                 self.finding(
                     finding_id="001",

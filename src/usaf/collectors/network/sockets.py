@@ -153,8 +153,8 @@ class InterfaceCollector(BaseCollector):
     name = "interfaces"
     description = "Network interfaces, IP addresses, and flags"
 
-    def _do_collect(self) -> dict[str, list[dict[str, str | list[str] | bool | None]]]:
-        interfaces: dict[str, list[dict[str, str | list[str] | bool | None]]] = {"interfaces": []}
+    def _do_collect(self) -> dict[str, list[dict[str, str | int | list[str] | bool | None]]]:
+        interfaces: dict[str, list[dict[str, str | int | list[str] | bool | None]]] = {"interfaces": []}
 
         net_path = Path("/sys/class/net")
         if not net_path.exists():
@@ -170,7 +170,7 @@ class InterfaceCollector(BaseCollector):
 
         return interfaces
 
-    def _get_interface_info(self, name: str) -> dict[str, str | list[str] | bool | None] | None:
+    def _get_interface_info(self, name: str) -> dict[str, str | int | list[str] | bool | None] | None:
         base = Path(f"/sys/class/net/{name}")
         try:
             operstate = (base / "operstate").read_text().strip()

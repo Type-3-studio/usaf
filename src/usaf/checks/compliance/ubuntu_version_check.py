@@ -26,7 +26,7 @@ class UbuntuVersionCheck(AuditCheck):
         kernel_data = self._get_data(collectors, "kernel")
         os_info = kernel_data.get("os", {})
         version = os_info.get("version", "")
-        findings = []
+        findings: list = []
 
         if version in self.SUPPORTED_VERSIONS:
             return findings

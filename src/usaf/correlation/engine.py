@@ -73,7 +73,9 @@ class CorrelationRule(ABC):
         cat_counts: dict[Any, int] = {}
         for f in findings:
             cat_counts[f.category] = cat_counts.get(f.category, 0) + 1
-        return max(cat_counts, key=cat_counts.get) if cat_counts else CheckCategory.COMPROMISE
+        if not cat_counts:
+            return CheckCategory.COMPROMISE
+        return max(cat_counts, key=lambda k: cat_counts[k])
 
 
 class CorrelationEngine:

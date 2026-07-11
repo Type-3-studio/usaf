@@ -45,7 +45,9 @@ class BaselineSnapshot(BaseModel):
     )
 
     def model_dump(self, **kwargs: Any) -> dict[str, Any]:
-        return json.loads(super().model_dump_json(**kwargs))
+        result = super().model_dump_json(**kwargs)
+        assert isinstance(result, str)
+        return dict(json.loads(result))
 
 
 class BaselineDiff(BaseModel):
@@ -67,7 +69,9 @@ class BaselineDiff(BaseModel):
         return added + removed + modified
 
     def model_dump(self, **kwargs: Any) -> dict[str, Any]:
-        return json.loads(super().model_dump_json(exclude_none=True, **kwargs))
+        result = super().model_dump_json(exclude_none=True, **kwargs)
+        assert isinstance(result, str)
+        return dict(json.loads(result))
 
 
 class BaselineManager:

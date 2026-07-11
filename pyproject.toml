@@ -110,10 +110,6 @@ warn_return_any = true
 warn_unreachable = true
 
 [[tool.mypy.overrides]]
-module = ["tests.*"]
-disallow_untyped_defs = false
-
-[[tool.mypy.overrides]]
 module = ["usaf.models.severity"]
 disable_error_code = ["override"]
 

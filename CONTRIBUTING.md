@@ -4,7 +4,7 @@ Thank you for considering contributing to USAF! This document outlines the proce
 
 ## Getting Started
 
-1. Fork the repo at `https://github.com/type-3-studio/usaf`
+1. Fork the repo at `https://github.com/Type-3-studio/usaf`
 2. Clone your fork: `git clone https://github.com/<your-username>/usaf.git`
 3. Install dev deps: `pip install -e ".[dev]"`
 4. Create a branch: `git checkout -b feature/my-feature`

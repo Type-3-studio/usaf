@@ -4,7 +4,7 @@
 
 If you discover a security vulnerability in **USAF itself** (not a finding detected by USAF), please report it privately by opening a security advisory at:
 
-https://github.com/type-3-studio/usaf/security/advisories/new
+https://github.com/Type-3-studio/usaf/security/advisories/new
 
 Or email the maintainers directly. Please do not open public issues for security vulnerabilities.
 

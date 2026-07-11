@@ -1,6 +1,6 @@
 # USAF — Ubuntu Security Audit Framework
 
-[![CI](https://github.com/type-3-studio/usaf/actions/workflows/ci.yml/badge.svg)](https://github.com/type-3-studio/usaf/actions/workflows/ci.yml)
+[![CI](https://github.com/Type-3-studio/usaf/actions/workflows/ci.yml/badge.svg)](https://github.com/Type-3-studio/usaf/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.13%2B-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
@@ -25,7 +25,7 @@ Production-grade security auditing for Ubuntu Linux. Modular plugin architecture
 
 ```bash
 # Install from source
-git clone https://github.com/type-3-studio/usaf.git
+git clone https://github.com/Type-3-studio/usaf.git
 cd usaf
 pip install -e ".[dev]"
 

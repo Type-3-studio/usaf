@@ -1,0 +1,140 @@
+[build-system]
+requires = ["setuptools>=75.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "usaf"
+version = "0.1.0.dev1"
+description = "Ubuntu Security Audit Framework - Production-grade security auditing for Ubuntu Linux"
+readme = "README.md"
+requires-python = ">=3.13"
+license = {text = "MIT"}
+authors = [
+    {name = "USAF Contributors"},
+]
+keywords = [
+    "security", "audit", "ubuntu", "linux", "hardening",
+    "compliance", "forensics", "incident-response", "cis-benchmarks",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: System Administrators",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Security",
+    "Topic :: System :: Systems Administration",
+    "Topic :: System :: Monitoring",
+]
+
+dependencies = [
+    "typer>=0.15",
+    "rich>=13.0",
+    "pydantic>=2.0",
+    "pyyaml>=6.0",
+    "requests>=2.31",
+    "packaging>=24.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pytest-xdist>=3.0",
+    "pytest-asyncio>=0.24",
+    "mypy>=1.10",
+    "ruff>=0.5",
+    "pre-commit>=3.0",
+]
+html = [
+    "jinja2>=3.0",
+]
+sarif = [
+    "sarif-om>=1.0",
+]
+docs = [
+    "mkdocs>=1.6",
+    "mkdocstrings>=0.25",
+]
+all = [
+    "usaf[dev,html,sarif,docs]",
+]
+
+[project.scripts]
+usaf = "usaf.cli.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["usaf*"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",   # pycodestyle, pyflakes, pycodestyle warnings
+    "I",             # isort
+    "N",             # naming
+    "UP",            # pyupgrade
+    "B",             # flake8-bugbear
+    "SIM",           # flake8-simplify
+    "ARG",           # flake8-unused-arguments
+    "RUF",           # ruff-specific
+    "PL",            # pylint
+    "T20",           # flake8-print (ban print statements)
+]
+ignore = [
+    "PLR2004",  # Magic value used in comparison
+    "PLR0913",  # Too many arguments
+    "E501",     # Line length (handled by formatter)
+]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+strict = true
+python_version = "3.13"
+warn_unused_configs = true
+disallow_any_unimported = true
+disallow_any_expr = false
+disallow_any_decorated = false
+disallow_any_generics = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-v --tb=short --strict-markers"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "online: marks tests requiring network (deselect with '-m \"not online\"')",
+    "root: marks tests requiring root (deselect with '-m \"not root\"')",
+    "golden: marks golden report tests",
+]
+
+[tool.coverage.run]
+source = ["usaf"]
+omit = [
+    "*/tests/*",
+    "*/__about__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "raise AssertionError",
+]

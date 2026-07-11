@@ -1,0 +1,63 @@
+Metadata-Version: 2.4
+Name: usaf
+Version: 0.1.0.dev1
+Summary: Ubuntu Security Audit Framework - Production-grade security auditing for Ubuntu Linux
+Author: USAF Contributors
+License: MIT
+Keywords: security,audit,ubuntu,linux,hardening,compliance,forensics,incident-response,cis-benchmarks
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: System Administrators
+Classifier: Intended Audience :: Information Technology
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Topic :: Security
+Classifier: Topic :: System :: Systems Administration
+Classifier: Topic :: System :: Monitoring
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+Requires-Dist: typer>=0.15
+Requires-Dist: rich>=13.0
+Requires-Dist: pydantic>=2.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: requests>=2.31
+Requires-Dist: packaging>=24.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+Requires-Dist: pytest-cov>=5.0; extra == "dev"
+Requires-Dist: pytest-xdist>=3.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.24; extra == "dev"
+Requires-Dist: mypy>=1.10; extra == "dev"
+Requires-Dist: ruff>=0.5; extra == "dev"
+Requires-Dist: pre-commit>=3.0; extra == "dev"
+Provides-Extra: html
+Requires-Dist: jinja2>=3.0; extra == "html"
+Provides-Extra: sarif
+Requires-Dist: sarif-om>=1.0; extra == "sarif"
+Provides-Extra: docs
+Requires-Dist: mkdocs>=1.6; extra == "docs"
+Requires-Dist: mkdocstrings>=0.25; extra == "docs"
+Provides-Extra: all
+Requires-Dist: usaf[dev,docs,html,sarif]; extra == "all"
+
+# USAF - Ubuntu Security Audit Framework
+
+Production-grade security auditing for Ubuntu Linux.
+
+## Quick Start
+
+```bash
+pip install -e ".[dev]"
+usaf scan
+```
+
+## Documentation
+
+- `AGENTS.md` - Complete guide for developers and AI agents
+- `ADR/` - Architecture Decision Records
+- `CONTRIBUTING.md` - How to contribute
+
+## License
+
+MIT

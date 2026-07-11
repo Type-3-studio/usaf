@@ -1,0 +1,66 @@
+from __future__ import annotations
+
+from typing import Any
+
+from pydantic import BaseModel, Field
+
+
+class SeverityConfig(BaseModel):
+    CRITICAL: float = 10.0
+    HIGH: float = 7.5
+    MEDIUM: float = 5.0
+    LOW: float = 2.5
+    INFO: float = 0.0
+
+
+class PluginOverride(BaseModel):
+    severity: str | None = None
+    enabled: bool | None = None
+    timeout: int | None = None
+
+
+class PluginConfig(BaseModel):
+    enabled: list[str] = Field(default_factory=lambda: ["*"])
+    disabled: list[str] = Field(default_factory=list)
+    overrides: dict[str, PluginOverride] = Field(default_factory=dict)
+
+
+class GeneralConfig(BaseModel):
+    scan_name: str = "usaf-scan"
+    parallel: bool = True
+    max_workers: int = 8
+    timeout: int = 300
+    cache: bool = True
+    cache_dir: str = "~/.cache/usaf"
+    offline: bool = False
+
+
+class BaselineConfig(BaseModel):
+    path: str | None = None
+    compare: bool = False
+    fail_on_drift: bool = False
+    auto_baseline: bool = False
+
+
+class ReportingConfig(BaseModel):
+    format: str = "terminal"
+    verbose: bool = False
+    output: str | None = None
+    sections: list[str] = Field(default_factory=lambda: ["summary", "findings", "remediation"])
+    color: bool = True
+    show_passed: bool = False
+
+
+class PolicyConfig(BaseModel):
+    name: str = ""
+    path: str = ""
+
+
+class USAFConfig(BaseModel):
+    general: GeneralConfig = Field(default_factory=GeneralConfig)
+    plugins: PluginConfig = Field(default_factory=PluginConfig)
+    severity: SeverityConfig = Field(default_factory=SeverityConfig)
+    ignore: list[str] = Field(default_factory=list)
+    baseline: BaselineConfig = Field(default_factory=BaselineConfig)
+    reporting: ReportingConfig = Field(default_factory=ReportingConfig)
+    policies: list[PolicyConfig] = Field(default_factory=list)

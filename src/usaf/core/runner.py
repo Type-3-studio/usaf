@@ -1,0 +1,201 @@
+from __future__ import annotations
+
+import platform
+import sys
+import time
+import uuid
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+from usaf.cache.engine import CacheEngine
+from usaf.collectors.manager import CollectorManager
+from usaf.collectors.network.sockets import InterfaceCollector, SocketCollector
+from usaf.collectors.packages.apt import APTCollector
+from usaf.collectors.processes.procfs import ProcessCollector
+from usaf.collectors.services.systemd import CronCollector, SystemdCollector
+from usaf.collectors.system.kernel import KernelCollector, KernelParametersCollector
+from usaf.collectors.users.passwd import GroupCollector, SudoCollector, UserCollector
+from usaf.config.loader import load_config
+from usaf.core.exceptions import PluginDependencyError
+from usaf.core.registry import registry
+from usaf.models.result import CheckResult, ScanMetadata, ScanResult
+from usaf.scoring.engine import ScoringEngine
+
+import usaf.__about__ as about
+import usaf.checks  # noqa: F401 - Trigger plugin registration
+
+
+class ScanRunner:
+    """Orchestrates the full security scan lifecycle."""
+
+    def __init__(self, config_path: str | None = None) -> None:
+        self.config = load_config(config_path)
+        self.collector_manager = CollectorManager()
+        self.scoring_engine = ScoringEngine()
+        self.cache = CacheEngine() if self.config.general.cache else None
+
+        self._setup_collectors()
+
+    def _setup_collectors(self) -> None:
+        """Register default collectors."""
+        collectors = [
+            KernelCollector(),
+            KernelParametersCollector(),
+            SocketCollector(),
+            InterfaceCollector(),
+            ProcessCollector(),
+            UserCollector(),
+            GroupCollector(),
+            SudoCollector(),
+            APTCollector(),
+            SystemdCollector(),
+            CronCollector(),
+        ]
+        for c in collectors:
+            self.collector_manager.add(c)
+
+    def run(self, check_ids: list[str] | None = None, verbose: bool = False) -> ScanResult:
+        start_time = time.time()
+        scan_start_dt = datetime.now(timezone.utc)
+        scan_id = str(uuid.uuid4())
+
+        metadata = ScanMetadata(
+            scan_name=self.config.general.scan_name,
+            scan_id=scan_id,
+            hostname=platform.node(),
+            os_info=self._get_os_info(),
+            kernel_info=platform.release(),
+            usaf_version=about.__version__,
+            python_version=sys.version,
+            configuration_file=self.config.general.scan_name,
+        )
+
+        if verbose:
+            print(f"[*] Collecting system data...")
+
+        # Phase 1: Collect data
+        collectors_data: dict[str, dict[str, Any]] = {}
+        collector_names = self._resolve_collector_dependencies()
+        for name in collector_names:
+            try:
+                data = self.collector_manager.collect_single(name)
+                collectors_data[name] = data
+            except Exception as e:
+                collectors_data[name] = {"_error": str(e)}
+                metadata.errors.append(f"Collector '{name}': {e}")
+                if verbose:
+                    print(f"  [!] Collector '{name}' failed: {e}")
+        metadata.collector_count = self.collector_manager.count
+
+        if verbose:
+            print(f"[*] Running security checks...")
+
+        # Phase 2: Resolve check dependencies and filter
+        all_check_ids = registry.get_all_ids()
+        enabled_ids = self._filter_checks(all_check_ids)
+        execution_order = registry.resolve_dependencies(enabled_ids)
+
+        metadata.total_checks = len(all_check_ids)
+        metadata.enabled_checks = len(enabled_ids)
+
+        # Phase 3: Execute checks (sequential for now; parallel in future)
+        results: list[CheckResult] = []
+        for check_id in execution_order:
+            try:
+                instance = registry.get_instance(check_id)
+                if verbose:
+                    print(f"  -> Running {check_id}: {instance.name}...")
+                result = instance.evaluate(collectors_data)
+                result = self._apply_ignore_list(result)
+                results.append(result)
+            except PluginDependencyError as e:
+                results.append(CheckResult(
+                    check_id=check_id,
+                    name=check_id,
+                    category="GENERAL",
+                    passed=False,
+                    error=str(e),
+                    execution_time_ms=0.0,
+                ))
+            except Exception as e:
+                results.append(CheckResult(
+                    check_id=check_id,
+                    name=check_id,
+                    category="GENERAL",
+                    passed=False,
+                    error=f"{type(e).__name__}: {e}",
+                    execution_time_ms=0.0,
+                ))
+
+        # Phase 4: Build result
+        metadata.end_time = scan_start_dt
+        metadata.duration_seconds = time.time() - start_time
+
+        return ScanResult(
+            metadata=metadata,
+            results=results,
+            collectors_data=collectors_data,
+        )
+
+    def score(self, result: ScanResult) -> Any:
+        return self.scoring_engine.calculate(result)
+
+    def help_text(self) -> str:
+        return "Run 'usaf scan' to perform a security audit."
+
+    def _resolve_collector_dependencies(self) -> list[str]:
+        return self.collector_manager.names
+
+    def _filter_checks(self, all_ids: list[str]) -> list[str]:
+        """Apply enabled/disabled/ignore filters from config."""
+        plugin_cfg = self.config.plugins
+        ignore_patterns = self.config.ignore
+
+        if plugin_cfg.enabled and plugin_cfg.enabled != ["*"]:
+            enabled_set = set(plugin_cfg.enabled)
+        else:
+            enabled_set = set(all_ids)
+
+        disabled_set = set(plugin_cfg.disabled)
+
+        # Handle overrides
+        for check_id, override in plugin_cfg.overrides.items():
+            if override.enabled is False:
+                disabled_set.add(check_id)
+            elif override.enabled is True:
+                enabled_set.add(check_id)
+
+        result = []
+        for cid in all_ids:
+            if cid in disabled_set:
+                continue
+            if cid in enabled_set:
+                result.append(cid)
+
+        return result
+
+    def _apply_ignore_list(self, result: CheckResult) -> CheckResult:
+        """Remove findings matching ignore patterns."""
+        ignore_patterns = self.config.ignore
+        if not ignore_patterns:
+            return result
+
+        import fnmatch
+        result.findings = [
+            f for f in result.findings
+            if not any(fnmatch.fnmatch(f.id, pattern) for pattern in ignore_patterns)
+        ]
+        result.passed = len(result.findings) == 0
+        return result
+
+    @staticmethod
+    def _get_os_info() -> str:
+        try:
+            with open("/etc/os-release") as f:
+                for line in f:
+                    if line.startswith("PRETTY_NAME="):
+                        return line.split("=", 1)[1].strip('"\n')
+        except OSError:
+            pass
+        return platform.system()

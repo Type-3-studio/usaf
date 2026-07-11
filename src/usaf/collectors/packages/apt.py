@@ -98,17 +98,28 @@ class APTCollector(BaseCollector):
                         continue
                     if line.startswith("deb ") or line.startswith("deb-src "):
                         parts = line.split()
-                        if len(parts) >= 3:
-                            repos.append(
-                                {
-                                    "type": parts[0],
-                                    "url": parts[1],
-                                    "suite": parts[2] if len(parts) > 2 else "",
-                                    "components": " ".join(parts[3:]),
-                                    "source": str(sources_file),
-                                    "enabled": True,
-                                }
-                            )
+                        if len(parts) < 3:
+                            continue
+                        url_idx = -1
+                        for i, token in enumerate(parts):
+                            if token.startswith(("http://", "https://", "ftp://")):
+                                url_idx = i
+                                break
+                        if url_idx == -1:
+                            continue
+                        url = parts[url_idx]
+                        suite = parts[url_idx + 1] if url_idx + 1 < len(parts) else ""
+                        components = " ".join(parts[url_idx + 2:])
+                        repos.append(
+                            {
+                                "type": parts[0],
+                                "url": url,
+                                "suite": suite,
+                                "components": components,
+                                "source": str(sources_file),
+                                "enabled": True,
+                            }
+                        )
         except OSError:
             pass
         return repos

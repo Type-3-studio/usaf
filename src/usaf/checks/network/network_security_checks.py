@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
 from usaf.models.evidence import NetworkEvidence, RegistryEvidence
@@ -125,7 +127,8 @@ class UnexpectedDNSServersCheck(AuditCheck):
         symlink_target = resolv_conf.get("symlink_target")
         nameservers = resolv_conf.get("nameservers", [])
 
-        if symlink_target and symlink_target not in EXPECTED_RESOLV_TARGETS:
+        resolved_target = str(Path("/etc/resolv.conf").resolve()) if symlink_target else ""
+        if resolved_target and resolved_target not in EXPECTED_RESOLV_TARGETS:
             findings.append(
                 self.finding(
                     finding_id="001",
@@ -214,6 +217,7 @@ class ModifiedHostsFileCheck(AuditCheck):
     tags = ["network", "dns", "hosts"]
 
     KNOWN_HOSTS = {"127.0.0.1", "127.0.1.1", "::1", "127.0.0.53"}
+    KNOWN_HOSTNAMES = {"localhost", "localhost.localdomain", "ip6-localhost", "ip6-loopback", "ip6-localnet", "ip6-mcastprefix", "ip6-allnodes", "ip6-allrouters"}
 
     def _run_check(self, collectors: dict) -> list:
         dns_data = self._get_data(collectors, "dns")
@@ -235,7 +239,7 @@ class ModifiedHostsFileCheck(AuditCheck):
             for hostname in hostnames:
                 if hostname.endswith(".local"):
                     continue
-                if hostname in ("localhost", "localhost.localdomain"):
+                if hostname in self.KNOWN_HOSTNAMES:
                     continue
 
                 findings.append(

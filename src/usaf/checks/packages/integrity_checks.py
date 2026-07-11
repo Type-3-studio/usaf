@@ -90,9 +90,12 @@ class ModifiedPackageFilesCheck(AuditCheck):
             if len(parts) < 2:
                 continue
             flags = parts[0]
-            filepath = parts[1]
+            filepath = parts[1].strip()
 
-            if "c" in flags:
+            if filepath.startswith("c "):
+                continue
+
+            if "(Permission denied)" in filepath:
                 continue
 
             findings.append(

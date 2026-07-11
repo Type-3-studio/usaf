@@ -12,7 +12,7 @@
 | 2 | SECR-502 | System CA root certs flagged as self-signed | 245→~0 | Exclude `/etc/ssl/certs/` and `/usr/share/ca-certificates/` | ✅ |
 | 3 | STATE.md | TD-022→026 marked 🔴 but collectors exist ✅ | — | Mark resolved with collector file references | ✅ |
 
-## P1 — Cut noise to improve signal-to-noise ratio
+## P1 — Cut noise to improve signal-to-noise ratio (DONE)
 
 | # | Check | Problem | Findings | Fix | Status |
 |---|-------|---------|----------|-----|--------|
@@ -21,15 +21,15 @@
 | 6 | PER-503 | System udev rules with RUN/PROGRAM | 60 | Skip rules in `/usr/lib/udev/rules.d/` (package-managed) | ✅ |
 | 7 | SVC-102 | Standard Ubuntu services flagged as unexpected | 42 | Added 30+ missing services + `snap.` prefix matching | ✅ |
 
-## P2 — Plug critical attacker-missed gaps
+## P2 — Plug critical attacker-missed gaps (DONE)
 
-| # | Gap | Why It Matters | Status |
-|---|-----|----------------|--------|
-| 8 | Process→port mapping | Can't identify which binary owns a listening port | ⬜ |
-| 9 | Docker daemon security config | No check for `--userns-remap`, `--no-new-privileges` | ⬜ |
-| 10 | Kernel module blacklist | No check for currently loaded dangerous modules | ⬜ |
-| 11 | Auditd coverage gap vs MITRE ATT&CK | No analysis of which techniques aren't covered | ⬜ |
-| 12 | AppArmor profile per service | Services running unconfined not flagged | ⬜ |
+| # | Gap | Why It Matters | Check | Status |
+|---|-----|----------------|-------|--------|
+| 8 | Kernel module blacklist | Flag loaded dangerous modules (bluetooth, firewire, obsolete protocols) | KERN-501 | ✅ |
+| 9 | Docker daemon security config | Check for userns-remap, no-new-privileges, icc, live-restore, log-driver | CTN-302 | ✅ |
+| 10 | Process→port mapping | Map each listening port to its owning process (name + PID) | NET-550 | ✅ |
+| 11 | AppArmor profile per service | Flag services running unconfined (no AppArmor profile) | SEC-102 | ✅ |
+| 12 | Auditd MITRE ATT&CK coverage | Map audit rules to 15 ATT&CK techniques, report gaps | LOG-503 | ✅ |
 
 ## P3 — Framework hardening
 
@@ -53,3 +53,13 @@
 | PER-503 (udev rules) | 60 | ~5-10 |
 | SVC-102 (services) | 42 | ~5-10 |
 | Signal-to-noise ratio | ~17% | ~60%+ |
+
+## New Checks Added
+
+| ID | Name | Category |
+|----|------|----------|
+| KERN-501 | Dangerous Kernel Modules Loaded | KERNEL |
+| CTN-302 | Docker Daemon Security Configuration | CONTAINERS |
+| NET-550 | Listening Port to Process Mapping | NETWORK |
+| SEC-102 | AppArmor Profile Coverage for Services | SECURITY |
+| LOG-503 | Auditd MITRE ATT&CK Coverage Gaps | AUDIT |

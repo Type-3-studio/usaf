@@ -739,7 +739,7 @@ _Secrets completed in Phase 4a above._
 | Security (AppArmor/USB) | 2 | 2 | 2 | 2 | 2 | 10 |
 | Compromise | 1 | 1 | 1 | 1 | 1 | 15 |
 | Password | 1 | 1 | 1 | 1 | 1 | 10 |
-| **Total checks** | **118** | **119** | **135** | **135** | **135** | **~450** |
+| **Total checks** | **122** | **119** | **135** | **135** | **135** | **~450** |
 | **Correlation rules** | 16 | 17 | 21 | 24 | 24 | **50+** |
 
 ---
@@ -832,7 +832,7 @@ src/usaf/
 
 | Metric | Current | Short-term (P3) | Medium-term (P4) | Long-term (P6) |
 |--------|---------|-----------------|-------------------|-----------------|
-| Checks | 118 | 119 | 135 | 135 → **450+** |
+| Checks | 122 | 119 | 135 | 135 → **450+** |
 | Collectors | 25 | 24 | 28 | 30 |
 | Correlation rules | 16 | 17 | 21 | 24 → **50+** |
 | Unit tests | 1020 | 1,500+ | 2,000+ | 3,000+ |
@@ -844,16 +844,28 @@ src/usaf/
 | Attack scenario coverage | 5 | 10 | 15 | 20+ |
 | Correlation engine maturity | Chained | Temporal | Temporal | Full kill chain |
 
-### v0.5.1 — Stabilization Fixes (2026-07-12)
+### v0.5.1 — Stabilization + P2 Gaps (2026-07-12)
 
+**P0 — Bug fixes:**
 - **FS-202**: Fixed kernel thread false positives — 299 noise findings eliminated by filtering ppid==2 and /proc/ binary paths
 - **SECR-502**: Fixed system CA certificate false positives — 245 findings eliminated by excluding `/etc/ssl/certs/` and `/usr/share/ca-certificates/`
+
+**P1 — Noise reduction:**
 - **FS-402**: Excluded `/node_modules/` paths from world-writable directory checks (~810 → realistic count)
 - **FS-201**: Added `._` Apple Double and `__MACOSX` path exclusions for hidden file checks
 - **PER-503**: Skipped `/usr/lib/udev/rules.d/` (package-managed system rules) from udev persistence check
-- **SVC-102**: Added 30+ missing standard Ubuntu services to known-safe set + `snap.` prefix matching
+- **SVC-102**: Added 30+ missing standard Ubuntu services + `snap.` prefix matching
+
+**P2 — New checks (5 added, 122 total):**
+- **KERN-501**: Dangerous kernel modules loaded (bluetooth, firewire, obsolete protocols)
+- **CTN-302**: Docker daemon security config (userns-remap, no-new-privileges, icc, etc.)
+- **NET-550**: Listening port to process mapping (cross-references /proc/net with /proc/*/fd/)
+- **SEC-102**: AppArmor profile coverage per service (detects unconfined services)
+- **LOG-503**: Auditd MITRE ATT&CK coverage gaps (maps rules to 15 techniques)
+
+**Infrastructure:**
 - **STATE.md**: Resolved TD-022–TD-026 (all collectors exist, entries were stale)
-- **Tests**: 4 new test cases added (1024 total, all passing)
+- **Tests**: 1024 total, all passing (was 1020)
 
 ---
 

@@ -45,6 +45,7 @@ class TerminalReporter(BaseReporter):
     description = "Color-coded terminal output with Rich formatting"
 
     def __init__(self) -> None:
+        super().__init__()
         self.console = Console()
 
     def generate(self, result: ScanResult, score: ScanScore | None = None, **kwargs: Any) -> str:

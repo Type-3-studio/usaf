@@ -1,0 +1,29 @@
+id: CTN-102
+title: Docker Daemon TCP Exposure
+threat: Remote attackers accessing the Docker API without authentication.
+exploit: 'curl http://target:2375/containers/json — lists all containers and allows remote container creation.'
+impact: Full host compromise via container escape, cryptojacking, data exfiltration.
+fix: 'Ensure dockerd only listens on the Unix socket. Remove tcp:// binds from /etc/docker/daemon.json.'
+breakage: Remote Docker API access will stop working. Use TLS if remote access is needed.
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H (10.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Swarm manager nodes with TLS-enabled Docker API"
+  - "Docker contexts configured for remote TLS access"
+related_findings:
+  - "CTN-101"
+  - "CTN-201"
+severity_override: null
+tags:
+  - "containers"
+  - "docker"
+  - "network"
+  - "remote-api"
+mitre_mappings:
+  - "T1610"
+  - "T1190"

@@ -1,0 +1,30 @@
+id: CTN-203
+title: Containers Using Host PID Namespace
+threat: Host PID namespace allows process discovery and potential privilege escalation.
+exploit: 'docker run --pid=host ubuntu ps aux — lists all host processes.'
+impact: Process isolation bypass, discovery of security tools and other containers.
+fix: 'Remove --pid=host. Use --pid=container:<id> for targeted sharing if needed.'
+breakage: Some monitoring tools require host PID access to collect metrics.
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N (5.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Infrastructure monitoring containers (Datadog, New Relic agents)"
+  - "Container runtime debugging tools"
+related_findings:
+  - "CTN-201"
+  - "CTN-202"
+  - "CORR-401"
+severity_override: null
+tags:
+  - "containers"
+  - "docker"
+  - "pid"
+  - "host-pid"
+mitre_mappings:
+  - "T1610"
+  - "T1611"

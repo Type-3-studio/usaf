@@ -1,0 +1,30 @@
+id: CTN-202
+title: Containers Using Host Network
+threat: Compromised host-network container can sniff all host traffic and bind privileged ports.
+exploit: 'docker run --network=host nginx — container can bind port 80 directly on the host.'
+impact: Network isolation bypass, traffic sniffing, privilege escalation via port binding.
+fix: 'Remove --network=host and use -p <port>:<port> for port mapping instead.'
+breakage: Containers that need to listen on many ports require individual -p flags.
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:L/A:N (7.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Performance-critical network applications (e.g., DPDK, PTP)"
+  - "Monitoring agents that need host network visibility"
+related_findings:
+  - "CTN-201"
+  - "CTN-203"
+  - "CORR-401"
+severity_override: null
+tags:
+  - "containers"
+  - "docker"
+  - "network"
+  - "host-network"
+mitre_mappings:
+  - "T1610"
+  - "T1611"

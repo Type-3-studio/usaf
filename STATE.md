@@ -84,7 +84,7 @@
 | `SecretsCollector` | ✅ | Credential scanning: AWS/GCP keys, GitHub tokens, API keys, .env files, DB creds |
 | `SnapCollector` | ✅ | Snap package inventory, file→package resolution |
 
-#### Checks (109 total)
+#### Checks (117 total)
 | Check | Status | Severity | Evidence |
 |-------|--------|----------|----------|
 | KERN-101 (ASLR) | ✅ | HIGH | RegistryEvidence |
@@ -139,6 +139,14 @@
 | CMP-101 (Ubuntu Support) | ✅ | MEDIUM | RegistryEvidence |
 | COM-101 (Bad Processes) | ✅ | HIGH | ProcessEvidence |
 | CTN-101 (Docker Socket) | ✅ | HIGH | FileEvidence |
+| CTN-102 (Docker TCP Exposure) | ✅ | CRITICAL | NetworkEvidence |
+| CTN-201 (Privileged Containers) | ✅ | CRITICAL | RegistryEvidence |
+| CTN-202 (Host Network) | ✅ | HIGH | RegistryEvidence |
+| CTN-203 (Host PID) | ✅ | HIGH | RegistryEvidence |
+| CTN-204 (Host Mounts) | ✅ | HIGH | RegistryEvidence |
+| CTN-301 (Root Containers) | ✅ | HIGH | RegistryEvidence |
+| CTN-401 (Old Images) | ✅ | MEDIUM | RegistryEvidence |
+| CTN-402 (Unsigned Images) | ✅ | MEDIUM | RegistryEvidence |
 | FOR-101 (Audit Logs) | ✅ | MEDIUM | FileEvidence |
 | LOG-101 (Journal Max Size) | ✅ | MEDIUM | RegistryEvidence |
 | LOG-201 (Log Rotation) | ✅ | MEDIUM | FileEvidence / RegistryEvidence |
@@ -259,7 +267,7 @@
 | Compliance | ✅ | 335 | CIS 27 controls, NIST 6 controls, gap analysis |
 | Profiles | ✅ | 451 | Desktop/server reference profiles, auto-detect |
 | Context Severity | ✅ | 201 | SSH, file perms, users, network context evaluators |
-| Knowledge Base | ✅ | 171 + 85 YAML | YAML for all 85 checks with threat/exploit/impact/fix/CVSS; KB wired into runner pipeline |
+| Knowledge Base | ✅ | 171 + 93 YAML | YAML for all 93 checks with threat/exploit/impact/fix/CVSS; KB wired into runner pipeline |
 | Trust Scoring | ✅ | 106 | Evidence-quality adjusted confidence |
 | Policies | ✅ | 86 | YAML policy loading, check overrides, severity overrides |
 
@@ -593,17 +601,17 @@ The goal is **~500 checks** organized into **20+ categories**, with a **correlat
 | SECR-501 | Expired TLS certificates | `certificates` | ✅ |
 | SECR-502 | Self-signed certificates | `certificates` | ✅ |
 
-#### Containers (8 checks)
-| ID | Name | Depends |
-|----|------|---------|
-| CTN-102 | Docker daemon TCP exposure | `containers` |
-| CTN-201 | Privileged containers | `containers` |
-| CTN-202 | Host network namespace | `containers` |
-| CTN-203 | Host PID namespace | `containers` |
-| CTN-204 | Host filesystem mounts | `containers` |
-| CTN-301 | Root containers | `containers` |
-| CTN-401 | Image age (>30 days) | `containers` |
-| CTN-402 | Unsigned images | `containers` |
+#### Containers (8 checks) — ✅ COMPLETE
+| ID | Name | Depends | Status |
+|----|------|---------|--------|
+| CTN-102 | Docker daemon TCP exposure | `containers` | ✅ |
+| CTN-201 | Privileged containers | `containers` | ✅ |
+| CTN-202 | Host network namespace | `containers` | ✅ |
+| CTN-203 | Host PID namespace | `containers` | ✅ |
+| CTN-204 | Host filesystem mounts | `containers` | ✅ |
+| CTN-301 | Root containers | `containers` | ✅ |
+| CTN-401 | Image age (>30 days) | `containers` | ✅ |
+| CTN-402 | Unsigned images | `containers` | ✅ |
 
 #### Logs & Forensics (8 checks) — ✅ COMPLETE
 | ID | Name | Depends | Status |
@@ -627,7 +635,7 @@ _Secrets completed in Phase 4a above._
 | CORR-403 | Active breach (log gaps + auth failures + new/failed services) | ✅ |
 | CORR-404 | Exposed attack surface (listening ports + weak TLS + no audit/fw) | ✅ |
 
-**Exit criteria:** 26 new checks, 4 new rules. **Phase 4a (Secrets) ✅, Phase 4b (Logs) ✅, Phase 4d (Correlation) ✅.**
+**Exit criteria:** 34 new checks, 4 new rules. **Phase 4 complete! ✅**
 
 ---
 
@@ -722,7 +730,7 @@ _Secrets completed in Phase 4a above._
 | Boot | 5 | 5 | 5 | 5 | 5 | 15 |
 | Services | 8 | 8 | 8 | 8 | 8 | 30 |
 | Persistence | 26 | 26 | 26 | 26 | 26 | 40 |
-| Containers | 1 | 1 | 9 | 9 | 9 | 25 |
+| Containers | 9 | 9 | 9 | 9 | 9 | 25 |
 | Logs & Forensics | 9 | 9 | 9 | 9 | 9 | 25 |
 | Secrets | 10 | 10 | 10 | 10 | 10 | 20 |
 | Cloud | 0 | 0 | 0 | 6 | 6 | 20 |
@@ -731,7 +739,7 @@ _Secrets completed in Phase 4a above._
 | Security (AppArmor/USB) | 2 | 2 | 2 | 2 | 2 | 10 |
 | Compromise | 1 | 1 | 1 | 1 | 1 | 15 |
 | Password | 1 | 1 | 1 | 1 | 1 | 10 |
-| **Total checks** | **109** | **119** | **135** | **135** | **135** | **~450** |
+| **Total checks** | **117** | **119** | **135** | **135** | **135** | **~450** |
 | **Correlation rules** | 16 | 17 | 21 | 24 | 24 | **50+** |
 
 ---
@@ -812,7 +820,7 @@ src/usaf/
 ├── compliance/framework.py    # CIS + NIST mappings
 ├── profiles/manager.py        # Profile matching
 ├── severity/engine.py         # Context-aware severity
-├── knowledge/                 # KB + 85 YAML entries (one per check)
+├── knowledge/                 # KB + 93 YAML entries (one per check)
 ├── policies/engine.py         # Policy loading + overrides
 ├── config/                    # YAML config loading
 └── cache/engine.py            # In-memory cache
@@ -824,7 +832,7 @@ src/usaf/
 
 | Metric | Current | Short-term (P3) | Medium-term (P4) | Long-term (P6) |
 |--------|---------|-----------------|-------------------|-----------------|
-| Checks | 109 | 119 | 135 | 135 → **450+** |
+| Checks | 117 | 119 | 135 | 135 → **450+** |
 | Collectors | 25 | 24 | 28 | 30 |
 | Correlation rules | 16 | 17 | 21 | 24 → **50+** |
 | Unit tests | 900+ | 1,500+ | 2,000+ | 3,000+ |

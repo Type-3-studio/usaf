@@ -22,7 +22,7 @@ class TestScanPipeline:
     """Integration tests for the full scan pipeline."""
 
     EXPECTED_COLLECTOR_COUNT = 25
-    EXPECTED_CHECK_COUNT = 109
+    EXPECTED_CHECK_COUNT = 117
 
     def test_collector_discovery_registers_all(self):
         collector_registry.discover()
@@ -68,6 +68,14 @@ class TestScanPipeline:
             "CMP-101",
             "COM-101",
             "CTN-101",
+            "CTN-102",
+            "CTN-201",
+            "CTN-202",
+            "CTN-203",
+            "CTN-204",
+            "CTN-301",
+            "CTN-401",
+            "CTN-402",
             "FOR-101",
             "FS-101",
             "FS-102",

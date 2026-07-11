@@ -1,0 +1,30 @@
+id: CTN-402
+title: Container Images Without Signing Verification
+threat: Supply chain attacks via unsigned container images.
+exploit: 'docker pull malicious:latest — pulls an attacker-controlled image with the same tag.'
+impact: Malicious code execution in production, data exfiltration, persistent backdoor.
+fix: 'Enable Docker Content Trust: export DOCKER_CONTENT_TRUST=1. Use signed images from trusted registries.'
+breakage: Content trust blocks pulls of unsigned images, which may include legitimate but unsigned images.
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Development environments where speed > security"
+  - "Images from internal registries with separate verification"
+related_findings:
+  - "CTN-401"
+  - "PKG-202"
+severity_override: null
+tags:
+  - "containers"
+  - "docker"
+  - "supply-chain"
+  - "signing"
+mitre_mappings:
+  - "T1554"
+  - "T1195"
+  - "T1195.001"

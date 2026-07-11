@@ -1,0 +1,30 @@
+id: CTN-204
+title: Containers Mounting Host Filesystem
+threat: Host filesystem mounts allow read/write access to critical system files.
+exploit: 'docker run -v /:/host ubuntu bash — container can modify any host file.'
+impact: Full host compromise via system file modification, SSH key injection, and persistence.
+fix: 'Use named volumes instead of bind mounts. Never mount /, /etc, or /var/run/docker.sock.'
+breakage: Stateful applications requiring host path access need careful path scoping.
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H (8.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Backup agents mounting specific host directories"
+  - "Log shippers mounting /var/log"
+related_findings:
+  - "CTN-201"
+  - "CTN-301"
+  - "CORR-401"
+severity_override: null
+tags:
+  - "containers"
+  - "docker"
+  - "mounts"
+  - "host-filesystem"
+mitre_mappings:
+  - "T1610"
+  - "T1611"

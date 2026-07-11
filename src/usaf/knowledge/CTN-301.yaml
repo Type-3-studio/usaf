@@ -1,0 +1,29 @@
+id: CTN-301
+title: Containers Running as Root
+threat: Root in container has elevated capabilities and simplifies container escape.
+exploit: 'docker run ubuntu whoami — returns root. Inside container, root has partial capability set.'
+impact: Easier container escape if combined with other vulnerabilities or misconfigurations.
+fix: 'Add USER directive to Dockerfile. Use --user flag in docker run.'
+breakage: Some base images require root for package installation during build.
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N (4.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Infrastructure containers needing root for system operations"
+  - "Legacy images that cannot be easily modified"
+related_findings:
+  - "CTN-201"
+  - "CTN-204"
+severity_override: null
+tags:
+  - "containers"
+  - "docker"
+  - "root"
+  - "least-privilege"
+mitre_mappings:
+  - "T1610"
+  - "T1548"

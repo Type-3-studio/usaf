@@ -23,12 +23,10 @@ class ContainerCollector(BaseCollector):
         }
 
     def _check_docker(self) -> dict:
-        result: dict = {"installed": False, "running": False, "containers": []}
-        dockerd = Path("/usr/bin/docker") or Path("/usr/local/bin/docker") or Path("/usr/sbin/docker")
+        result: dict = {"installed": False, "running": False, "containers": [], "detailed": []}
+        dockerd = Path("/usr/bin/docker")
         if not dockerd.exists():
-            dockerd = Path("/usr/bin/docker")
-            if not dockerd.exists():
-                return result
+            return result
         result["installed"] = True
         try:
             r = subprocess.run(
@@ -41,36 +39,106 @@ class ContainerCollector(BaseCollector):
         except (OSError, subprocess.SubprocessError):
             pass
         if result["running"]:
-            try:
-                r = subprocess.run(
-                    ["docker", "ps", "--all", "--format", json.dumps({
-                        "id": "{{.ID}}", "image": "{{.Image}}",
-                        "names": "{{.Names}}", "status": "{{.Status}}",
-                        "ports": "{{.Ports}}", "created": "{{.CreatedAt}}",
-                    })],
-                    capture_output=True, text=True, timeout=10, check=False,
-                )
-                if r.returncode == 0 and r.stdout.strip():
-                    for line in r.stdout.splitlines():
-                        try:
-                            container = json.loads(line)
-                            result["containers"].append(container)
-                        except json.JSONDecodeError:
-                            pass
-            except (OSError, subprocess.SubprocessError):
-                pass
+            result["containers"] = self._list_docker_containers()
+            result["detailed"] = self._inspect_docker_containers()
         return result
 
+    def _list_docker_containers(self) -> list[dict]:
+        containers: list[dict] = []
+        try:
+            r = subprocess.run(
+                ["docker", "ps", "--all", "--format", json.dumps({
+                    "id": "{{.ID}}", "image": "{{.Image}}",
+                    "names": "{{.Names}}", "status": "{{.Status}}",
+                    "ports": "{{.Ports}}", "created": "{{.CreatedAt}}",
+                })],
+                capture_output=True, text=True, timeout=15, check=False,
+            )
+            if r.returncode == 0 and r.stdout.strip():
+                for line in r.stdout.splitlines():
+                    try:
+                        containers.append(json.loads(line))
+                    except json.JSONDecodeError:
+                        pass
+        except (OSError, subprocess.SubprocessError):
+            pass
+        return containers
+
+    def _inspect_docker_containers(self) -> list[dict]:
+        detailed: list[dict] = []
+        try:
+            r = subprocess.run(
+                ["docker", "ps", "--all", "-q"],
+                capture_output=True, text=True, timeout=10, check=False,
+            )
+            if r.returncode != 0 or not r.stdout.strip():
+                return detailed
+            ids = r.stdout.strip().splitlines()
+            for cid in ids:
+                try:
+                    ir = subprocess.run(
+                        ["docker", "inspect", cid],
+                        capture_output=True, text=True, timeout=15, check=False,
+                    )
+                    if ir.returncode != 0 or not ir.stdout.strip():
+                        continue
+                    data = json.loads(ir.stdout)
+                    if not data:
+                        continue
+                    info = data[0]
+                    host_config = info.get("HostConfig", {}) or {}
+                    config = info.get("Config", {}) or {}
+                    detailed.append({
+                        "id": cid,
+                        "image": config.get("Image", ""),
+                        "created": info.get("Created", ""),
+                        "state": info.get("State", {}).get("Status", ""),
+                        "privileged": host_config.get("Privileged", False),
+                        "host_network": host_config.get("NetworkMode") == "host",
+                        "host_pid": host_config.get("PidMode") == "host",
+                        "host_ipc": host_config.get("IpcMode") == "host",
+                        "user": config.get("User", ""),
+                        "readonly_rootfs": host_config.get("ReadonlyRootfs", False),
+                        "bind_mounts": self._get_bind_mounts(host_config),
+                        "port_bindings": host_config.get("PortBindings", {}) or {},
+                        "cap_add": host_config.get("CapAdd", []) or [],
+                        "cap_drop": host_config.get("CapDrop", []) or [],
+                        "security_opt": host_config.get("SecurityOpt", []) or [],
+                        "image_name": config.get("Image", ""),
+                    })
+                except (OSError, subprocess.SubprocessError, json.JSONDecodeError):
+                    continue
+        except (OSError, subprocess.SubprocessError):
+            pass
+        return detailed
+
+    @staticmethod
+    def _get_bind_mounts(host_config: dict) -> list[dict]:
+        mounts: list[dict] = []
+        for m in host_config.get("Binds", []) or []:
+            parts = m.split(":", 2)
+            mounts.append({
+                "source": parts[0] if len(parts) > 0 else "",
+                "destination": parts[1] if len(parts) > 1 else "",
+                "mode": parts[2] if len(parts) > 2 else "",
+            })
+        for m in host_config.get("Mounts", []) or []:
+            mounts.append({
+                "source": m.get("Source", ""),
+                "destination": m.get("Target", ""),
+                "mode": "",
+            })
+        return mounts
+
     def _check_podman(self) -> dict:
-        result: dict = {"installed": False, "running": False, "containers": []}
+        result: dict = {"installed": False, "running": False, "containers": [], "detailed": []}
         podman_path = Path("/usr/bin/podman")
         if not podman_path.exists():
             return result
         result["installed"] = True
         try:
             r = subprocess.run(
-                ["podman", "info", "--format", "{{.Version}}" if False else "",
-                 "--format", "json"],
+                ["podman", "info", "--format", "json"],
                 capture_output=True, text=True, timeout=10, check=False,
             )
             if r.returncode == 0 and r.stdout.strip():
@@ -89,13 +157,12 @@ class ContainerCollector(BaseCollector):
                         "id": "{{.ID}}", "image": "{{.Image}}",
                         "names": "{{.Names}}", "status": "{{.Status}}",
                     })],
-                    capture_output=True, text=True, timeout=10, check=False,
+                    capture_output=True, text=True, timeout=15, check=False,
                 )
                 if r.returncode == 0 and r.stdout.strip():
                     for line in r.stdout.splitlines():
                         try:
-                            container = json.loads(line)
-                            result["containers"].append(container)
+                            result["containers"].append(json.loads(line))
                         except json.JSONDecodeError:
                             pass
             except (OSError, subprocess.SubprocessError):

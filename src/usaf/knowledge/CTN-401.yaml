@@ -1,0 +1,29 @@
+id: CTN-401
+title: Container Images Older Than 30 Days
+threat: Outdated base images contain unpatched vulnerabilities.
+exploit: 'docker run old-image — runs software with known CVEs that can be exploited for RCE.'
+impact: Remote code execution, data breach, container escape via known vulnerabilities.
+fix: 'docker pull <image> to get the latest version. Use automated image update pipelines with vulnerability scanning.'
+breakage: Updating images may break compatibility if upstream introduces breaking changes.
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Pinned images for reproducible builds"
+  - "Images with no updates available (custom or archived)"
+related_findings:
+  - "CTN-402"
+  - "PKG-401"
+severity_override: null
+tags:
+  - "containers"
+  - "docker"
+  - "images"
+  - "vulnerabilities"
+mitre_mappings:
+  - "T1190"
+  - "T1610"

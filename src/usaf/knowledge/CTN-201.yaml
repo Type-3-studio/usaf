@@ -1,0 +1,31 @@
+id: CTN-201
+title: Privileged Containers
+threat: Container escape via privileged mode grants full host root access.
+exploit: 'docker run --privileged -it ubuntu bash — inside container: mount /dev/sda1 /mnt && chroot /mnt'
+impact: Full host compromise from a single compromised privileged container.
+fix: 'Remove --privileged flag. Use specific --cap-add for required capabilities.'
+breakage: Containers requiring many capabilities may fail until specific caps are granted.
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H (8.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+  - "Ubuntu 26.04"
+false_positive_rate: 0.02
+known_exceptions:
+  - "CI runners requiring Docker-in-Docker (use --privileged cautiously)"
+  - "Legacy applications with hardware access requirements"
+related_findings:
+  - "CTN-202"
+  - "CTN-301"
+  - "CORR-401"
+severity_override: null
+tags:
+  - "containers"
+  - "docker"
+  - "privileged"
+  - "escape"
+mitre_mappings:
+  - "T1610"
+  - "T1611"
+  - "T1548"

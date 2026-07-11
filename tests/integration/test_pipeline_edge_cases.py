@@ -29,7 +29,7 @@ class TestPipelineErrorHandling:
         check_ids = registry.get_all_ids()
         collector_names = collector_registry.get_all_names()
         assert len(collector_names) == 25
-        assert len(check_ids) == 109
+        assert len(check_ids) == 117
 
     @pytest.mark.slow
     @SKIP_LINUX

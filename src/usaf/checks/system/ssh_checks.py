@@ -12,7 +12,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 class SSHProtocolCheck(AuditCheck):
     """Check that SSH only allows protocol version 2."""
 
-    id = "SSH-001"
+    id = "SSH-101"
     name = "SSH Protocol Version"
     category = CheckCategory.SYSTEM
     severity = Severity.HIGH
@@ -91,7 +91,7 @@ class SSHProtocolCheck(AuditCheck):
 class SSHRootLoginCheck(AuditCheck):
     """Check SSH root login configuration."""
 
-    id = "SSH-002"
+    id = "SSH-102"
     name = "SSH Root Login"
     category = CheckCategory.SYSTEM
     severity = Severity.HIGH
@@ -167,7 +167,7 @@ class SSHRootLoginCheck(AuditCheck):
 class SSHKeyExchangeCheck(AuditCheck):
     """Check that SSH uses secure key exchange algorithms."""
 
-    id = "SSH-003"
+    id = "SSH-201"
     name = "SSH Key Exchange Algorithms"
     category = CheckCategory.SYSTEM
     severity = Severity.MEDIUM

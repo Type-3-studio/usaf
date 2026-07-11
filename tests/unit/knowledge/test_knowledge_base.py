@@ -33,10 +33,10 @@ class TestKnowledgeEntry:
         assert not entry.has_exceptions
 
     def test_from_file(self):
-        path = Path(__file__).parent.parent.parent.parent / "src" / "usaf" / "knowledge" / "KERN-001.yaml"
+        path = Path(__file__).parent.parent.parent.parent / "src" / "usaf" / "knowledge" / "KERN-101.yaml"
         if path.exists():
             entry = KnowledgeEntry.from_file(path)
-            assert entry.id == "KERN-001"
+            assert entry.id == "KERN-101"
             assert entry.title == "Kernel ASLR Disabled"
             assert len(entry.affected_versions) > 0
             assert len(entry.tags) > 0
@@ -123,9 +123,9 @@ class TestKnowledgeBase:
 
     def test_get_existing_entry(self):
         kb = KnowledgeBase()
-        entry = kb.get("KERN-001")
+        entry = kb.get("KERN-101")
         assert entry is not None
-        assert entry.id == "KERN-001"
+        assert entry.id == "KERN-101"
         assert entry.title == "Kernel ASLR Disabled"
 
     def test_get_nonexistent_entry(self):
@@ -136,8 +136,8 @@ class TestKnowledgeBase:
     def test_lookup_finding(self):
         kb = KnowledgeBase()
         finding = Finding(
-            id="KERN-001-001",
-            check_id="KERN-001",
+            id="KERN-101-001",
+            check_id="KERN-101",
             category=CheckCategory.KERNEL,
             severity=Severity.HIGH,
             risk_score=7.5,
@@ -149,7 +149,7 @@ class TestKnowledgeBase:
         )
         entry = kb.lookup_finding(finding)
         assert entry is not None
-        assert entry.id == "KERN-001"
+        assert entry.id == "KERN-101"
 
     def test_lookup_finding_no_match(self):
         kb = KnowledgeBase()
@@ -171,8 +171,8 @@ class TestKnowledgeBase:
     def test_evaluate_finding_confidence(self):
         kb = KnowledgeBase()
         finding = Finding(
-            id="KERN-001-001",
-            check_id="KERN-001",
+            id="KERN-101-001",
+            check_id="KERN-101",
             category=CheckCategory.KERNEL,
             severity=Severity.HIGH,
             risk_score=7.5,
@@ -191,9 +191,9 @@ class TestKnowledgeBase:
         kb = KnowledgeBase()
         entries = kb.entries
         assert len(entries) >= 13
-        assert "KERN-001" in entries
-        assert "SSH-001" in entries
-        assert "USR-001" in entries
+        assert "KERN-101" in entries
+        assert "SSH-101" in entries
+        assert "USR-101" in entries
 
     def test_count(self):
         kb = KnowledgeBase()

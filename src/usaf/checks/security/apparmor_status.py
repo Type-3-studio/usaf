@@ -10,7 +10,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 
 @register_check
 class AppArmorStatusCheck(AuditCheck):
-    id = "SEC-001"
+    id = "SEC-101"
     name = "AppArmor Status"
     category = CheckCategory.SECURITY
     severity = Severity.HIGH

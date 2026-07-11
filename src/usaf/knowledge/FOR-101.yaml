@@ -1,4 +1,4 @@
-id: FOR-001
+id: FOR-101
 title: Audit Log Availability
 threat: Without audit logs, there is no record of system calls, file access, or authentication events. This severely hampers incident response and forensic investigation.
 exploit: "An attacker who compromises the system disables auditd (systemctl stop auditd) and clears /var/log/audit/ to cover their tracks. Without audit logs, the incident response team cannot determine the attack vector, scope, or timeline."
@@ -19,8 +19,8 @@ known_exceptions:
   - "Containers that inherit the host audit system"
   - "Ephemeral systems where audit logs are sent to a centralized SIEM"
 related_findings:
-  - "CMP-001"
-  - "PER-001"
+  - "CMP-101"
+  - "PER-201"
 severity_override: null
 tags:
   - "auditing"

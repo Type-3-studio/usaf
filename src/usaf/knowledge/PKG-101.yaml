@@ -1,4 +1,4 @@
-id: PKG-001
+id: PKG-101
 title: Unnecessary or Risky Installed Packages
 threat: Every installed package, especially network services, expands the attack surface. Legacy or unnecessary services may contain unpatched vulnerabilities or expose unintended functionality.
 exploit: "An attacker scans the network, discovers a telnet or rsh service running on the target, and brute-forces credentials transmitted in cleartext. Alternatively, an unpatched CUPS or Samba vulnerability provides remote code execution."
@@ -19,8 +19,8 @@ known_exceptions:
   - "Samba required for file sharing with Windows clients"
   - "Avahi required for zero-configuration networking in some environments"
 related_findings:
-  - "SVC-001"
-  - "NET-001"
+  - "SVC-101"
+  - "NET-101"
 severity_override: null
 tags:
   - "attack-surface"

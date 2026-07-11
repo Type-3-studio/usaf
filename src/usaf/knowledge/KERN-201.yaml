@@ -1,4 +1,4 @@
-id: KERN-002
+id: KERN-201
 title: Kernel Pointer Restriction Disabled
 threat: Without kptr_restrict, /proc/kallsyms exposes kernel symbol addresses to unprivileged users, providing critical information for kernel exploit development.
 exploit: "A local attacker reads /proc/kallsyms to find the address of commit_creds() and prepare_kernel_cred(), then uses a kernel vulnerability to call them with known offsets — bypassing KASLR entirely."
@@ -18,8 +18,8 @@ known_exceptions:
   - "Containers cannot change kernel parameters"
   - "Some debugging environments set kptr_restrict=0 intentionally"
 related_findings:
-  - "KERN-001"
-  - "KERN-003"
+  - "KERN-101"
+  - "KERN-301"
 severity_override: null
 tags:
   - "kernel-hardening"

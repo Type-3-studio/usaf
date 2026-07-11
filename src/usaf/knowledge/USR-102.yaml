@@ -1,4 +1,4 @@
-id: USR-003
+id: USR-102
 title: Passwords Not Shadowed
 threat: Password hashes stored in /etc/passwd (world-readable) are exposed to all users on the system, enabling offline password cracking attacks.
 exploit: "A local attacker reads /etc/passwd, extracts the password hashes, and runs hashcat or John the Ripper against them. Weak or common passwords are cracked within minutes to hours."
@@ -17,8 +17,8 @@ known_exceptions:
   - "NIS-based authentication may keep hashes in passwd"
   - "Container images sometimes omit /etc/shadow"
 related_findings:
-  - "USR-001"
-  - "USR-002"
+  - "USR-101"
+  - "USR-201"
 severity_override: null
 tags:
   - "users"

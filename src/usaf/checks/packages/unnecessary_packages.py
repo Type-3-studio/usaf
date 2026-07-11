@@ -8,7 +8,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 
 @register_check
 class UnnecessaryPackagesCheck(AuditCheck):
-    id = "PKG-001"
+    id = "PKG-101"
     name = "Unnecessary or Risky Installed Packages"
     category = CheckCategory.PACKAGES
     severity = Severity.MEDIUM

@@ -21,7 +21,7 @@ class UnexpectedSUIDCheck(AuditCheck):
       3. Package-ownership check (binaries from official packages are low-risk)
     """
 
-    id = "PRM-001"
+    id = "PRM-101"
     name = "Unexpected SUID Binaries"
     category = CheckCategory.PERMISSIONS
     severity = Severity.HIGH
@@ -325,7 +325,7 @@ class UnexpectedSUIDCheck(AuditCheck):
 class WorldWritableFilesCheck(AuditCheck):
     """Check for world-writable system files that shouldn't be."""
 
-    id = "PRM-002"
+    id = "PRM-201"
     name = "World-Writable System Files"
     category = CheckCategory.PERMISSIONS
     severity = Severity.HIGH

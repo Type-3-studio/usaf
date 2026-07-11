@@ -24,7 +24,7 @@ KNOWN_SAFE_PORTS: dict[int, str] = {
 class UnexpectedListeningPortsCheck(AuditCheck):
     """Check for unexpected listening ports that could indicate unauthorized services."""
 
-    id = "NET-001"
+    id = "NET-101"
     name = "Unexpected Listening Ports"
     category = CheckCategory.NETWORK
     severity = Severity.MEDIUM
@@ -103,7 +103,7 @@ class UnexpectedListeningPortsCheck(AuditCheck):
 class PromiscuousModeCheck(AuditCheck):
     """Check for network interfaces in promiscuous mode."""
 
-    id = "NET-002"
+    id = "NET-201"
     name = "Promiscuous Mode Interfaces"
     category = CheckCategory.NETWORK
     severity = Severity.MEDIUM

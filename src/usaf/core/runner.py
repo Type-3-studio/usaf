@@ -23,11 +23,14 @@ from usaf.correlation.engine import (
     CorrelationEngine,
 )
 from usaf.correlation.rules import (
+    BootIntegrityFailure,
     DataExfilSurface,
     DefenseEvasionIndicators,
+    DNSHijacking,
     ExposedVulnerableService,
     SSHBruteForceSurface,
     SuidArmingChain,
+    SupplyChainAttack,
     SuspiciousPersistence,
     UnauthorizedService,
 )
@@ -77,6 +80,9 @@ class ScanRunner:
         engine.register(SuidArmingChain())
         engine.register(DefenseEvasionIndicators())
         engine.register(ExposedVulnerableService())
+        engine.register(SupplyChainAttack())
+        engine.register(BootIntegrityFailure())
+        engine.register(DNSHijacking())
         return engine
 
     def _setup_collectors(self) -> None:
@@ -224,13 +230,12 @@ class ScanRunner:
                     )
 
         # Phase 3.5: Correlation — cross-check analysis
-        if self.config.general.cache:
-            all_findings = [f for r in results for f in r.findings]
-            correlated = self.correlation_engine.evaluate(all_findings)
-            if correlated:
-                self._inject_correlated_findings(results, correlated)
-                if verbose:
-                    print(f"  -> Correlation produced {len(correlated)} synthetic finding(s)")
+        all_findings = [f for r in results for f in r.findings]
+        correlated = self.correlation_engine.evaluate(all_findings)
+        if correlated:
+            self._inject_correlated_findings(results, correlated)
+            if verbose:
+                print(f"  -> Correlation produced {len(correlated)} synthetic finding(s)")
 
         # Phase 3.75: Context-aware severity adjustment
         all_findings = [f for r in results for f in r.findings]

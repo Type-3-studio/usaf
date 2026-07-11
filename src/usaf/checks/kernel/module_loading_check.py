@@ -10,7 +10,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 
 @register_check
 class KernelModuleLoadingCheck(AuditCheck):
-    id = "KRN-001"
+    id = "KERN-401"
     name = "Kernel Module Loading Restrictions"
     category = CheckCategory.KERNEL
     severity = Severity.MEDIUM

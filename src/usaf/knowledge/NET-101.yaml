@@ -1,4 +1,4 @@
-id: NET-001
+id: NET-101
 title: Unexpected Listening Ports
 threat: Unauthorized services listening on network ports expand the attack surface and may indicate backdoors, rogue applications, or misconfigured legitimate services.
 exploit: "An attacker deploys a reverse shell listening on a high port (>1024). Since the port is unexpected, it bypasses monitoring. The attacker connects from a remote host and maintains persistent access."
@@ -18,8 +18,8 @@ known_exceptions:
   - "Container host-port mappings"
   - "Development environments with extra services"
 related_findings:
-  - "NET-002"
-  - "PRM-001"
+  - "NET-201"
+  - "PRM-101"
 severity_override: null
 tags:
   - "network"

@@ -28,8 +28,8 @@ class TestPipelineErrorHandling:
         collector_registry.discover()
         check_ids = registry.get_all_ids()
         collector_names = collector_registry.get_all_names()
-        assert len(collector_names) == 15
-        assert len(check_ids) == 25
+        assert len(collector_names) == 22
+        assert len(check_ids) == 47
 
     @pytest.mark.slow
     @SKIP_LINUX
@@ -40,7 +40,7 @@ class TestPipelineErrorHandling:
             runner = ScanRunner()
             result = runner.run()
         assert isinstance(result, ScanResult)
-        assert result.metadata.collector_count == 15
+        assert result.metadata.collector_count == 22
 
     @pytest.mark.slow
     @SKIP_LINUX
@@ -63,7 +63,7 @@ class TestPipelineErrorHandling:
             runner.config.general.max_workers = 4
             result = runner.run()
         assert isinstance(result, ScanResult)
-        assert result.metadata.collector_count == 15
+        assert result.metadata.collector_count == 22
 
     @pytest.mark.slow
     @SKIP_LINUX
@@ -102,22 +102,22 @@ class TestPipelineCheckFiltering:
     @SKIP_LINUX
     def test_disabled_check_not_executed(self, tmp_path):
         config_file = tmp_path / "usaf.yaml"
-        config_file.write_text("general:\n  scan_name: filtered-test\n  parallel: false\nplugins:\n  enabled: ['*']\n  disabled: ['SSH-001', 'SSH-002']\nignore: []\nsuid_allowlist: []\n")
+        config_file.write_text("general:\n  scan_name: filtered-test\n  parallel: false\nplugins:\n  enabled: ['*']\n  disabled: ['SSH-101', 'SSH-102']\nignore: []\nsuid_allowlist: []\n")
         with patch("subprocess.run") as mock_run:
             mock_run.return_value.stdout = ""
             mock_run.return_value.returncode = 0
             runner = ScanRunner(str(config_file))
             result = runner.run()
         check_ids = {r.check_id for r in result.results}
-        assert "SSH-001" not in check_ids
-        assert "SSH-002" not in check_ids
-        assert "KERN-001" in check_ids
+        assert "SSH-101" not in check_ids
+        assert "SSH-102" not in check_ids
+        assert "KERN-101" in check_ids
 
     @pytest.mark.slow
     @SKIP_LINUX
     def test_ignore_pattern_filters_findings(self, tmp_path):
         config_file = tmp_path / "usaf.yaml"
-        config_file.write_text("general:\n  scan_name: ignore-test\n  parallel: false\nplugins:\n  enabled: ['*']\n  disabled: []\nignore: ['KERN-002-*']\nsuid_allowlist: []\n")
+        config_file.write_text("general:\n  scan_name: ignore-test\n  parallel: false\nplugins:\n  enabled: ['*']\n  disabled: []\nignore: ['KERN-201-*']\nsuid_allowlist: []\n")
         with patch("subprocess.run") as mock_run:
             mock_run.return_value.stdout = ""
             mock_run.return_value.returncode = 0
@@ -125,7 +125,7 @@ class TestPipelineCheckFiltering:
             result = runner.run()
         for r in result.results:
             for f in r.findings:
-                assert not f.id.startswith("KERN-002-")
+                assert not f.id.startswith("KERN-201-")
 
 
 class TestPipelineScoreConsistency:

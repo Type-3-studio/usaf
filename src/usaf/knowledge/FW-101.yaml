@@ -1,4 +1,4 @@
-id: FIREWALL-001
+id: FW-101
 title: Firewall Inactive or Not Installed
 threat: Without an active firewall, every network service listening on the system is exposed to potential attackers on the network, including adjacent compromised hosts.
 exploit: "An attacker on the same network scans for open ports, finds an unpatched Samba or Redis service exposed due to the missing firewall, and exploits a known CVE to gain initial access."
@@ -20,7 +20,7 @@ known_exceptions:
   - "Containers/VMs behind a network firewall may intentionally disable host-based firewalls"
   - "Air-gapped systems with no network connectivity"
 related_findings:
-  - "NET-001"
+  - "NET-101"
 severity_override: null
 tags:
   - "firewall"

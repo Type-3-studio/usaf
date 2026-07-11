@@ -10,7 +10,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 
 @register_check
 class InsecureServicesCheck(AuditCheck):
-    id = "SVC-001"
+    id = "SVC-101"
     name = "Legacy Insecure Services"
     category = CheckCategory.SERVICES
     severity = Severity.HIGH

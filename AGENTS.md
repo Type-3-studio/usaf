@@ -16,7 +16,7 @@ uv pip install -e ".[dev]"
 usaf scan
 
 # Run specific checks
-usaf scan --checks SSH-001 KERN-001
+usaf scan --checks SSH-101 KERN-101
 
 # Output as JSON
 usaf scan --format json
@@ -78,7 +78,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 
 @register_check
 class MyNewCheck(AuditCheck):
-    id = "MYC-001"
+    id = "MYC-101"          # Use sub-ranged ID: 100-level for first sub-category
     name = "My Security Check"
     category = CheckCategory.SECURITY
     severity = Severity.MEDIUM
@@ -122,10 +122,35 @@ class MyNewCheck(AuditCheck):
 from usaf.checks.system import my_check
 ```
 
+### Check ID Numbering Scheme
+
+All check IDs use sub-ranged format `<PREFIX>-<SUBRANGE><SEQ>`. Each prefix has reserved 100-level blocks:
+
+| Prefix | Range | Sub-ranges | Example |
+|--------|-------|------------|---------|
+| SSH | 100–999 | 100=Auth, 200=Algorithms, 300=Keys, 400=Logging, 500=Network, 600=Compliance | SSH-101 |
+| KERN | 100–999 | 100=Memory, 200=Pointers, 300=Core dumps, 400=Modules/BPF | KERN-101 |
+| USR | 100–999 | 100=Account integrity, 200=Weak creds, 300=Policy, 400=Privilege, 500=SSH keys | USR-101 |
+| NET | 100–999 | 100=Ports, 200=Interfaces, 300=DNS, 400=Kernel net, 500=Wireless, 600=TLS/Certs | NET-101 |
+| PKG | 100–999 | 100=Unnecessary, 200=Integrity, 300=Repos, 400=CVEs, 500=Held | PKG-101 |
+| FS | 100–999 | 100=File integrity, 200=Hidden/orphan, 300=Mounts, 400=Symlinks, 500=Capabilities | FS-101 |
+| BOOT | 100–999 | 100=Secure Boot, 200=Lockdown, 300=EFI, 400=GRUB, 500=Kernel images | BOOT-101 |
+| SVC | 100–999 | 100=Enabled, 200=Security, 300=Listening, 400=Failed, 500=Modified | SVC-101 |
+| PER | 100–999 | 100=Cron, 200=Systemd, 300=Shell init, 400=LD injection, 500=Kernel, 600=Network, 700=Hooks | PER-201 |
+| CTN | 100–999 | 100=Socket, 200=Privileges, 300=Security, 400=Images, 500=Runtime, 600=LXC | CTN-101 |
+| LOG | 100–999 | 100=Journal, 200=Rotation, 300=Tamper, 400=Auth fail, 500=Auditd | LOG-101 |
+| SECR | 100–999 | 100=Cloud creds, 200=Code secrets, 300=Crypto keys, 400=DB/API, 500=Certs | SECR-101 |
+| FW | 100–999 | 100=Status, 200=Rules, 300=Defaults, 400=Logging | FW-101 |
+| CMP | 100–999 | 100=Version, 200=CIS, 300=STIG, 400=Regulatory, 500=Custom | CMP-101 |
+| COM | 100–999 | 100=Processes, 200=Network IOC, 300=Filesystem IOC | COM-101 |
+| PRM | 100–999 | 100=SUID, 200=World-writable, 300=Capabilities, 400=Ownership | PRM-101 |
+
+Always use the correct sub-range for new checks. See `STATE.md` for the full ID map.
+
 ### Step 3: Run it
 
 ```bash
-usaf scan --checks MYC-001
+usaf scan --checks MYC-101
 ```
 
 ## How to Add a New Collector
@@ -165,7 +190,7 @@ Then register it in `ScanRunner._setup_collectors()` in `src/usaf/core/runner.py
 ## Key Principles
 
 ### Findings Must Be:
-- **ID'd**: Unique, check-specific ID (e.g., `SSH-001-001`)
+- **ID'd**: Unique, check-specific ID (e.g., `SSH-101-001`)
 - **Evidenced**: Include the actual bad line/permission/process
 - **Justified**: Explain the threat model and exploit scenario
 - **Remediated**: Provide exact commands to fix
@@ -252,7 +277,7 @@ Start with `src/usaf/checks/` — find the check by ID or category. Every check:
 ### Debugging
 ```bash
 usaf scan --verbose           # See progress and collector output
-usaf scan --checks SSH-001    # Run one check in isolation
+usaf scan --checks SSH-101    # Run one check in isolation
 usaf scan --format json       # Structured output for inspection
 ```
 

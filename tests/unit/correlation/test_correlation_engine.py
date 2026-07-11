@@ -77,10 +77,10 @@ class TestCorrelationEngine:
             rationale="Test rationale",
             remediation="Test remediation",
             source="TestSource",
-            source_findings=["SSH-001-001", "NET-001-001"],
+            source_findings=["SSH-101-001", "NET-101-001"],
             correlation_rule="SSH-BRUTE",
         )
-        assert cf.source_findings == ["SSH-001-001", "NET-001-001"]
+        assert cf.source_findings == ["SSH-101-001", "NET-101-001"]
         assert cf.correlation_rule == "SSH-BRUTE"
 
     def test_rule_with_no_matches_returns_empty(self):
@@ -93,8 +93,8 @@ class TestCorrelationEngine:
         engine = CorrelationEngine()
         engine.register(_TestRuleNetworkMatch())
         findings = [
-            _make_finding_with_network("NET-001-001", "SSH port", Severity.MEDIUM, 22),
-            _make_finding("SSH-001-001", "root login", Severity.HIGH),
+            _make_finding_with_network("NET-101-001", "SSH port", Severity.MEDIUM, 22),
+            _make_finding("SSH-101-001", "root login", Severity.HIGH),
         ]
         result = engine.evaluate(findings)
         assert len(result) == 1

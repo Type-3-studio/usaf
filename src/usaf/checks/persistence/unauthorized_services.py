@@ -8,7 +8,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 
 @register_check
 class UnauthorizedServicesCheck(AuditCheck):
-    id = "PER-001"
+    id = "PER-201"
     name = "Suspicious Systemd Services"
     category = CheckCategory.PERSISTENCE
     severity = Severity.HIGH

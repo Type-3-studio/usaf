@@ -1,4 +1,4 @@
-id: USR-001
+id: USR-101
 title: Duplicate UID 0 Accounts
 threat: Any account with UID 0 has full root privileges. Duplicate UID 0 accounts bypass audit controls — actions attributed to the secondary account cannot be easily traced to the actual user.
 exploit: "An attacker who compromises a service account with UID 0 gains root-equivalent access immediately. Unlike 'root', this account may not trigger the same monitoring alerts or login notifications."
@@ -17,8 +17,8 @@ known_exceptions:
   - "Containers may share host UID namespace"
   - "Some LDAP/NIS setups may show remote UID 0 users"
 related_findings:
-  - "USR-002"
-  - "USR-003"
+  - "USR-201"
+  - "USR-102"
 severity_override: null
 tags:
   - "users"

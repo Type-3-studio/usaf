@@ -12,7 +12,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 class USBGuardCheck(AuditCheck):
     """Check that USB storage is restricted."""
 
-    id = "USB-001"
+    id = "USB-101"
     name = "USB Storage Restriction"
     category = CheckCategory.SECURITY
     severity = Severity.MEDIUM

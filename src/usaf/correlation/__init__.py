@@ -4,18 +4,30 @@ from usaf.correlation.engine import (
     CorrelationRule,
 )
 from usaf.correlation.rules import (
+    BootIntegrityFailure,
     DataExfilSurface,
+    DefenseEvasionIndicators,
+    DNSHijacking,
+    ExposedVulnerableService,
     SSHBruteForceSurface,
+    SuidArmingChain,
+    SupplyChainAttack,
     SuspiciousPersistence,
     UnauthorizedService,
 )
 
 __all__ = [
+    "BootIntegrityFailure",
+    "CorrelatedFinding",
     "CorrelationEngine",
     "CorrelationRule",
-    "CorrelatedFinding",
+    "DataExfilSurface",
+    "DefenseEvasionIndicators",
+    "DNSHijacking",
+    "ExposedVulnerableService",
     "SSHBruteForceSurface",
+    "SuidArmingChain",
+    "SupplyChainAttack",
     "SuspiciousPersistence",
     "UnauthorizedService",
-    "DataExfilSurface",
 ]

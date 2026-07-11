@@ -1,4 +1,4 @@
-id: NET-002
+id: NET-201
 title: Promiscuous Mode Network Interface
 threat: Network interfaces in promiscuous mode capture all network traffic on the segment, not just traffic addressed to the host. This is a primary indicator of packet sniffing.
 exploit: "An attacker with root access enables promiscuous mode on eth0, then runs tcpdump or a custom sniffer to capture unencrypted traffic — including internal DNS queries, NFS traffic, HTTP cookies, and database connections."
@@ -19,8 +19,8 @@ known_exceptions:
   - "DHCP clients and network bridges"
   - "Virtualization hosts (bridged networking)"
 related_findings:
-  - "NET-001"
-  - "PRM-002"
+  - "NET-101"
+  - "PRM-201"
 severity_override: null
 tags:
   - "network"

@@ -1,4 +1,4 @@
-id: PER-001
+id: PER-201
 title: Suspicious Systemd Services
 threat: Attackers frequently create systemd services to maintain persistence after initial compromise. Suspicious service names or descriptions are strong indicators of malicious activity.
 exploit: "An attacker gains initial access via a vulnerable web application, drops a reverse shell script, and registers it as a systemd service with an innocuous name. The service restarts the reverse shell on boot, maintaining persistent access."
@@ -20,8 +20,8 @@ known_exceptions:
   - "Development environments with intentionally installed backdoor-like services"
   - "Container images with pre-installed management agents"
 related_findings:
-  - "COM-001"
-  - "SVC-001"
+  - "COM-101"
+  - "SVC-101"
 severity_override: null
 tags:
   - "persistence"

@@ -12,7 +12,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 class PasswordPolicyCheck(AuditCheck):
     """Check that password policy enforces minimum strength requirements."""
 
-    id = "PWD-001"
+    id = "PWD-101"
     name = "Password Policy Strength"
     category = CheckCategory.AUTHENTICATION
     severity = Severity.HIGH

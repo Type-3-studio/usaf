@@ -1,4 +1,4 @@
-id: SEC-001
+id: SEC-101
 title: AppArmor Status
 threat: Without AppArmor (or another MAC system), compromised applications have full access to user files and system resources. AppArmor confines applications to only the resources they need.
 exploit: "An attacker exploits a buffer overflow in a network-facing application like nginx or cups. Without AppArmor, the exploited process has the full privileges of its user. With AppArmor, the exploit is contained to the profile's allowed resources."
@@ -20,8 +20,8 @@ known_exceptions:
   - "Some kernel configurations may not include AppArmor LSM support"
   - "SELinux systems (CentOS/RHEL) use a different MAC system"
 related_findings:
-  - "KERN-001"
-  - "KERN-002"
+  - "KERN-101"
+  - "KERN-201"
 severity_override: null
 tags:
   - "security"

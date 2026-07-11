@@ -8,7 +8,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 
 @register_check
 class UbuntuVersionCheck(AuditCheck):
-    id = "CMP-001"
+    id = "CMP-101"
     name = "Ubuntu Version Support Status"
     category = CheckCategory.COMPLIANCE
     severity = Severity.MEDIUM

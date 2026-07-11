@@ -10,7 +10,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 
 @register_check
 class DockerSocketCheck(AuditCheck):
-    id = "CTN-001"
+    id = "CTN-101"
     name = "Docker Socket Permissions"
     category = CheckCategory.CONTAINERS
     severity = Severity.HIGH

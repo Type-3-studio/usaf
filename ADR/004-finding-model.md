@@ -12,7 +12,7 @@ Security findings must be structured, actionable, and include evidence. Plain st
 
 ```python
 class Finding(BaseModel):
-    id: str                              # Unique ID (e.g., "SSH-001-001")
+    id: str                              # Unique ID (e.g., "SSH-101-001")
     check_id: str                        # Parent check ID
     category: CheckCategory
     severity: Severity                   # CRITICAL, HIGH, MEDIUM, LOW, INFO

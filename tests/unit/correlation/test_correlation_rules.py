@@ -23,14 +23,14 @@ class TestSSHBruteForceSurface:
 
     def test_no_ssh_findings_returns_empty(self):
         rule = SSHBruteForceSurface()
-        findings = [_make_finding("KERN-001-001", "kernel", Severity.MEDIUM)]
+        findings = [_make_finding("KERN-101-001", "kernel", Severity.MEDIUM)]
         result = rule.evaluate(findings)
         assert result == []
 
     def test_no_network_exposure_returns_empty(self):
         rule = SSHBruteForceSurface()
         findings = [
-            _make_finding("SSH-001-001", "protocol", Severity.HIGH),
+            _make_finding("SSH-101-001", "protocol", Severity.HIGH),
         ]
         result = rule.evaluate(findings)
         assert result == []
@@ -38,9 +38,9 @@ class TestSSHBruteForceSurface:
     def test_ssh_and_network_produces_finding(self):
         rule = SSHBruteForceSurface()
         findings = [
-            _make_finding("SSH-001-001", "Protocol version 1 detected", Severity.HIGH),
-            _make_finding("SSH-002-001", "Root SSH login is permitted", Severity.HIGH),
-            _make_finding_with_port("NET-001-001", "ssh port", Severity.MEDIUM, 22),
+            _make_finding("SSH-101-001", "Protocol version 1 detected", Severity.HIGH),
+            _make_finding("SSH-102-001", "Root SSH login is permitted", Severity.HIGH),
+            _make_finding_with_port("NET-101-001", "ssh port", Severity.MEDIUM, 22),
         ]
         result = rule.evaluate(findings)
         assert len(result) == 1
@@ -50,8 +50,8 @@ class TestSSHBruteForceSurface:
     def test_root_login_triggers_correlation(self):
         rule = SSHBruteForceSurface()
         findings = [
-            _make_finding("SSH-002-001", "Root SSH login is not disabled", Severity.HIGH),
-            _make_finding_with_port("NET-001-001", "ssh port", Severity.MEDIUM, 22),
+            _make_finding("SSH-102-001", "Root SSH login is not disabled", Severity.HIGH),
+            _make_finding_with_port("NET-101-001", "ssh port", Severity.MEDIUM, 22),
         ]
         result = rule.evaluate(findings)
         assert len(result) == 1
@@ -59,8 +59,8 @@ class TestSSHBruteForceSurface:
     def test_mitre_mapping_present(self):
         rule = SSHBruteForceSurface()
         findings = [
-            _make_finding("SSH-001-001", "Weak protocol version allowed", Severity.HIGH),
-            _make_finding_with_port("NET-001-001", "ssh port", Severity.MEDIUM, 22),
+            _make_finding("SSH-101-001", "Weak protocol version allowed", Severity.HIGH),
+            _make_finding_with_port("NET-101-001", "ssh port", Severity.MEDIUM, 22),
         ]
         result = rule.evaluate(findings)
         assert len(result[0].mitre_attack_ids) > 0
@@ -69,8 +69,8 @@ class TestSSHBruteForceSurface:
     def test_cis_mapping_present(self):
         rule = SSHBruteForceSurface()
         findings = [
-            _make_finding("SSH-001-001", "Protocol version contains security issue", Severity.HIGH),
-            _make_finding_with_port("NET-001-001", "ssh port", Severity.MEDIUM, 22),
+            _make_finding("SSH-101-001", "Protocol version contains security issue", Severity.HIGH),
+            _make_finding_with_port("NET-101-001", "ssh port", Severity.MEDIUM, 22),
         ]
         result = rule.evaluate(findings)
         assert len(result[0].cis_benchmarks) > 0
@@ -85,9 +85,9 @@ class TestSuspiciousPersistence:
     def test_user_anomaly_and_unknown_service_triggers(self):
         rule = SuspiciousPersistence()
         findings = [
-            _make_finding("USR-001-001", "duplicate uid", Severity.CRITICAL),
-            _make_finding("PRM-001-001", "unknown_suid", Severity.HIGH),
-            _make_finding("PRM-001-002", "another_suid", Severity.HIGH),
+            _make_finding("USR-101-001", "duplicate uid", Severity.CRITICAL),
+            _make_finding("PRM-101-001", "unknown_suid", Severity.HIGH),
+            _make_finding("PRM-101-002", "another_suid", Severity.HIGH),
         ]
         result = rule.evaluate(findings)
         assert len(result) == 1
@@ -96,10 +96,10 @@ class TestSuspiciousPersistence:
     def test_suid_backdoor_triggers(self):
         rule = SuspiciousPersistence()
         findings = [
-            _make_finding("USR-001-001", "duplicate uid", Severity.CRITICAL),
-            _make_finding("PRM-001-001", "suid1", Severity.HIGH),
-            _make_finding("PRM-001-002", "suid2", Severity.HIGH),
-            _make_finding("PRM-001-003", "suid3", Severity.HIGH),
+            _make_finding("USR-101-001", "duplicate uid", Severity.CRITICAL),
+            _make_finding("PRM-101-001", "suid1", Severity.HIGH),
+            _make_finding("PRM-101-002", "suid2", Severity.HIGH),
+            _make_finding("PRM-101-003", "suid3", Severity.HIGH),
         ]
         result = rule.evaluate(findings)
         assert len(result) == 1
@@ -107,9 +107,9 @@ class TestSuspiciousPersistence:
     def test_mitre_mapping_present(self):
         rule = SuspiciousPersistence()
         findings = [
-            _make_finding("USR-001-001", "duplicate uid", Severity.CRITICAL),
-            _make_finding("PRM-001-001", "suid1", Severity.HIGH),
-            _make_finding("PRM-001-002", "suid2", Severity.HIGH),
+            _make_finding("USR-101-001", "duplicate uid", Severity.CRITICAL),
+            _make_finding("PRM-101-001", "suid1", Severity.HIGH),
+            _make_finding("PRM-101-002", "suid2", Severity.HIGH),
         ]
         result = rule.evaluate(findings)
         assert len(result[0].mitre_attack_ids) > 0
@@ -117,9 +117,9 @@ class TestSuspiciousPersistence:
     def test_source_findings_are_tracked(self):
         rule = SuspiciousPersistence()
         findings = [
-            _make_finding("USR-002-001", "empty password", Severity.CRITICAL),
-            _make_finding("PRM-001-001", "suid1", Severity.HIGH),
-            _make_finding("PRM-001-002", "suid2", Severity.HIGH),
+            _make_finding("USR-201-001", "empty password", Severity.CRITICAL),
+            _make_finding("PRM-101-001", "suid1", Severity.HIGH),
+            _make_finding("PRM-101-002", "suid2", Severity.HIGH),
         ]
         result = rule.evaluate(findings)
         assert len(result[0].source_findings) >= 2
@@ -134,7 +134,7 @@ class TestUnauthorizedService:
     def test_unexpected_port_triggers(self):
         rule = UnauthorizedService()
         findings = [
-            _make_finding_with_port("NET-001-001", "unexpected", Severity.MEDIUM, 4444),
+            _make_finding_with_port("NET-101-001", "unexpected", Severity.MEDIUM, 4444),
         ]
         result = rule.evaluate(findings)
         assert len(result) == 1
@@ -142,7 +142,7 @@ class TestUnauthorizedService:
     def test_expected_ports_do_not_trigger(self):
         rule = UnauthorizedService()
         findings = [
-            _make_finding_with_port("NET-001-001", "ssh", Severity.MEDIUM, 22),
+            _make_finding_with_port("NET-101-001", "ssh", Severity.MEDIUM, 22),
         ]
         result = rule.evaluate(findings)
         assert result == []
@@ -150,7 +150,7 @@ class TestUnauthorizedService:
     def test_mitre_mapping_present(self):
         rule = UnauthorizedService()
         findings = [
-            _make_finding_with_port("NET-001-001", "unexpected", Severity.MEDIUM, 9999),
+            _make_finding_with_port("NET-101-001", "unexpected", Severity.MEDIUM, 9999),
         ]
         result = rule.evaluate(findings)
         assert len(result[0].mitre_attack_ids) > 0
@@ -158,7 +158,7 @@ class TestUnauthorizedService:
     def test_port_detail_in_description(self):
         rule = UnauthorizedService()
         findings = [
-            _make_finding_with_port("NET-001-001", "unexpected", Severity.MEDIUM, 8080),
+            _make_finding_with_port("NET-101-001", "unexpected", Severity.MEDIUM, 8080),
         ]
         result = rule.evaluate(findings)
         assert "8080" in result[0].description
@@ -173,10 +173,10 @@ class TestDataExfilSurface:
     def test_promiscuous_and_ports_triggers(self):
         rule = DataExfilSurface()
         findings = [
-            _make_finding_with_promiscuous("NET-002-001", "promiscuous", Severity.MEDIUM),
-            _make_finding_with_port("NET-001-001", "unexpected", Severity.MEDIUM, 4444),
-            _make_finding_with_port("NET-001-002", "unexpected", Severity.MEDIUM, 5555),
-            _make_finding("PRM-001-001", "suid", Severity.HIGH),
+            _make_finding_with_promiscuous("NET-201-001", "promiscuous", Severity.MEDIUM),
+            _make_finding_with_port("NET-101-001", "unexpected", Severity.MEDIUM, 4444),
+            _make_finding_with_port("NET-101-002", "unexpected", Severity.MEDIUM, 5555),
+            _make_finding("PRM-101-001", "suid", Severity.HIGH),
         ]
         result = rule.evaluate(findings)
         assert len(result) == 1
@@ -184,7 +184,7 @@ class TestDataExfilSurface:
     def test_promiscuous_alone_triggers(self):
         rule = DataExfilSurface()
         findings = [
-            _make_finding_with_promiscuous("NET-002-001", "promiscuous", Severity.MEDIUM),
+            _make_finding_with_promiscuous("NET-201-001", "promiscuous", Severity.MEDIUM),
         ]
         result = rule.evaluate(findings)
         assert len(result) == 1
@@ -192,7 +192,7 @@ class TestDataExfilSurface:
     def test_mitre_mapping_present(self):
         rule = DataExfilSurface()
         findings = [
-            _make_finding_with_promiscuous("NET-002-001", "promiscuous", Severity.MEDIUM),
+            _make_finding_with_promiscuous("NET-201-001", "promiscuous", Severity.MEDIUM),
         ]
         result = rule.evaluate(findings)
         assert len(result[0].mitre_attack_ids) > 0
@@ -200,7 +200,7 @@ class TestDataExfilSurface:
     def test_sniffing_keyword_in_title(self):
         rule = DataExfilSurface()
         findings = [
-            _make_finding_with_promiscuous("NET-002-001", "promiscuous", Severity.MEDIUM),
+            _make_finding_with_promiscuous("NET-201-001", "promiscuous", Severity.MEDIUM),
         ]
         result = rule.evaluate(findings)
         assert "sniffing" in result[0].title.lower()
@@ -215,7 +215,7 @@ class TestSuidArmingChain:
     def test_no_suid_findings_returns_empty(self):
         rule = SuidArmingChain()
         findings = [
-            _make_finding_with_ww_file("PRM-002-001", "ww", Severity.HIGH, "/etc/shadow"),
+            _make_finding_with_ww_file("PRM-201-001", "ww", Severity.HIGH, "/etc/shadow"),
         ]
         result = rule.evaluate(findings)
         assert result == []
@@ -223,8 +223,8 @@ class TestSuidArmingChain:
     def test_both_required_for_correlation(self):
         rule = SuidArmingChain()
         findings = [
-            _make_finding_with_ww_file("PRM-002-001", "ww", Severity.HIGH, "/etc/shadow"),
-            _make_finding("PRM-001-001", "suid binary", Severity.HIGH),
+            _make_finding_with_ww_file("PRM-201-001", "ww", Severity.HIGH, "/etc/shadow"),
+            _make_finding("PRM-101-001", "suid binary", Severity.HIGH),
         ]
         result = rule.evaluate(findings)
         assert len(result) == 1
@@ -233,8 +233,8 @@ class TestSuidArmingChain:
     def test_mitre_mapping_present(self):
         rule = SuidArmingChain()
         findings = [
-            _make_finding_with_ww_file("PRM-002-001", "ww", Severity.HIGH, "/etc/passwd"),
-            _make_finding("PRM-001-001", "suid", Severity.HIGH),
+            _make_finding_with_ww_file("PRM-201-001", "ww", Severity.HIGH, "/etc/passwd"),
+            _make_finding("PRM-101-001", "suid", Severity.HIGH),
         ]
         result = rule.evaluate(findings)
         assert "T1548.001" in result[0].mitre_attack_ids
@@ -242,8 +242,8 @@ class TestSuidArmingChain:
     def test_ww_paths_in_description(self):
         rule = SuidArmingChain()
         findings = [
-            _make_finding_with_ww_file("PRM-002-001", "ww", Severity.HIGH, "/etc/shadow"),
-            _make_finding("PRM-001-001", "suid", Severity.HIGH),
+            _make_finding_with_ww_file("PRM-201-001", "ww", Severity.HIGH, "/etc/shadow"),
+            _make_finding("PRM-101-001", "suid", Severity.HIGH),
         ]
         result = rule.evaluate(findings)
         assert "/etc/shadow" in result[0].description
@@ -258,7 +258,7 @@ class TestDefenseEvasionIndicators:
     def test_single_control_does_not_trigger(self):
         rule = DefenseEvasionIndicators()
         findings = [
-            _make_finding("FIREWALL-001-001", "firewall inactive", Severity.HIGH),
+            _make_finding("FW-101-001", "firewall inactive", Severity.HIGH),
         ]
         result = rule.evaluate(findings)
         assert result == []
@@ -266,8 +266,8 @@ class TestDefenseEvasionIndicators:
     def test_two_disabled_controls_triggers(self):
         rule = DefenseEvasionIndicators()
         findings = [
-            _make_finding("FIREWALL-001-001", "firewall inactive", Severity.HIGH),
-            _make_finding("FOR-001-001", "auditd disabled", Severity.MEDIUM),
+            _make_finding("FW-101-001", "firewall inactive", Severity.HIGH),
+            _make_finding("FOR-101-001", "auditd disabled", Severity.MEDIUM),
         ]
         result = rule.evaluate(findings)
         assert len(result) == 1
@@ -276,10 +276,10 @@ class TestDefenseEvasionIndicators:
     def test_all_four_disabled_triggers(self):
         rule = DefenseEvasionIndicators()
         findings = [
-            _make_finding("FIREWALL-001-001", "fw", Severity.HIGH),
-            _make_finding("FOR-001-001", "auditd", Severity.MEDIUM),
-            _make_finding("SEC-001-001", "apparmor", Severity.HIGH),
-            _make_finding("USB-001-001", "usb", Severity.MEDIUM),
+            _make_finding("FW-101-001", "fw", Severity.HIGH),
+            _make_finding("FOR-101-001", "auditd", Severity.MEDIUM),
+            _make_finding("SEC-101-001", "apparmor", Severity.HIGH),
+            _make_finding("USB-101-001", "usb", Severity.MEDIUM),
         ]
         result = rule.evaluate(findings)
         assert len(result) == 1
@@ -288,8 +288,8 @@ class TestDefenseEvasionIndicators:
     def test_mitre_mapping_present(self):
         rule = DefenseEvasionIndicators()
         findings = [
-            _make_finding("FIREWALL-001-001", "fw", Severity.HIGH),
-            _make_finding("FOR-001-001", "auditd", Severity.MEDIUM),
+            _make_finding("FW-101-001", "fw", Severity.HIGH),
+            _make_finding("FOR-101-001", "auditd", Severity.MEDIUM),
         ]
         result = rule.evaluate(findings)
         assert "T1562.001" in result[0].mitre_attack_ids
@@ -304,7 +304,7 @@ class TestExposedVulnerableService:
     def test_no_listening_ports_returns_empty(self):
         rule = ExposedVulnerableService()
         findings = [
-            _make_finding_with_package("PKG-001-001", "cups", Severity.MEDIUM, "cups"),
+            _make_finding_with_package("PKG-101-001", "cups", Severity.MEDIUM, "cups"),
         ]
         result = rule.evaluate(findings)
         assert result == []
@@ -312,8 +312,8 @@ class TestExposedVulnerableService:
     def test_cups_on_port_631_triggers(self):
         rule = ExposedVulnerableService()
         findings = [
-            _make_finding_with_package("PKG-001-001", "cups installed", Severity.MEDIUM, "cups"),
-            _make_finding_with_port("NET-001-001", "ipp", Severity.MEDIUM, 631),
+            _make_finding_with_package("PKG-101-001", "cups installed", Severity.MEDIUM, "cups"),
+            _make_finding_with_port("NET-101-001", "ipp", Severity.MEDIUM, 631),
         ]
         result = rule.evaluate(findings)
         assert len(result) == 1
@@ -323,8 +323,8 @@ class TestExposedVulnerableService:
     def test_samba_on_port_445_triggers(self):
         rule = ExposedVulnerableService()
         findings = [
-            _make_finding_with_package("PKG-001-001", "samba installed", Severity.MEDIUM, "samba"),
-            _make_finding_with_port("NET-001-001", "smb", Severity.MEDIUM, 445),
+            _make_finding_with_package("PKG-101-001", "samba installed", Severity.MEDIUM, "samba"),
+            _make_finding_with_port("NET-101-001", "smb", Severity.MEDIUM, 445),
         ]
         result = rule.evaluate(findings)
         assert len(result) == 1
@@ -333,8 +333,8 @@ class TestExposedVulnerableService:
     def test_irrelevant_port_does_not_trigger(self):
         rule = ExposedVulnerableService()
         findings = [
-            _make_finding_with_package("PKG-001-001", "cups installed", Severity.MEDIUM, "cups"),
-            _make_finding_with_port("NET-001-001", "ssh", Severity.MEDIUM, 22),
+            _make_finding_with_package("PKG-101-001", "cups installed", Severity.MEDIUM, "cups"),
+            _make_finding_with_port("NET-101-001", "ssh", Severity.MEDIUM, 22),
         ]
         result = rule.evaluate(findings)
         assert result == []
@@ -342,10 +342,10 @@ class TestExposedVulnerableService:
     def test_multiple_exposed_services(self):
         rule = ExposedVulnerableService()
         findings = [
-            _make_finding_with_package("PKG-001-001", "cups installed", Severity.MEDIUM, "cups"),
-            _make_finding_with_package("PKG-001-002", "samba installed", Severity.MEDIUM, "samba"),
-            _make_finding_with_port("NET-001-001", "ipp", Severity.MEDIUM, 631),
-            _make_finding_with_port("NET-001-002", "smb", Severity.MEDIUM, 445),
+            _make_finding_with_package("PKG-101-001", "cups installed", Severity.MEDIUM, "cups"),
+            _make_finding_with_package("PKG-101-002", "samba installed", Severity.MEDIUM, "samba"),
+            _make_finding_with_port("NET-101-001", "ipp", Severity.MEDIUM, 631),
+            _make_finding_with_port("NET-101-002", "smb", Severity.MEDIUM, 445),
         ]
         result = rule.evaluate(findings)
         assert len(result) == 1
@@ -355,8 +355,8 @@ class TestExposedVulnerableService:
     def test_mitre_mapping_present(self):
         rule = ExposedVulnerableService()
         findings = [
-            _make_finding_with_package("PKG-001-001", "cups installed", Severity.MEDIUM, "cups"),
-            _make_finding_with_port("NET-001-001", "ipp", Severity.MEDIUM, 631),
+            _make_finding_with_package("PKG-101-001", "cups installed", Severity.MEDIUM, "cups"),
+            _make_finding_with_port("NET-101-001", "ipp", Severity.MEDIUM, 631),
         ]
         result = rule.evaluate(findings)
         assert "T1190" in result[0].mitre_attack_ids
@@ -371,11 +371,11 @@ class TestCorrelationEngineIntegration:
         engine.register(DataExfilSurface())
 
         findings = [
-            _make_finding("SSH-001-001", "Protocol version allows weak negotiation", Severity.HIGH),
-            _make_finding_with_port("NET-001-001", "ssh port", Severity.MEDIUM, 22),
-            _make_finding("USR-002-001", "empty password", Severity.CRITICAL),
-            _make_finding_with_port("NET-001-002", "unexpected", Severity.MEDIUM, 9999),
-            _make_finding_with_promiscuous("NET-002-001", "promiscuous", Severity.MEDIUM),
+            _make_finding("SSH-101-001", "Protocol version allows weak negotiation", Severity.HIGH),
+            _make_finding_with_port("NET-101-001", "ssh port", Severity.MEDIUM, 22),
+            _make_finding("USR-201-001", "empty password", Severity.CRITICAL),
+            _make_finding_with_port("NET-101-002", "unexpected", Severity.MEDIUM, 9999),
+            _make_finding_with_promiscuous("NET-201-001", "promiscuous", Severity.MEDIUM),
         ]
 
         result = engine.evaluate(findings)

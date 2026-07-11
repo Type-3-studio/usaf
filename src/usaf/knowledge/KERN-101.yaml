@@ -1,4 +1,4 @@
-id: KERN-001
+id: KERN-101
 title: Kernel ASLR Disabled
 threat: Without ASLR, attackers can predict memory addresses of running processes, making buffer overflow and code injection exploits significantly more reliable.
 exploit: "A local attacker exploits a buffer overflow in a SUID binary, knowing the exact location of libc functions because ASLR is disabled (kernel.randomize_va_space=0). This enables ret2libc or ROP chains with near 100% reliability."
@@ -17,8 +17,8 @@ known_exceptions:
   - "Containers inherit kernel ASLR setting, cannot be changed per-container"
   - "Some real-time kernels disable ASLR intentionally for determinism"
 related_findings:
-  - "KERN-002"
-  - "KERN-003"
+  - "KERN-201"
+  - "KERN-301"
 severity_override: null
 tags:
   - "memory-protection"

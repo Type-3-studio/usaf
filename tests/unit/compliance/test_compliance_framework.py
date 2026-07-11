@@ -10,7 +10,7 @@ class TestComplianceFramework:
     def test_get_findings_for_cis(self):
         compliance = ComplianceFramework()
         findings = [
-            _make_finding_with_cis("SSH-001-001", "protocol", Severity.HIGH, ["CIS Ubuntu 22.04: 5.2.2"]),
+            _make_finding_with_cis("SSH-101-001", "protocol", Severity.HIGH, ["CIS Ubuntu 22.04: 5.2.2"]),
         ]
         results = compliance.get_findings_for("cis", findings)
         assert len(results) > 0
@@ -18,7 +18,7 @@ class TestComplianceFramework:
         assert len(matched) == 1
         ctrl = matched[0][1]
         assert ctrl.status == "failed"
-        assert "SSH-001-001" in ctrl.finding_ids
+        assert "SSH-101-001" in ctrl.finding_ids
 
     def test_get_findings_for_cis_no_match(self):
         compliance = ComplianceFramework()
@@ -49,8 +49,8 @@ class TestComplianceFramework:
     def test_get_coverage_with_findings(self):
         compliance = ComplianceFramework()
         findings = [
-            _make_finding_with_cis("SSH-001-001", "protocol", Severity.HIGH, ["CIS Ubuntu 22.04: 5.2.2"]),
-            _make_finding_with_cis("KERN-001-001", "aslr", Severity.HIGH, ["CIS Ubuntu 22.04: 1.5.1"]),
+            _make_finding_with_cis("SSH-101-001", "protocol", Severity.HIGH, ["CIS Ubuntu 22.04: 5.2.2"]),
+            _make_finding_with_cis("KERN-101-001", "aslr", Severity.HIGH, ["CIS Ubuntu 22.04: 1.5.1"]),
         ]
         result = ScanResult(
             metadata=ScanMetadata(hostname="test"),
@@ -76,7 +76,7 @@ class TestComplianceFramework:
     def test_controls_have_remediation_when_failed(self):
         compliance = ComplianceFramework()
         findings = [
-            _make_finding_with_cis("SSH-001-001", "protocol", Severity.HIGH, ["CIS Ubuntu 22.04: 5.2.2"]),
+            _make_finding_with_cis("SSH-101-001", "protocol", Severity.HIGH, ["CIS Ubuntu 22.04: 5.2.2"]),
         ]
         results = compliance.get_findings_for("cis", findings)
         matched = [r for r in results if r[0] == "CIS Ubuntu 22.04: 5.2.2"]

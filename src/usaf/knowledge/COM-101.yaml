@@ -1,4 +1,4 @@
-id: COM-001
+id: COM-101
 title: Known Malicious Process Detection
 threat: Running processes with names matching known malware, coin miners, or C2 implants are strong indicators of active compromise requiring immediate incident response.
 exploit: "An attacker exploits a vulnerable web application, downloads a coin miner binary (e.g., xmrig), and executes it. The miner consumes CPU resources for cryptocurrency mining while potentially exfiltrating data through the mining pool connection."
@@ -21,8 +21,8 @@ known_exceptions:
   - "Honeypot systems designed to attract attackers"
   - "Research environments running malware samples for analysis"
 related_findings:
-  - "PER-001"
-  - "NET-001"
+  - "PER-201"
+  - "NET-101"
 severity_override: null
 tags:
   - "compromise-indicator"

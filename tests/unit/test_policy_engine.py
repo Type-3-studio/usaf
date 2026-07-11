@@ -22,14 +22,14 @@ class TestPolicyModel:
         policy = Policy(
             name="hardened",
             description="Hardened server policy",
-            check_overrides={"SSH-001": {"enabled": True}},
+            check_overrides={"SSH-101": {"enabled": True}},
             ignore_patterns=["/tmp/*"],
-            severity_overrides={"SSH-001": "CRITICAL"},
+            severity_overrides={"SSH-101": "CRITICAL"},
         )
         assert policy.name == "hardened"
-        assert policy.check_overrides["SSH-001"]["enabled"] is True
+        assert policy.check_overrides["SSH-101"]["enabled"] is True
         assert policy.ignore_patterns == ["/tmp/*"]
-        assert policy.severity_overrides["SSH-001"] == "CRITICAL"
+        assert policy.severity_overrides["SSH-101"] == "CRITICAL"
 
 
 class TestPolicyEngine:
@@ -72,20 +72,20 @@ class TestPolicyEngine:
     def test_get_override(self):
         policy = Policy(
             name="test",
-            check_overrides={"SSH-001": {"severity": "LOW"}},
+            check_overrides={"SSH-101": {"severity": "LOW"}},
         )
-        assert PolicyEngine.get_override(policy, "SSH-001", "severity") == "LOW"
-        assert PolicyEngine.get_override(policy, "SSH-001", "nonexistent") is None
+        assert PolicyEngine.get_override(policy, "SSH-101", "severity") == "LOW"
+        assert PolicyEngine.get_override(policy, "SSH-101", "nonexistent") is None
         assert PolicyEngine.get_override(policy, "UNKNOWN", "severity") is None
 
     def test_apply_to_config_severity_overrides(self):
         policy = Policy(
             name="test",
-            severity_overrides={"SSH-001": "CRITICAL"},
+            severity_overrides={"SSH-101": "CRITICAL"},
         )
         config = USAFConfig()
         PolicyEngine.apply_to_config(policy, config)
-        assert config.plugins.overrides["SSH-001"].severity == "CRITICAL"
+        assert config.plugins.overrides["SSH-101"].severity == "CRITICAL"
 
     def test_apply_to_config_ignore_patterns(self):
         policy = Policy(
@@ -109,7 +109,7 @@ class TestPolicyEngine:
     def test_validate_invalid_severity(self):
         policy = Policy(
             name="test",
-            severity_overrides={"SSH-001": "INVALID"},
+            severity_overrides={"SSH-101": "INVALID"},
         )
         errors = PolicyEngine.validate(policy)
         assert len(errors) == 1
@@ -118,7 +118,7 @@ class TestPolicyEngine:
     def test_validate_valid_severity_overrides(self):
         policy = Policy(
             name="test",
-            severity_overrides={"SSH-001": "HIGH", "KERN-001": "MEDIUM"},
+            severity_overrides={"SSH-101": "HIGH", "KERN-101": "MEDIUM"},
         )
         errors = PolicyEngine.validate(policy)
         assert errors == []
@@ -142,11 +142,11 @@ class TestPolicyEngine:
 
         policy = Policy(
             name="test",
-            severity_overrides={"SSH-001": "CRITICAL"},
+            severity_overrides={"SSH-101": "CRITICAL"},
         )
         config = FakeConfig()
         result = PolicyEngine.apply_to_config(policy, config)
-        assert result.severity_overrides["SSH-001"] == "CRITICAL"
+        assert result.severity_overrides["SSH-101"] == "CRITICAL"
 
     def test_get_override_nonexistent_check_id(self):
         policy = Policy(name="test")
@@ -155,6 +155,6 @@ class TestPolicyEngine:
     def test_get_override_nonexistent_key(self):
         policy = Policy(
             name="test",
-            check_overrides={"SSH-001": {"enabled": True}},
+            check_overrides={"SSH-101": {"enabled": True}},
         )
-        assert PolicyEngine.get_override(policy, "SSH-001", "severity") is None
+        assert PolicyEngine.get_override(policy, "SSH-101", "severity") is None

@@ -10,7 +10,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 class FirewallActiveCheck(AuditCheck):
     """Check that a firewall (ufw/nftables/iptables) is active."""
 
-    id = "FIREWALL-001"
+    id = "FW-101"
     name = "Firewall Active"
     category = CheckCategory.NETWORK
     severity = Severity.HIGH

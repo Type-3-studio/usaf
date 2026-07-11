@@ -96,14 +96,14 @@ class TestScoringEngine:
         result = ScanResult(
             results=[
                 CheckResult(
-                    check_id="NET-001",
+                    check_id="NET-101",
                     name="Net",
                     category=CheckCategory.NETWORK,
                     passed=False,
                     findings=[
                         Finding(
                             id="N1",
-                            check_id="NET-001",
+                            check_id="NET-101",
                             category=CheckCategory.NETWORK,
                             severity=Severity.HIGH,
                             risk_score=7.5,
@@ -116,14 +116,14 @@ class TestScoringEngine:
                     ],
                 ),
                 CheckResult(
-                    check_id="USR-001",
+                    check_id="USR-101",
                     name="Usr",
                     category=CheckCategory.USERS,
                     passed=False,
                     findings=[
                         Finding(
                             id="U1",
-                            check_id="USR-001",
+                            check_id="USR-101",
                             category=CheckCategory.USERS,
                             severity=Severity.LOW,
                             risk_score=2.5,

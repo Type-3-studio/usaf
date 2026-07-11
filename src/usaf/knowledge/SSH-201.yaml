@@ -1,4 +1,4 @@
-id: SSH-003
+id: SSH-201
 title: Weak SSH Key Exchange Algorithms
 threat: Weak key exchange algorithms like diffie-hellman-group1-sha1 and diffie-hellman-group14-sha1 use small prime groups and outdated hash functions, making them vulnerable to discrete-log attacks.
 exploit: "A well-resourced attacker (nation-state) performs a Logjam attack, downgrading the SSH key exchange to export-grade DH using the small 512-bit group, then decrypts the session in real-time."
@@ -17,8 +17,8 @@ known_exceptions:
   - "Interoperability with legacy SSH implementations"
   - "Default Ubuntu configs include some weak algorithms for compatibility"
 related_findings:
-  - "SSH-001"
-  - "SSH-002"
+  - "SSH-101"
+  - "SSH-102"
 severity_override: null
 tags:
   - "ssh"

@@ -1,4 +1,4 @@
-id: KERN-003
+id: KERN-301
 title: Core Dumps Not Restricted
 threat: Unrestricted core dumps can leak sensitive data from process memory — including passwords, encryption keys, and confidential data — to any user who can trigger a crash in a target process.
 exploit: "An attacker induces a crash in a privileged process (e.g., via a format string bug), then reads the resulting core dump from /var/crash or coredumpctl to extract secrets from the crashed process's memory image."
@@ -18,8 +18,8 @@ known_exceptions:
   - "Development systems may require core dumps for debugging"
   - "systemd-coredump provides controlled core dump handling"
 related_findings:
-  - "KERN-001"
-  - "KERN-002"
+  - "KERN-101"
+  - "KERN-201"
 severity_override: null
 tags:
   - "kernel-hardening"

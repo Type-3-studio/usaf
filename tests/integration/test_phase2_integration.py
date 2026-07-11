@@ -140,11 +140,11 @@ class TestSeverityContextPipeline:
 
     def test_ssh_exposure_escalates_severity(self):
         findings = [
-            _make_finding("SSH-001", "001", Severity.HIGH, CheckCategory.SYSTEM),
+            _make_finding("SSH-101", "001", Severity.HIGH, CheckCategory.SYSTEM),
         ]
         engine = SeverityContextEngine()
         adjustments = engine.apply_all(findings, _FAKE_COLLECTORS)
-        adj = adjustments.get("SSH-001-001")
+        adj = adjustments.get("SSH-101-001")
         assert adj is not None
         assert adj.changed
         assert adj.adjusted == Severity.CRITICAL
@@ -152,20 +152,20 @@ class TestSeverityContextPipeline:
     def test_permission_temp_dir_deescalates(self):
         findings = [
             _make_finding(
-                "PRM-002", "001", Severity.HIGH, CheckCategory.PERMISSIONS,
+                "PRM-201", "001", Severity.HIGH, CheckCategory.PERMISSIONS,
                 evidence=FileEvidence(path="/tmp/world_writable", permission="0o777"),
             ),
         ]
         engine = SeverityContextEngine()
         adjustments = engine.apply_all(findings, _FAKE_COLLECTORS)
-        adj = adjustments.get("PRM-002-001")
+        adj = adjustments.get("PRM-201-001")
         assert adj is not None
         assert adj.changed
         assert adj.adjusted == Severity.LOW
 
     def test_severity_adjustment_flows_to_scoring(self):
         findings = [
-            _make_finding("SSH-001", "001", Severity.HIGH, CheckCategory.SYSTEM),
+            _make_finding("SSH-101", "001", Severity.HIGH, CheckCategory.SYSTEM),
         ]
         engine = SeverityContextEngine()
         adjustments = engine.apply_all(findings, _FAKE_COLLECTORS)
@@ -178,7 +178,7 @@ class TestSeverityContextPipeline:
         result = ScanResult(
             metadata=ScanMetadata(hostname="test"),
             results=[CheckResult(
-                check_id="SSH-001", name="SSH Test", category=CheckCategory.SYSTEM,
+                check_id="SSH-101", name="SSH Test", category=CheckCategory.SYSTEM,
                 passed=False, findings=findings,
             )],
         )
@@ -196,7 +196,7 @@ class TestCorrelationPipeline:
     def test_ssh_brute_force_surface_detected(self):
         findings = [
             _make_finding(
-                "SSH-002", "001", Severity.HIGH, CheckCategory.SYSTEM,
+                "SSH-102", "001", Severity.HIGH, CheckCategory.SYSTEM,
                 title="Root login is permitted",
                 evidence=NetworkEvidence(
                     protocol="TCP", local_address="0.0.0.0", local_port=22,
@@ -204,7 +204,7 @@ class TestCorrelationPipeline:
                 ),
             ),
             _make_finding(
-                "NET-001", "001", Severity.MEDIUM, CheckCategory.NETWORK,
+                "NET-101", "001", Severity.MEDIUM, CheckCategory.NETWORK,
                 evidence=NetworkEvidence(
                     protocol="TCP", local_address="0.0.0.0", local_port=22,
                     state="LISTEN", pid=100, process_name="sshd",
@@ -226,7 +226,7 @@ class TestCorrelationPipeline:
                 affected="systemd: backdoor",
             ),
             _make_finding(
-                "USR-001", "001", Severity.CRITICAL, CheckCategory.USERS,
+                "USR-101", "001", Severity.CRITICAL, CheckCategory.USERS,
                 evidence=RegistryEvidence(key="passwd", value="root:0:0", expected="one root only", source="/etc/passwd"),
             ),
         ]
@@ -238,7 +238,7 @@ class TestCorrelationPipeline:
     def test_multi_rule_correlation(self):
         findings = [
             _make_finding(
-                "SSH-002", "001", Severity.HIGH, CheckCategory.SYSTEM,
+                "SSH-102", "001", Severity.HIGH, CheckCategory.SYSTEM,
                 title="Root login is permitted",
                 evidence=NetworkEvidence(
                     protocol="TCP", local_address="0.0.0.0", local_port=22,
@@ -246,7 +246,7 @@ class TestCorrelationPipeline:
                 ),
             ),
             _make_finding(
-                "NET-001", "001", Severity.MEDIUM, CheckCategory.NETWORK,
+                "NET-101", "001", Severity.MEDIUM, CheckCategory.NETWORK,
                 evidence=NetworkEvidence(
                     protocol="TCP", local_address="0.0.0.0", local_port=22,
                     state="LISTEN", pid=100, process_name="sshd",
@@ -259,7 +259,7 @@ class TestCorrelationPipeline:
                 affected="systemd: backdoor",
             ),
             _make_finding(
-                "USR-001", "001", Severity.CRITICAL, CheckCategory.USERS,
+                "USR-101", "001", Severity.CRITICAL, CheckCategory.USERS,
                 evidence=RegistryEvidence(key="passwd", value="root:0:0", expected="one root only", source="/etc/passwd"),
             ),
         ]
@@ -279,7 +279,7 @@ class TestKnowledgeEnrichmentPipeline:
     def test_kb_enriches_kernel_finding(self):
         kb = KnowledgeBase()
         findings = [
-            _make_finding("KERN-001", "001", Severity.HIGH),
+            _make_finding("KERN-101", "001", Severity.HIGH),
         ]
         names = set()
         for f in findings:
@@ -291,14 +291,14 @@ class TestKnowledgeEnrichmentPipeline:
     def test_kb_enriches_all_known_checks(self):
         kb = KnowledgeBase()
         check_ids = {
-            "KERN-001", "KERN-002", "KERN-003",
-            "SSH-001", "SSH-002", "SSH-003",
-            "USR-001", "USR-002", "USR-003",
-            "NET-001", "NET-002",
-            "PRM-001", "PRM-002",
-            "FIREWALL-001", "USB-001", "PWD-001",
-            "KRN-001", "PKG-001", "PER-001", "SEC-001", "SVC-001",
-            "CMP-001", "COM-001", "CTN-001", "FOR-001",
+            "KERN-101", "KERN-201", "KERN-301",
+            "SSH-101", "SSH-102", "SSH-201",
+            "USR-101", "USR-201", "USR-102",
+            "NET-101", "NET-201",
+            "PRM-101", "PRM-201",
+            "FW-101", "USB-101", "PWD-101",
+            "KERN-401", "PKG-101", "PER-201", "SEC-101", "SVC-101",
+            "CMP-101", "COM-101", "CTN-101", "FOR-101",
         }
         for cid in check_ids:
             entry = kb.get(cid)
@@ -312,7 +312,7 @@ class TestKnowledgeEnrichmentPipeline:
     def test_kb_confidence_evaluation(self):
         kb = KnowledgeBase()
         finding = _make_finding(
-            "KERN-001", "001", Severity.HIGH,
+            "KERN-101", "001", Severity.HIGH,
             evidence=RegistryEvidence(key="test", value="0", expected="2", source="/proc/test"),
         )
         confidence, effective = kb.evaluate_finding_confidence(finding)
@@ -333,9 +333,9 @@ class TestCompliancePipeline:
     def test_cis_mapping_coverage(self):
         self._ensure_discovery()
         findings = [
-            _make_finding("KERN-001", "001", Severity.HIGH, cis_benchmarks=["CIS Ubuntu 20.04: 1.6.1"]),
-            _make_finding("SSH-001", "001", Severity.HIGH, cis_benchmarks=["CIS Ubuntu 20.04: 5.2.2"]),
-            _make_finding("KRN-001", "001", Severity.MEDIUM, cis_benchmarks=["CIS Ubuntu 20.04: 3.5"]),
+            _make_finding("KERN-101", "001", Severity.HIGH, cis_benchmarks=["CIS Ubuntu 20.04: 1.6.1"]),
+            _make_finding("SSH-101", "001", Severity.HIGH, cis_benchmarks=["CIS Ubuntu 20.04: 5.2.2"]),
+            _make_finding("KERN-401", "001", Severity.MEDIUM, cis_benchmarks=["CIS Ubuntu 20.04: 3.5"]),
         ]
         result = ScanResult(
             metadata=ScanMetadata(hostname="test"),
@@ -357,7 +357,7 @@ class TestCompliancePipeline:
         assert isinstance(gaps, dict)
 
     def test_findings_without_cis_are_not_mapped(self):
-        finding = _make_finding("COM-001", "001", Severity.HIGH)
+        finding = _make_finding("COM-101", "001", Severity.HIGH)
         framework = ComplianceFramework()
         mapping = framework.get_findings_for("cis", [finding])
         assert isinstance(mapping, list)
@@ -441,18 +441,18 @@ class TestFullPipelineEndToEnd:
     def test_full_pipeline_with_fake_data(self):
         # Phase 1: Build findings from fake collector data
         findings = [
-            _make_finding("KERN-001", "001", Severity.HIGH, CheckCategory.KERNEL,
+            _make_finding("KERN-101", "001", Severity.HIGH, CheckCategory.KERNEL,
                           evidence=RegistryEvidence(key="randomize_va_space", value="0", expected="2", source="/proc/sys")),
-            _make_finding("SSH-002", "001", Severity.HIGH, CheckCategory.SYSTEM,
+            _make_finding("SSH-102", "001", Severity.HIGH, CheckCategory.SYSTEM,
                           title="Root login is permitted",
                           evidence=NetworkEvidence(protocol="TCP", local_address="0.0.0.0", local_port=22, state="LISTEN", pid=100, process_name="sshd")),
-            _make_finding("USR-002", "001", Severity.CRITICAL, CheckCategory.USERS,
+            _make_finding("USR-201", "001", Severity.CRITICAL, CheckCategory.USERS,
                           evidence=RegistryEvidence(key="root", value="", expected="x", source="/etc/shadow")),
-            _make_finding("NET-001", "001", Severity.MEDIUM, CheckCategory.NETWORK,
+            _make_finding("NET-101", "001", Severity.MEDIUM, CheckCategory.NETWORK,
                           evidence=NetworkEvidence(protocol="TCP", local_address="0.0.0.0", local_port=22, state="LISTEN", pid=100, process_name="sshd")),
-            _make_finding("USR-001", "001", Severity.CRITICAL, CheckCategory.USERS,
+            _make_finding("USR-101", "001", Severity.CRITICAL, CheckCategory.USERS,
                           evidence=RegistryEvidence(key="passwd", value="root:0:0", expected="one root", source="/etc/passwd")),
-            _make_finding("PRM-002", "001", Severity.HIGH, CheckCategory.PERMISSIONS,
+            _make_finding("PRM-201", "001", Severity.HIGH, CheckCategory.PERMISSIONS,
                           evidence=FileEvidence(path="/tmp/world_writable", permission="0o777")),
         ]
 
@@ -464,9 +464,9 @@ class TestFullPipelineEndToEnd:
             if adj and adj.changed:
                 f.severity = adj.adjusted
                 f.risk_score = adj.adjusted.score
-        ssh_adj = adjustments.get("SSH-002-001")
+        ssh_adj = adjustments.get("SSH-102-001")
         assert ssh_adj is not None and ssh_adj.changed
-        prm_adj = adjustments.get("PRM-002-001")
+        prm_adj = adjustments.get("PRM-201-001")
         assert prm_adj is not None and prm_adj.changed
 
         # Phase 3: Correlation

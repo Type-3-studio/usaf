@@ -1,4 +1,4 @@
-id: PRM-002
+id: PRM-201
 title: World-Writable System Files
 threat: Critical system files with world-writable permissions allow any user to modify configuration, executables, or security policies — leading to privilege escalation or system compromise.
 exploit: "An attacker finds /etc/cron.d/backup is world-writable and adds a malicious cron job. The job runs as root, giving the attacker a reverse shell with full privileges. Alternatively, a world-writable script in PATH is replaced with a backdoor."
@@ -18,8 +18,8 @@ known_exceptions:
   - "Some application caches require world-writable directories"
   - "Desktop environments have X11 socket directories"
 related_findings:
-  - "PRM-001"
-  - "NET-002"
+  - "PRM-101"
+  - "NET-201"
 severity_override: null
 tags:
   - "permissions"

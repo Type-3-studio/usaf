@@ -14,7 +14,7 @@ Every plugin implements `AuditCheck` abstract base class:
 
 ```python
 class AuditCheck(ABC):
-    id: ClassVar[str]                    # Unique identifier (e.g., "SSH-001")
+    id: ClassVar[str]                    # Unique identifier (e.g., "SSH-101")
     name: ClassVar[str]                  # Human-readable name
     category: ClassVar[CheckCategory]    # Category enum
     severity: ClassVar[Severity]         # Default severity

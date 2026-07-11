@@ -10,7 +10,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 
 @register_check
 class AuditLogCheck(AuditCheck):
-    id = "FOR-001"
+    id = "FOR-101"
     name = "Audit Log Availability"
     category = CheckCategory.FORENSICS
     severity = Severity.MEDIUM

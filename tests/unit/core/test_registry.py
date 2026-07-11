@@ -297,8 +297,8 @@ def test_discover_checks_discovers_existing_checks():
     # Should not lose any checks
     assert after >= before
     # Known checks should be present
-    assert "KERN-001" in registry.get_all_ids()
-    assert "SSH-001" in registry.get_all_ids()
-    assert "USR-001" in registry.get_all_ids()
-    assert "NET-001" in registry.get_all_ids()
-    assert "PRM-001" in registry.get_all_ids()
+    assert "KERN-101" in registry.get_all_ids()
+    assert "SSH-101" in registry.get_all_ids()
+    assert "USR-101" in registry.get_all_ids()
+    assert "NET-101" in registry.get_all_ids()
+    assert "PRM-101" in registry.get_all_ids()

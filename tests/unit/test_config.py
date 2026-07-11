@@ -39,15 +39,15 @@ class TestUSAFConfigModel:
         config = USAFConfig(
             plugins={
                 "enabled": ["*"],
-                "disabled": ["SSH-001"],
+                "disabled": ["SSH-101"],
                 "overrides": {
-                    "KERN-001": {"severity": "LOW", "enabled": False},
+                    "KERN-101": {"severity": "LOW", "enabled": False},
                 },
             }
         )
-        assert "SSH-001" in config.plugins.disabled
-        assert config.plugins.overrides["KERN-001"].severity == "LOW"
-        assert config.plugins.overrides["KERN-001"].enabled is False
+        assert "SSH-101" in config.plugins.disabled
+        assert config.plugins.overrides["KERN-101"].severity == "LOW"
+        assert config.plugins.overrides["KERN-101"].enabled is False
 
     def test_reporting_config(self):
         config = USAFConfig(reporting={"format": "json", "verbose": True, "output": "/tmp/report.json"})

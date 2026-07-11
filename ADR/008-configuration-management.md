@@ -32,7 +32,7 @@ plugins:
   enabled: ["*"]           # Enable all, or list specific
   disabled: []             # Explicitly disable
   overrides:
-    SSH-001:
+    SSH-101:
       severity: HIGH       # Override default severity
       enabled: true
 
@@ -44,7 +44,7 @@ severity:
   INFO: 0.0
 
 ignore:
-  - SSH-001-003           # Ignore specific findings
+  - SSH-101-003           # Ignore specific findings
   - "SSH-*"               # Glob patterns supported
 
 baseline:

@@ -1,4 +1,4 @@
-id: PWD-001
+id: PWD-101
 title: Weak Password Policy
 threat: Short and simple passwords can be brute-forced or guessed in seconds with modern GPU-accelerated tools, leading to unauthorized account access.
 exploit: "An attacker obtains a password hash from /etc/shadow (via SQL injection or local file read) and cracks it using hashcat with a GPU cluster. A 6-character lowercase password cracks in under a minute. A 12-character mixed-case password would take centuries."
@@ -21,7 +21,7 @@ known_exceptions:
   - "LDAP/SSSD-managed authentication where policy is enforced on the server side"
   - "Systems using SSH key-only authentication with disabled password login"
 related_findings:
-  - "SSH-002"
+  - "SSH-102"
 severity_override: null
 tags:
   - "passwords"

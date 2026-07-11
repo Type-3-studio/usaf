@@ -1,4 +1,4 @@
-id: PRM-001
+id: PRM-101
 title: Unexpected SUID Binaries
 threat: SUID root binaries execute with elevated privileges regardless of the calling user. An unexpected SUID binary is a primary vector for local privilege escalation.
 exploit: "An attacker discovers /usr/bin/custom-backup with SUID root permissions. The binary calls a helper script using a relative path — the attacker creates a malicious 'tar' earlier in PATH, and the SUID binary executes it with root privileges."
@@ -19,8 +19,8 @@ known_exceptions:
   - "Third-party packages (Docker, VirtualBox, Flatpak) install their own SUID binaries"
   - "Add expected SUID binaries to usaf.yaml suid_allowlist to suppress findings"
 related_findings:
-  - "PRM-002"
-  - "NET-001"
+  - "PRM-201"
+  - "NET-101"
 severity_override: null
 tags:
   - "permissions"

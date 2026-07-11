@@ -36,7 +36,7 @@ usaf scan
 usaf list-checks
 
 # Run specific checks
-usaf scan --checks SSH-001 KERN-001
+usaf scan --checks SSH-101 KERN-101
 
 # Output as JSON
 usaf scan --format json

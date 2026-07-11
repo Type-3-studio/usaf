@@ -68,7 +68,7 @@ def scan(
     ] = False,
     checks: Annotated[
         list[str] | None,
-        typer.Option("--checks", help="Specific checks to run (e.g., SSH-001 SSH-002)"),
+        typer.Option("--checks", help="Specific checks to run (e.g., SSH-101 SSH-102)"),
     ] = None,
     baseline_diff: Annotated[
         bool,

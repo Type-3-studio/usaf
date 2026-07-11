@@ -55,7 +55,7 @@
 
 ### Detailed Status
 
-#### Collectors (15 total)
+#### Collectors (22 total)
 | Collector | Status | Notes |
 |-----------|--------|-------|
 | `KernelCollector` | ✅ | `/proc/sys`, sysctl, uname |
@@ -73,35 +73,42 @@
 | `MountCollector` | ✅ | `/proc/mounts`, `/etc/fstab` parsing |
 | `ContainerCollector` | ✅ | Docker/Podman runtime, running containers |
 | `AuditdCollector` | ✅ | Auditd status, rules, log statistics |
+| `BootCollector` | ✅ | Secure Boot, kernel lockdown, EFI, GRUB (P0) |
+| `DNSCollector` | ✅ | resolv.conf, systemd-resolved, /etc/hosts (P0) |
+| `PAMCollector` | ✅ | PAM config files, module inventory (P0) |
+| `SSHConfigCollector` | ✅ | sshd_config, host keys, authorized_keys (P0) |
+| `JournaldCollector` | ✅ | journald config, log usage, persistence (P0) |
+| `FilesystemCollector` | ✅ | SUID, world-writable, capabilities, hidden files (P0) |
+| `CertStoreCollector` | ✅ | System CA bundles, certificate inventory (P0) |
 
 #### Checks (25 total)
 | Check | Status | Severity | Evidence |
 |-------|--------|----------|----------|
-| KERN-001 (ASLR) | ✅ | HIGH | RegistryEvidence |
-| KERN-002 (Pointer Restriction) | ✅ | MEDIUM | RegistryEvidence |
-| KERN-003 (Core Dump) | ✅ | MEDIUM | RegistryEvidence |
-| SSH-001 (Protocol) | ✅ | HIGH | RegistryEvidence |
-| SSH-002 (Root Login) | ✅ | HIGH | RegistryEvidence |
-| SSH-003 (KEX Algorithms) | ✅ | MEDIUM | RegistryEvidence |
-| USR-001 (Duplicate UID 0) | ✅ | CRITICAL | UserEvidence |
-| USR-002 (Empty Passwords) | ✅ | CRITICAL | UserEvidence |
-| USR-003 (Shadowed Passwords) | ✅ | HIGH | RegistryEvidence |
-| NET-001 (Listening Ports) | ✅ | MEDIUM | NetworkEvidence |
-| NET-002 (Promiscuous Mode) | ✅ | MEDIUM | NetworkEvidence |
-| PRM-001 (SUID Binaries) | ✅ | HIGH | FileEvidence (config allowlist + 60 known-safe packages auto-allowlisted) |
-| PRM-002 (World-Writable) | ✅ | HIGH | FileEvidence |
-| CMP-001 (Ubuntu Support) | ✅ | MEDIUM | RegistryEvidence |
-| COM-001 (Bad Processes) | ✅ | HIGH | ProcessEvidence |
-| CTN-001 (Docker Socket) | ✅ | HIGH | FileEvidence |
-| FOR-001 (Audit Logs) | ✅ | MEDIUM | FileEvidence |
-| KRN-001 (Module Loading) | ✅ | MEDIUM | RegistryEvidence |
-| PKG-001 (Unnecessary Pkgs) | ✅ | MEDIUM | PackageEvidence |
-| PER-001 (Unauth Services) | ✅ | HIGH | FileEvidence |
-| SEC-001 (AppArmor) | ✅ | HIGH | FileEvidence |
-| SVC-001 (Insecure Svcs) | ✅ | HIGH | FileEvidence |
-| FIREWALL-001 (Firewall Active) | ✅ | HIGH | CommandEvidence |
-| USB-001 (USB Storage Restriction) | ✅ | MEDIUM | FileEvidence |
-| PWD-001 (Password Policy Strength) | ✅ | HIGH | FileEvidence |
+| KERN-101 (ASLR) | ✅ | HIGH | RegistryEvidence |
+| KERN-201 (Pointer Restriction) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-301 (Core Dump) | ✅ | MEDIUM | RegistryEvidence |
+| SSH-101 (Protocol) | ✅ | HIGH | RegistryEvidence |
+| SSH-102 (Root Login) | ✅ | HIGH | RegistryEvidence |
+| SSH-201 (KEX Algorithms) | ✅ | MEDIUM | RegistryEvidence |
+| USR-101 (Duplicate UID 0) | ✅ | CRITICAL | UserEvidence |
+| USR-201 (Empty Passwords) | ✅ | CRITICAL | UserEvidence |
+| USR-102 (Shadowed Passwords) | ✅ | HIGH | RegistryEvidence |
+| NET-101 (Listening Ports) | ✅ | MEDIUM | NetworkEvidence |
+| NET-201 (Promiscuous Mode) | ✅ | MEDIUM | NetworkEvidence |
+| PRM-101 (SUID Binaries) | ✅ | HIGH | FileEvidence (config allowlist + 60 known-safe packages auto-allowlisted) |
+| PRM-201 (World-Writable) | ✅ | HIGH | FileEvidence |
+| CMP-101 (Ubuntu Support) | ✅ | MEDIUM | RegistryEvidence |
+| COM-101 (Bad Processes) | ✅ | HIGH | ProcessEvidence |
+| CTN-101 (Docker Socket) | ✅ | HIGH | FileEvidence |
+| FOR-101 (Audit Logs) | ✅ | MEDIUM | FileEvidence |
+| KERN-401 (Module Loading) | ✅ | MEDIUM | RegistryEvidence |
+| PKG-101 (Unnecessary Pkgs) | ✅ | MEDIUM | PackageEvidence |
+| PER-201 (Unauth Services) | ✅ | HIGH | FileEvidence |
+| SEC-101 (AppArmor) | ✅ | HIGH | FileEvidence |
+| SVC-101 (Insecure Svcs) | ✅ | HIGH | FileEvidence |
+| FW-101 (Firewall Active) | ✅ | HIGH | CommandEvidence |
+| USB-101 (USB Storage Restriction) | ✅ | MEDIUM | FileEvidence |
+| PWD-101 (Password Policy Strength) | ✅ | HIGH | FileEvidence |
 
 #### Reporters (3 total)
 | Reporter | Status | Features |
@@ -213,16 +220,16 @@
 | Knowledge | ✅ | 216 | tests/unit/knowledge/test_knowledge_base.py |
 | Profiles | ✅ | 161 | tests/unit/profiles/test_profile_manager.py |
 | Severity | ✅ | 305 | tests/unit/severity/test_context_severity.py |
-| Compromise checks (COM-001) | ✅ | 48 | tests/unit/checks/test_compromise_checks.py |
-| Compliance checks (CMP-001) | ✅ | 55 | tests/unit/checks/test_compliance_checks.py |
-| Container checks (CTN-001) | ✅ | 56 | tests/unit/checks/test_container_checks.py |
-| Forensics checks (FOR-001) | ✅ | 48 | tests/unit/checks/test_forensics_checks.py |
-| Kernel module checks (KRN-001) | ✅ | 25 | tests/unit/checks/test_krn_checks.py |
-| Package checks (PKG-001) | ✅ | 50 | tests/unit/checks/test_package_checks.py |
-| Persistence checks (PER-001) | ✅ | 48 | tests/unit/checks/test_persistence_checks.py |
-| Security checks (FIREWALL/SEC/USB) | ✅ | 94 | tests/unit/checks/test_security_checks.py |
-| Service checks (SVC-001) | ✅ | 42 | tests/unit/checks/test_service_checks.py |
-| Password policy (PWD-001) | ✅ | 60 | tests/unit/checks/test_password_policy_checks.py |
+| Compromise checks (COM-101) | ✅ | 48 | tests/unit/checks/test_compromise_checks.py |
+| Compliance checks (CMP-101) | ✅ | 55 | tests/unit/checks/test_compliance_checks.py |
+| Container checks (CTN-101) | ✅ | 56 | tests/unit/checks/test_container_checks.py |
+| Forensics checks (FOR-101) | ✅ | 48 | tests/unit/checks/test_forensics_checks.py |
+| Kernel module checks (KERN-401) | ✅ | 25 | tests/unit/checks/test_krn_checks.py |
+| Package checks (PKG-101) | ✅ | 50 | tests/unit/checks/test_package_checks.py |
+| Persistence checks (PER-201) | ✅ | 48 | tests/unit/checks/test_persistence_checks.py |
+| Security checks (FW-101/SEC-101/USB-101) | ✅ | 94 | tests/unit/checks/test_security_checks.py |
+| Service checks (SVC-101) | ✅ | 42 | tests/unit/checks/test_service_checks.py |
+| Password policy (PWD-101) | ✅ | 60 | tests/unit/checks/test_password_policy_checks.py |
 | Cache engine | ✅ | 56 | tests/unit/test_cache.py |
 | Config loader/model | ✅ | 118 | tests/unit/test_config.py |
 | Policy engine | ✅ | 136 | tests/unit/test_policy_engine.py |
@@ -258,59 +265,429 @@
 | `mypy` config | ✅ | strict mode |
 | Pre-commit hooks | ✅ | ruff, mypy (0 errors ✅), trailing whitespace, YAML/TOML check |
 | CI/CD | ✅ | GitHub Actions: ruff lint+format, mypy (0 errors ✅), pytest on push/PR |
-| Versioning | ✅ | 0.3.0 — semver |
+| Versioning | ✅ | 0.4.0 — semver |
 
 ---
 
-## What Remains
+## Check ID Numbering Scheme
 
-### P4: Scale & Distribution
+All check IDs follow a **sub-ranged** format: `<PREFIX>-<SUBRANGE><SEQ>`.
+
+Each prefix has reserved 100-level blocks for subcategories. This prevents renumbering as check counts grow.
+
+### ID Ranges by Category
+
+| Prefix | Range | Sub-ranges | Current |
+|--------|-------|------------|---------|
+| **SSH** | 100–999 | 100=Auth, 200=Algorithms, 300=Keys, 400=Logging, 500=Network, 600=Compliance | 3 |
+| **KERN** | 100–999 | 100=Memory, 200=Pointers, 300=Core dumps, 400=Modules/BPF, 500=FS prot, 600=Network | 4 |
+| **USR** | 100–999 | 100=Account integrity, 200=Weak creds, 300=Policy, 400=Privilege, 500=SSH keys, 600=Service accts | 3 |
+| **NET** | 100–999 | 100=Ports, 200=Interfaces, 300=DNS, 400=Kernel net, 500=Wireless, 600=TLS/Certs | 2 |
+| **PKG** | 100–999 | 100=Unnecessary, 200=Integrity, 300=Repos, 400=CVEs, 500=Held | 1 |
+| **FS** | 100–999 | 100=File integrity, 200=Hidden/orphan, 300=Mounts, 400=Symlinks/immutable, 500=Capabilities | 0 |
+| **BOOT** | 100–999 | 100=Secure Boot, 200=Lockdown, 300=EFI, 400=GRUB, 500=Kernel images | 0 |
+| **SVC** | 100–999 | 100=Enabled svcs, 200=Security, 300=Listening, 400=Failed, 500=Modified | 1 |
+| **PER** | 100–999 | 100=Cron/at, 200=Systemd, 300=Shell init, 400=LD injection, 500=Kernel, 600=Network, 700=Package hooks, 800=Login/init | 1 |
+| **CTN** | 100–999 | 100=Socket, 200=Privileges, 300=Security, 400=Images, 500=Runtime, 600=LXC | 1 |
+| **LOG** | 100–999 | 100=Journal, 200=Rotation, 300=Tamper, 400=Auth fail, 500=Auditd | 0 |
+| **SECR** | 100–999 | 100=Cloud, 200=Code, 300=Crypto keys, 400=DB/API, 500=Certs | 0 |
+| **FW** | 100–999 | 100=Status, 200=Rules, 300=Defaults, 400=Logging | 1 |
+| **CMP** | 100–999 | 100=Version, 200=CIS, 300=STIG, 400=Regulatory, 500=Custom | 1 |
+| **COM** | 100–999 | 100=Processes, 200=Network IOC, 300=Filesystem IOC | 1 |
+| **FOR** | 100–999 | 100=Logs, 200=Timeline, 300=Artifacts | 1 |
+| **SEC** | 100–999 | 100=AppArmor, 200=SELinux, 300=LSM | 1 |
+| **USB** | 100–999 | 100=Storage, 200=Devices, 300=Guard | 1 |
+| **PWD** | 100–999 | 100=Policy, 200=Reuse, 300=Aging | 1 |
+| **CLD** | 100–999 | 100=AWS, 200=GCP, 300=Azure, 400=Generic | 0 |
+| **PRM** | 100–999 | 100=SUID, 200=World-writable, 300=Capabilities, 400=Ownership | 2 |
+
+### Renumbering Plan (existing → new)
+
+| Old ID | New ID | Rationale |
+|--------|--------|-----------|
+| SSH-001 | SSH-101 | Authentication sub-range |
+| SSH-002 | SSH-102 | Authentication sub-range |
+| SSH-003 | SSH-201 | Algorithms sub-range |
+| KERN-001 | KERN-101 | Memory hardening sub-range |
+| KERN-002 | KERN-201 | Pointer protection sub-range |
+| KERN-003 | KERN-301 | Core dump sub-range |
+| KRN-001 | KERN-401 | Module loading sub-range (merged into KERN) |
+| USR-001 | USR-101 | Account integrity sub-range |
+| USR-002 | USR-201 | Weak credentials sub-range |
+| USR-003 | USR-102 | Account integrity sub-range |
+| NET-001 | NET-101 | Ports sub-range |
+| NET-002 | NET-201 | Interfaces sub-range |
+| PRM-001 | PRM-101 | SUID sub-range |
+| PRM-002 | PRM-201 | World-writable sub-range |
+| PKG-001 | PKG-101 | Unnecessary packages sub-range |
+| PER-001 | PER-201 | Systemd persistence sub-range |
+| SVC-001 | SVC-101 | Enabled services sub-range |
+| CTN-001 | CTN-101 | Socket exposure sub-range |
+| COM-001 | COM-101 | Process-based compromise sub-range |
+| FOR-001 | FOR-101 | Log forensics sub-range |
+| SEC-001 | SEC-101 | AppArmor sub-range |
+| USB-001 | USB-101 | Storage restriction sub-range |
+| PWD-001 | PWD-101 | Password policy sub-range |
+| CMP-001 | CMP-101 | Version compliance sub-range |
+| FIREWALL-001 | FW-101 | Firewall status sub-range |
+
+**NOTE:** All code references, test files, knowledge YAML, docs, and config files must be updated atomically when renumbering.
+
+---
+
+## Phased Roadmap: Building the Complete Platform
+
+The goal is **~500 checks** organized into **20+ categories**, with a **correlation engine** that connects findings into attack chains. Each phase builds on the previous and is independently shippable.
+
+### Phase 0: Foundation (current sprint)
+
+**Goal:** Renumber all checks to reserved ranges, expand collector coverage to unserved domains.
+
+| Task | Deliverable | Status |
+|------|-------------|--------|
+| P0-1 | Renumber all 25 checks to sub-ranged IDs | ✅ |
+| P0-2 | Update all test references (unit/integration/golden) | ✅ |
+| P0-3 | Update knowledge YAML filenames & content references | ✅ |
+| P0-4 | Update docs, CONTRIBUTING, AGENTS.md | ✅ |
+| P0-5 | **New collectors:** Boot, DNS, PAM, SSH config, Journald, Filesystem walker, Cert store | ✅ |
+| P0-6 | Register new collectors in runner (auto-discover via pkgutil) | ✅ |
+| P0-7 | TD-020: Fix correlation phase gated on wrong config key | ✅ |
+| P0-8 | TD-021: Fix __init__.py exports for all 7 correlation rules | ✅ |
+
+**Exit criteria:** All existing checks pass with new IDs. All Phase 0 collectors registered and tested. `mypy --strict` passes (0 errors, pre-existing yaml-stub warnings excluded). **Status: ✅ COMPLETE**
+
+---
+
+### Phase 1: High-Value Check Wave (~25 checks)
+
+**Goal:** Deliver the highest-value missing checks — Identity, Packages, Network, Boot.
+
+#### Identity & Authentication (6 checks)
+| ID | Name | Depends |
+|----|------|---------|
+| USR-103 | Duplicate UIDs | `users`, `groups` |
+| USR-104 | Disabled accounts with valid shells | `users` |
+| USR-105 | Expired passwords | `users` |
+| USR-202 | Password reuse policy | `users` (shadow fields) |
+| USR-301 | MFA status (pam_u2a, pam_duo) | `pam` |
+| USR-401 | Unauthorized sudo members | `sudo` |
+
+#### Package Integrity (6 checks)
+| ID | Name | Depends |
+|----|------|---------|
+| PKG-201 | Modified package files (dpkg --verify) | `apt` |
+| PKG-202 | Broken package signatures | `apt` |
+| PKG-301 | Unknown repositories | `apt` |
+| PKG-302 | Expired repo signing keys | `apt` |
+| PKG-401 | Packages with known CVEs | `apt` |
+| PKG-402 | Pending security updates | `apt` |
+
+#### Network Security (5 checks)
+| ID | Name | Depends |
+|----|------|---------|
+| NET-301 | Unexpected DNS servers | `dns` |
+| NET-302 | Modified hosts file | `dns` |
+| NET-401 | Weak sysctl networking | `kernel_params` |
+| NET-402 | IPv6 hardening | `kernel_params`, `interfaces` |
+| NET-501 | DNSSEC validation | `dns` |
+
+#### Boot Security (5 checks)
+| ID | Name | Depends |
+|----|------|---------|
+| BOOT-101 | Secure Boot status | `boot` |
+| BOOT-201 | Kernel lockdown mode | `boot` |
+| BOOT-301 | EFI integrity | `boot` |
+| BOOT-401 | GRUB password set | `boot` |
+| BOOT-501 | Unsigned kernels | `boot` |
+
+#### Phase 1 Cross-Cutting Rules (3 new)
+| Rule ID | What it detects |
+|---------|----------------|
+| CORR-101 | Supply chain attack (unknown repo + unsigned pkg + modified pkg) |
+| CORR-102 | Boot integrity failure (Secure Boot off + unsigned kernel + no GRUB password) |
+| CORR-103 | DNS hijacking (unexpected DNS + modified hosts + no DNSSEC) |
+
+**Exit criteria:** 25 new checks with tests, 3 new correlation rules, all passing CI.
+
+---
+
+### Phase 2: Filesystem & Services (~20 checks)
+
+**Goal:** Cover filesystem integrity and expand service auditing.
+
+#### Filesystem Integrity (10 checks)
+| ID | Name | Depends |
+|----|------|---------|
+| FS-101 | Unexpected files in /etc | `filesystem` |
+| FS-102 | Unexpected executables in PATH | `filesystem` |
+| FS-201 | Hidden files in world-writable dirs | `filesystem` |
+| FS-202 | Deleted binaries still running | `processes`, `filesystem` |
+| FS-301 | Unexpected symlinks in /etc | `filesystem` |
+| FS-302 | Immutable file drift | `filesystem` |
+| FS-401 | Unexpected file capabilities | `filesystem` |
+| FS-402 | World-writable directories | `filesystem` |
+| FS-403 | Orphaned files (no package owner) | `filesystem`, `apt` |
+| FS-501 | Filesystem mount option gaps (noexec, nosuid) | `mounts` |
+
+#### Services (7 checks)
+| ID | Name | Depends |
+|----|------|---------|
+| SVC-102 | Unexpected enabled services | `systemd` |
+| SVC-201 | Services running as root | `systemd`, `processes` |
+| SVC-202 | Services from unknown binaries | `systemd`, `apt` |
+| SVC-301 | Failed services | `systemd` |
+| SVC-302 | Unexpected listening services | `systemd`, `sockets` |
+| SVC-401 | Recently installed services | `systemd`, `apt` |
+| SVC-402 | Modified systemd unit files | `systemd` |
+
+#### Phase 2 Correlation Rules (2 new)
+| Rule ID | What it detects |
+|---------|----------------|
+| CORR-201 | Rogue service deployment (unknown binary + enabled svc + listening port) |
+| CORR-202 | File integrity breach (orphaned files + unexpected symlinks + modified /etc) |
+
+**Exit criteria:** 17 new checks with tests, 2 new correlation rules.
+
+---
+
+### Phase 3: Deep Persistence (~25 checks)
+
+**Goal:** Cover every attacker persistence mechanism. This is the deepest category.
+
+| ID | Name | Depends |
+|----|------|---------|
+| PER-101 | Cron job anomalies | `cron` |
+| PER-102 | Anacron jobs | `cron` |
+| PER-103 | `at` jobs | `cron` |
+| PER-202 | Suspicious systemd timer names | `systemd` |
+| PER-203 | Systemd service drop-ins | `systemd` |
+| PER-204 | Systemd path units | `systemd` |
+| PER-301 | Unexpected profile.d scripts | `filesystem` |
+| PER-302 | Modified bashrc/bash_profile | `filesystem` |
+| PER-303 | Modified zshrc | `filesystem` |
+| PER-401 | LD_PRELOAD in environment | `processes` |
+| PER-402 | ld.so.preload entries | `filesystem` |
+| PER-403 | LD_LIBRARY_PATH anomalies | `processes` |
+| PER-501 | Unexpected PAM modules | `pam` |
+| PER-502 | PAM module modifications | `pam` |
+| PER-503 | udev rules persistence | `filesystem` |
+| PER-601 | Network hook scripts | `filesystem` |
+| PER-602 | SSH forced commands | `ssh_config` |
+| PER-603 | SSH AuthorizedKeysFile tampering | `ssh_config` |
+| PER-701 | APT hook persistence | `apt` |
+| PER-702 | dpkg hook persistence | `filesystem` |
+| PER-801 | rc.local scripts | `filesystem` |
+| PER-802 | init.d scripts | `filesystem` |
+| PER-803 | Login/logout hooks | `filesystem` |
+| PER-804 | systemd user units | `systemd` |
+| PER-805 | XDG autostart entries | `filesystem` |
+
+#### Phase 3 Correlation Engine 2.0
+
+The correlation engine evolves from simple pattern matching to **attack chain detection**:
+
+| Feature | Description |
+|---------|-------------|
+| Multi-finding chain detection | e.g., new user + SSH key + systemd timer + cron job → persistence |
+| Temporal scoring | Freshness of finding weights the confidence score |
+| Kill chain visualization | Map findings to MITRE ATT&CK tactics in order |
+| YAML-driven rules | Correlation rules defined in YAML, not code |
+| Risk accumulation | Multiple persistence mechanisms → exponential scoring |
+| False positive dampening | Counter-evidence reduces scores (e.g., known-good packages) |
+
+**Exit criteria:** 25 persistence checks, 5 new correlation rules for persistence chains.
+
+---
+
+### Phase 4: Containers, Secrets & Logs (~30 checks)
+
+**Goal:** Cover modern deployment realities.
+
+#### Containers (8 checks)
+| ID | Name | Depends |
+|----|------|---------|
+| CTN-102 | Docker daemon TCP exposure | `containers` |
+| CTN-201 | Privileged containers | `containers` |
+| CTN-202 | Host network namespace | `containers` |
+| CTN-203 | Host PID namespace | `containers` |
+| CTN-204 | Host filesystem mounts | `containers` |
+| CTN-301 | Root containers | `containers` |
+| CTN-401 | Image age (>30 days) | `containers` |
+| CTN-402 | Unsigned images | `containers` |
+
+#### Logs & Forensics (8 checks)
+| ID | Name | Depends |
+|----|------|---------|
+| LOG-101 | Journal max size / retention | `journald` |
+| LOG-201 | Log rotation gaps | `journald` |
+| LOG-301 | Missing log periods (tampering) | `journald` |
+| LOG-302 | Log file permissions | `filesystem` |
+| LOG-401 | Repeated sudo failures | `auditd` |
+| LOG-402 | Repeated SSH auth failures | `auditd` |
+| LOG-501 | Auditd rule coverage gaps | `auditd` |
+| LOG-502 | Auditd log exhaustion risk | `auditd` |
+
+#### Secrets (10 checks)
+| ID | Name | Depends |
+|----|------|---------|
+| SECR-101 | AWS keys in filesystem | `filesystem` |
+| SECR-102 | GCP service account keys | `filesystem` |
+| SECR-201 | GitHub tokens in files | `filesystem` |
+| SECR-202 | .env files with secrets | `filesystem` |
+| SECR-203 | API keys in config files | `filesystem` |
+| SECR-301 | Exposed SSH private keys | `filesystem` |
+| SECR-302 | Weak SSH key types (DSA, 1024-bit RSA) | `ssh_config` |
+| SECR-401 | Database credentials in world-readable files | `filesystem` |
+| SECR-501 | Expired TLS certificates | `certificates` |
+| SECR-502 | Self-signed certificates in prod | `certificates` |
+
+#### Phase 4 Correlation Rules (4 new)
+| Rule ID | What it detects |
+|---------|----------------|
+| CORR-401 | Container escape path (privileged + host net + root + old image) |
+| CORR-402 | Credential compromise (secrets leaked + exposed SSH keys + cloud creds) |
+| CORR-403 | Active breach (log gaps + auth failures + new service + new user) |
+| CORR-404 | Exposed attack surface (many listening services + weak TLS + no auditd) |
+
+**Exit criteria:** 26 new checks, 4 new rules.
+
+---
+
+### Phase 5: Correlation Engine 2.0 — Full Attack Chain Detection
+
+**Goal:** Transform correlation from simple pattern matching to a full threat-detection engine.
+
+| Feature | Priority | Details |
+|---------|----------|---------|
+| YAML-defined rules | HIGH | Define correlation rules as YAML files in `policies/correlation/` |
+| Temporal correlation | HIGH | Weight findings by freshness (newer = higher confidence) |
+| Kill chain mapper | MEDIUM | Map finding chain to MITRE ATT&CK tactics (Recon→Weaponize→Deliver→Exploit→Install→C2→Actions) |
+| Risk accumulation | HIGH | N persistence mechanisms → `1 - (0.5)^N` confidence |
+| Counter-evidence | MEDIUM | Known-good packages, vendor-signed binaries reduce scores |
+| Threat intel feeds | LOW | Import external threat intel for IOC matching |
+| Custom rule DSL | LOW | Simple Python-like DSL for power users |
+| Scenario scoring | HIGH | Pre-built attack scenarios (ransomware, cryptominer, persistence) scored as a unit |
+
+**Target correlation rule count: 25–50 rules** covering common attack scenarios.
+
+**Exit criteria:** All 8 core attack scenarios detectable with >90% precision.
+
+---
+
+### Phase 6: Cloud & Compliance (~25 checks)
+
+**Goal:** Extend to cloud environments and regulatory compliance automation.
+
+#### Cloud (10 checks)
+| ID | Name | Depends |
+|----|------|---------|
+| CLD-101 | Cloud metadata service exposure | `network` |
+| CLD-102 | IMDSv1 vs IMDSv2 | `network` |
+| CLD-201 | Public cloud storage exposure | `network` |
+| CLD-301 | Cloud IAM credential audit | `filesystem` |
+| CLD-401 | Cloud agent health | `processes` |
+| CLD-501 | Kubernetes node security | `containers`, `processes` |
+
+#### Compliance (10 checks)
+| ID | Name | Depends |
+|----|------|---------|
+| CMP-201 | CIS Level 1 — Server | all |
+| CMP-202 | CIS Level 2 — Server | all |
+| CMP-203 | CIS Level 1 — Desktop | all |
+| CMP-301 | STIG Ubuntu 22.04 | all |
+| CMP-401 | PCI DSS 4.0 relevant controls | all |
+| CMP-402 | SOC2 relevant controls | all |
+| CMP-403 | HIPAA relevant controls | all |
+| CMP-501 | Custom policy evaluation | all |
+| CMP-502 | Drift from baseline | baseline |
+| CMP-503 | Remediation verification | all |
+
+#### Phase 6 Correlation Rules (3 new)
+| Rule ID | What it detects |
+|---------|----------------|
+| CORR-601 | Cloud credential exposure + metadata API accessible → instance compromise |
+| CORR-602 | CIS level 1 failures > 10 + firewall disabled + auditd off → critical compliance gap |
+| CORR-603 | Multiple compliance frameworks failing same control → priority remediation |
+
+**Exit criteria:** 25 new checks, 3 new rules, full CIS benchmark coverage.
+
+---
+
+### Phase 7: Scale, Distribution & Ecosystem (infrastructure phase)
+
+**Goal:** Production-grade deployment capabilities.
+
 | Feature | Priority | Notes |
 |---------|----------|-------|
-| Parallel execution | ✅ | `ThreadPoolExecutor` with `max_workers` from config |
-| Plugin isolation | LOW | No sandbox for 3rd-party plugins |
-| Remote / Fleet scanning | LOW | SSH transport for remote collectors |
-| Agent mode / MQ | LOW | Periodic publishing to NATS/MQTT |
-| Timeline DB | LOW | SQLite history of baseline changes |
+| Remote / Fleet scanning | HIGH | SSH transport for remote collectors, aggregate results |
+| Agent mode | HIGH | Daemon with periodic scanning + MQTT/NATS publishing |
+| Timeline DB | MEDIUM | SQLite history of all findings with trend analysis |
+| Web dashboard | MEDIUM | FastAPI + React dashboard for scan results |
+| Plugin marketplace | LOW | Community check repository with signing |
+| Plugin sandboxing | LOW | Container/namespace isolation for 3rd-party plugins |
+| Performance optimization | MEDIUM | Caching, batch collectors, incremental scans |
+| Event-driven monitoring | LOW | inotify/fanotify for real-time file change detection |
 
-### Filling Empty Placeholders
-| Area | Priority | Notes |
-|------|----------|-------|
-| Golden report tests | LOW | ✅ Implemented |
-| Container collectors | LOW | ✅ `ContainerCollector` added |
-| Filesystem collectors | LOW | ✅ `MountCollector` implemented |
-| Security collectors | LOW | ✅ `FirewallCollector`, `AuditdCollector` implemented |
-| Knowledge YAML coverage | MEDIUM | ✅ All 25 checks have knowledge YAML files |
-| Reference URLs in findings | MEDIUM | ✅ All 25 checks include reference URLs |
-| MITRE ATT&CK coverage | MEDIUM | ✅ All 25 checks include mitre_attack_ids |
-| `scoring/__init__.py` exports | LOW | ✅ Populated with `ScoringEngine`, `TrustScorer` |
-| `models/__init__.py` exports | LOW | ✅ Populated with all model exports |
+---
+
+## Target Check Counts by Layer
+
+| Layer | Current | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Phase 6 | Target |
+|-------|---------|---------|---------|---------|---------|---------|--------|
+| SSH | 3 | 3 | 3 | 3 | 3 | 3 | 25 |
+| Kernel | 4 | 4 | 4 | 4 | 4 | 4 | 25 |
+| Users | 3 | 9 | 9 | 9 | 9 | 9 | 20 |
+| Network | 2 | 7 | 7 | 7 | 7 | 7 | 35 |
+| Packages | 1 | 7 | 7 | 7 | 7 | 7 | 25 |
+| Filesystem | 0 | 0 | 10 | 10 | 10 | 10 | 30 |
+| Permissions | 2 | 2 | 2 | 2 | 2 | 2 | 25 |
+| Boot | 0 | 5 | 5 | 5 | 5 | 5 | 15 |
+| Services | 1 | 1 | 8 | 8 | 8 | 8 | 30 |
+| Persistence | 1 | 1 | 1 | 26 | 26 | 26 | 40 |
+| Containers | 1 | 1 | 1 | 1 | 9 | 9 | 25 |
+| Logs & Forensics | 1 | 1 | 1 | 1 | 9 | 9 | 25 |
+| Secrets | 0 | 0 | 0 | 0 | 10 | 10 | 20 |
+| Cloud | 0 | 0 | 0 | 0 | 0 | 6 | 20 |
+| Compliance | 1 | 1 | 1 | 1 | 1 | 11 | 20 |
+| Firewall | 1 | 1 | 1 | 1 | 1 | 1 | 10 |
+| Security (AppArmor/USB) | 2 | 2 | 2 | 2 | 2 | 2 | 10 |
+| Compromise | 1 | 1 | 1 | 1 | 1 | 1 | 15 |
+| Password | 1 | 1 | 1 | 1 | 1 | 1 | 10 |
+| **Total checks** | **25** | **53** | **65** | **91** | **117** | **133** | **~450** |
+| **Correlation rules** | 7 | 10 | 12 | 17 | 21 | 24 | **50+** |
 
 ---
 
 ## Technical Debt Log
 
-| ID | Description | Severity | Status |
-|----|-------------|----------|--------|
-| TD-001 | `metadata.configuration_file` set to `scan_name` instead of config path | LOW | ✅ |
-| TD-002 | `metadata.end_time` set to `scan_start_dt` instead of actual end time | LOW | ✅ |
-| TD-003 | Integration tests coverage expanded from 21→93 tests (8 test files, 3 new) | MEDIUM | ✅ |
-| TD-004 | ~~Scoring ignores confidence~~ → **Fixed** (P1-1 + P3-3) | HIGH | ✅ |
-| TD-005 | Collectors hardcoded in runner → **Fixed** (auto-discovered) | MEDIUM | ✅ |
-| TD-006 | No parallel execution despite `parallel=True` in config | LOW | ✅ |
-| TD-007 | ~~`mypy --strict` fails (245→15 errors)~~ → **Fixed: 0 errors across 100 source files** | MEDIUM | ✅ |
-| TD-008 | ~~SUID FP rate ~80%~~ → **Resolved** (expanded whitelist, config allowlist, MEDIUM/LOW confidence tiers based on 60 known-safe packages) | HIGH | ✅ |
-| TD-009 | Severity context `apply_all()` computed adjustments but never applied them to findings (dead data pipeline) | HIGH | ✅ |
-| TD-010 | Knowledge Base YAML coverage was 16/25 checks (64%); 9 missing files added + KB wired into runner pipeline | MEDIUM | ✅ |
-| TD-011 | CMP-001 (Ubuntu version check) missing `mitre_attack_ids` entirely | MEDIUM | ✅ |
-| TD-012 | `scoring/__init__.py` and `models/__init__.py` were empty (no exports) | LOW | ✅ |
-| TD-013 | 9 checks missing `reference` URL in findings | MEDIUM | ✅ |
-| TD-014 | Systemd collector doesn't strip `●` bullet char → service names corrupted for failed/degraded units | HIGH | ✅ |
-| TD-015 | `get_package_for_file()` doesn't resolve symlinks → `/bin/*` and `/sbin/*` show "Not owned by any installed package" (merged-usr layout) | HIGH | ✅ |
-| TD-016 | CMP-001 supported versions hardcoded to 20.04/22.04/24.04 → 26.04 flagged as unsupported | MEDIUM | ✅ |
-| TD-017 | PKG-001 flags desktop packages (cups, avahi, whoopsie, xorg) on desktop systems | MEDIUM | ✅ |
-| TD-018 | PER-001 doesn't filter snap-managed services → false positives for snap.svc names | MEDIUM | ✅ |
-| TD-019 | PER-001 doesn't filter known-legitimate services (e.g., switcheroo-control → "proxy" match) | LOW | ✅ |
+| ID | Description | Severity | Status | Phase |
+|----|-------------|----------|--------|-------|
+| TD-001 | `metadata.configuration_file` set to `scan_name` instead of config path | LOW | ✅ | — |
+| TD-002 | `metadata.end_time` set to `scan_start_dt` instead of actual end time | LOW | ✅ | — |
+| TD-003 | Integration tests coverage expanded from 21→93 tests (8 test files, 3 new) | MEDIUM | ✅ | — |
+| TD-004 | ~~Scoring ignores confidence~~ → **Fixed** (P1-1 + P3-3) | HIGH | ✅ | — |
+| TD-005 | Collectors hardcoded in runner → **Fixed** (auto-discovered) | MEDIUM | ✅ | — |
+| TD-006 | No parallel execution despite `parallel=True` in config | LOW | ✅ | — |
+| TD-007 | ~~`mypy --strict` fails (245→15 errors)~~ → **Fixed: 0 errors across 100 source files** | MEDIUM | ✅ | — |
+| TD-008 | ~~SUID FP rate ~80%~~ → **Resolved** (expanded whitelist, config allowlist, MEDIUM/LOW confidence tiers based on 60 known-safe packages) | HIGH | ✅ | — |
+| TD-009 | Severity context `apply_all()` computed adjustments but never applied them to findings (dead data pipeline) | HIGH | ✅ | — |
+| TD-010 | Knowledge Base YAML coverage was 16/25 checks (64%); 9 missing files added + KB wired into runner pipeline | MEDIUM | ✅ | — |
+| TD-011 | CMP-101 (Ubuntu version check) missing `mitre_attack_ids` entirely | MEDIUM | ✅ | — |
+| TD-012 | `scoring/__init__.py` and `models/__init__.py` were empty (no exports) | LOW | ✅ | — |
+| TD-013 | 9 checks missing `reference` URL in findings | MEDIUM | ✅ | — |
+| TD-014 | Systemd collector doesn't strip `●` bullet char → service names corrupted for failed/degraded units | HIGH | ✅ | — |
+| TD-015 | `get_package_for_file()` doesn't resolve symlinks → `/bin/*` and `/sbin/*` show "Not owned by any installed package" (merged-usr layout) | HIGH | ✅ | — |
+| TD-016 | CMP-101 supported versions hardcoded to 20.04/22.04/24.04 → 26.04 flagged as unsupported | MEDIUM | ✅ | — |
+| TD-017 | PKG-101 flags desktop packages (cups, avahi, whoopsie, xorg) on desktop systems | MEDIUM | ✅ | — |
+| TD-018 | PER-201 doesn't filter snap-managed services → false positives for snap.svc names | MEDIUM | ✅ | — |
+| TD-019 | PER-201 doesn't filter known-legitimate services (e.g., switcheroo-control → "proxy" match) | LOW | ✅ | — |
+| TD-020 | Correlation phase gated on `config.general.cache` instead of own flag (should be `always run`) | LOW | 🔴 | P0 |
+| TD-021 | `__init__.py` doesn't export all 7 correlation rules (3 missing from `__all__`) | LOW | 🔴 | P0 |
+| TD-022 | No collector exists for SSH config parsing (`sshd_config`); checks parse via subprocess | MEDIUM | 🔴 | P0 |
+| TD-023 | No collector exists for PAM configuration | MEDIUM | 🔴 | P0 |
+| TD-024 | No collector exists for boot/firmware state | MEDIUM | 🔴 | P0 |
+| TD-025 | No collector exists for filesystem walking (SUID, world-writable) | MEDIUM | 🔴 | P0 |
+| TD-026 | No collector for DNS resolver state | LOW | 🔴 | P0 |
 
 ---
 
@@ -338,7 +715,7 @@ src/usaf/
 │   ├── interfaces.py          # All ABCs (10 interfaces)
 │   ├── plugin.py              # AuditCheck base class
 │   ├── registry.py            # Plugin registry + auto-discovery
-│   └── runner.py              # ScanRunner orchestrator (5 phases)
+│   └── runner.py              # ScanRunner orchestrator (8 phases)
 ├── models/
 │   ├── evidence.py            # 8 evidence types
 │   ├── finding.py             # Finding model (24 fields)
@@ -346,14 +723,14 @@ src/usaf/
 │   ├── result.py              # CheckResult, ScanResult, ScanMetadata
 │   ├── score.py               # ScanScore, CategoryScore
 │   └── references.py          # CVE, CIS, MITRE, OWASP models
-├── collectors/                # 11 collectors (+3 placeholder dirs)
-├── checks/                    # 25 checks across 14 categories
+├── collectors/                # 15 collectors across 8 categories
+├── checks/                    # 25 checks across 17 categories
 ├── reporting/                 # 3 reporters
 ├── scoring/
 │   ├── engine.py              # Scoring engine (with confidence*FP)
 │   └── trust.py               # Trust scoring (evidence quality)
 ├── baseline/manager.py        # Baseline snapshots
-├── correlation/               # Correlation engine + 4 rules
+├── correlation/               # Correlation engine + 7 rules
 ├── compliance/framework.py    # CIS + NIST mappings
 ├── profiles/manager.py        # Profile matching
 ├── severity/engine.py         # Context-aware severity
@@ -367,29 +744,20 @@ src/usaf/
 
 ## Metrics & Targets
 
-| Metric | Current | Target | Status |
-|--------|---------|--------|--------|
-| Checks | 25 | 25+ | ✅ (target met) |
-| Findings (real desktop scan) | 29→**22** | — | ✅ (-7 false findings eliminated) |
-| Collectors | 15 | 15+ | ✅ (target met) |
-| Unit tests | 490→**511** | 300+ | ✅ (+21 correlation rule tests added) |
-| Unit test files | 48 | 40+ | ✅ (target exceeded) |
-| Integration tests | 21→**93** | 15+ | ✅ (72 new tests across 3 new files) |
-| Test coverage (stmt) | ~40% → **85%** | 85%+ | ✅ (target met) |
-| Test coverage (branch) | ~29% → **82%** | 80%+ | ✅ (target met) |
-| CI pipeline | Green on push | Green on push | ✅ |
-| mypy --strict | **0 errors** | 0 errors | ✅ |
-| Knowledge YAML coverage | 16/25 (64%) → **25/25 (100%)** | 100% | ✅ (9 missing files created) |
-| Knowledge enrichment in pipeline | Off → **Enabled** | Enabled | ✅ (wired into runner Phase 3.8) |
-| Severity pipeline dead data | Yes → **Fixed** | Fixed | ✅ (adjustments now applied to findings) |
-| False positive rate (SUID) | ~80% → ~30% → **~5% → ~2%** | <10% | ✅ (known-safe + symlink resolution + sudo-rs added) |
-| Desktop package false positives | 4 per scan → **0** | 0 | ✅ (desktop detection in PKG-001) |
-| Service detection false positives | varied → **eliminated** | 0 | ✅ (bullet fix + benign/snap filter) |
-| Total findings (desktop, after config) | 29 → **4** | — | ✅ (SUID allowlist eliminated 18 false positives) |
-| Confidence scoring | Applied | Applied | ✅ |
-| Correlation rules | 4→**7** | 4+ | ✅ (3 new: SUID-ARM, DEF-EVADE, EXPO-VULN) |
-| Baseline support | Full | Full + timeline | ◐ |
-| Remote scanning | None | SSH transport | 🔴 |
+| Metric | Current | Short-term (P1) | Medium-term (P3) | Long-term (P6) |
+|--------|---------|-----------------|-------------------|-----------------|
+| Checks | 25 | 53 | 91 | 133 → **450+** |
+| Collectors | 22 | 22 | 24 | 28 |
+| Correlation rules | 7 | 10 | 17 | 24 → **50+** |
+| Unit tests | 507 | 800+ | 1,500+ | 3,000+ |
+| Integration tests | 114 | 150+ | 300+ | 500+ |
+| Test coverage (stmt) | 85% | 88% | 90% | 92%+ |
+| Test coverage (branch) | 82% | 85% | 88% | 90%+ |
+| mypy --strict | 0 errors | 0 errors | 0 errors | 0 errors |
+| Knowledge YAML coverage | 100% | 100% | 100% | 100% |
+| False positive rate | ~2% | <3% | <3% | <2% |
+| Attack scenario coverage | 3 | 6 | 10 | 20+ |
+| Correlation engine maturity | Basic | Chained | Temporal | Full kill chain |
 
 ---
 

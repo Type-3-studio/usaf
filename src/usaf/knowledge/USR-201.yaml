@@ -1,4 +1,4 @@
-id: USR-002
+id: USR-201
 title: Empty Password Accounts
 threat: Accounts with empty passwords allow authentication without any credential. Any user can log in as that account by simply pressing Enter at the password prompt.
 exploit: "An attacker runs 'su <username>' for accounts with empty passwords, gaining access without knowing any password. Combined with sudo access, this leads to privilege escalation."
@@ -17,8 +17,8 @@ known_exceptions:
   - "root account with '!' or '*' in shadow password field — these indicate locked accounts, not empty passwords"
   - "Service accounts intentionally created without login capability"
 related_findings:
-  - "USR-001"
-  - "USR-003"
+  - "USR-101"
+  - "USR-102"
 severity_override: null
 tags:
   - "users"

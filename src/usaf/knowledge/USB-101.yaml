@@ -1,4 +1,4 @@
-id: USB-001
+id: USB-101
 title: USB Storage Not Restricted
 threat: Unrestricted USB ports allow anyone with physical access to exfiltrate data or introduce malware via USB devices, bypassing network security controls entirely.
 exploit: "An attacker with brief physical access plugs in a USB drive preloaded with malware. The system auto-mounts it (via usb-storage), and the attacker executes a payload from the drive. Alternatively, a malicious USB device (Rubber Ducky, Bash Bunny) emulates a keyboard to inject keystrokes."

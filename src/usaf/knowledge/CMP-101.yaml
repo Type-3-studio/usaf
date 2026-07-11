@@ -1,4 +1,4 @@
-id: CMP-001
+id: CMP-101
 title: Ubuntu Version Support Status
 threat: Running an unsupported Ubuntu release means no security patches for kernel vulnerabilities, critical libraries, or userspace tools. Unpatched CVEs accumulate over time.
 exploit: "An attacker scans the network, identifies an Ubuntu 18.04 system (end-of-life), and exploits a known CVE in the kernel or OpenSSL that was patched in later releases but never backported to the unsupported version."
@@ -19,7 +19,7 @@ known_exceptions:
   - "Air-gapped systems with no network connectivity"
   - "Systems scheduled for decommissioning"
 related_findings:
-  - "PKG-001"
+  - "PKG-101"
 severity_override: null
 tags:
   - "compliance"

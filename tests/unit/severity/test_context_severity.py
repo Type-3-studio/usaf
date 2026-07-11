@@ -9,14 +9,14 @@ from usaf.severity.engine import SeverityContextEngine
 class TestSeverityContextEngine:
     def test_no_adjustment_for_unmatched_check(self):
         engine = SeverityContextEngine()
-        finding = _make_finding("KERN-001-001", "kernel", Severity.MEDIUM)
+        finding = _make_finding("KERN-101-001", "kernel", Severity.MEDIUM)
         result = engine.evaluate(finding, {})
         assert not result.changed
         assert result.original == result.adjusted
 
     def test_ssh_public_exposure_escalates_to_critical(self):
         engine = SeverityContextEngine()
-        finding = _make_finding("SSH-001-001", "ssh protocol", Severity.HIGH)
+        finding = _make_finding("SSH-101-001", "ssh protocol", Severity.HIGH)
         collectors = {
             "sockets": {
                 "connections": [
@@ -34,7 +34,7 @@ class TestSeverityContextEngine:
 
     def test_ssh_localhost_reduces_to_medium(self):
         engine = SeverityContextEngine()
-        finding = _make_finding("SSH-001-001", "ssh protocol", Severity.HIGH)
+        finding = _make_finding("SSH-101-001", "ssh protocol", Severity.HIGH)
         collectors = {
             "sockets": {
                 "connections": [
@@ -52,7 +52,7 @@ class TestSeverityContextEngine:
 
     def test_ssh_private_network_keeps_high(self):
         engine = SeverityContextEngine()
-        finding = _make_finding("SSH-001-001", "ssh protocol", Severity.HIGH)
+        finding = _make_finding("SSH-101-001", "ssh protocol", Severity.HIGH)
         collectors = {
             "sockets": {
                 "connections": [
@@ -70,7 +70,7 @@ class TestSeverityContextEngine:
     def test_permission_in_temp_reduces_to_low(self):
         engine = SeverityContextEngine()
         finding = _make_finding_with_path(
-            "PRM-002-001", "world-writable", Severity.HIGH, "/tmp/test.txt"
+            "PRM-201-001", "world-writable", Severity.HIGH, "/tmp/test.txt"
         )
         result = engine.evaluate(finding, {})
         assert result.adjusted == Severity.LOW
@@ -79,7 +79,7 @@ class TestSeverityContextEngine:
     def test_suid_in_opt_escalates_to_critical(self):
         engine = SeverityContextEngine()
         finding = _make_finding_with_path(
-            "PRM-001-001", "suid binary", Severity.HIGH, "/opt/backdoor"
+            "PRM-101-001", "suid binary", Severity.HIGH, "/opt/backdoor"
         )
         result = engine.evaluate(finding, {})
         assert result.adjusted == Severity.CRITICAL
@@ -87,7 +87,7 @@ class TestSeverityContextEngine:
     def test_suid_in_usr_bin_reduces_to_medium(self):
         engine = SeverityContextEngine()
         finding = _make_finding_with_path(
-            "PRM-001-001", "suid binary", Severity.HIGH, "/usr/bin/sudo"
+            "PRM-101-001", "suid binary", Severity.HIGH, "/usr/bin/sudo"
         )
         result = engine.evaluate(finding, {})
         assert result.adjusted == Severity.MEDIUM
@@ -95,7 +95,7 @@ class TestSeverityContextEngine:
     def test_service_account_user_reduces_severity(self):
         engine = SeverityContextEngine()
         finding = _make_finding(
-            "USR-002-001", "empty password", Severity.CRITICAL,
+            "USR-201-001", "empty password", Severity.CRITICAL,
             affected_component="daemon",
         )
         collectors = {
@@ -110,7 +110,7 @@ class TestSeverityContextEngine:
     def test_human_user_escalates_medium_to_high(self):
         engine = SeverityContextEngine()
         finding = _make_finding(
-            "USR-003-001", "shadow password", Severity.MEDIUM,
+            "USR-102-001", "shadow password", Severity.MEDIUM,
             affected_component="alice",
         )
         collectors = {
@@ -124,7 +124,7 @@ class TestSeverityContextEngine:
     def test_root_account_escalates_properly(self):
         engine = SeverityContextEngine()
         finding = _make_finding(
-            "USR-002-001", "root issue", Severity.HIGH,
+            "USR-201-001", "root issue", Severity.HIGH,
             affected_component="root",
         )
         collectors = {
@@ -138,7 +138,7 @@ class TestSeverityContextEngine:
     def test_network_sensitive_port_exposed(self):
         engine = SeverityContextEngine()
         finding = _make_finding_with_network(
-            "NET-001-001", "port exposed", Severity.MEDIUM, 3389, "0.0.0.0"
+            "NET-101-001", "port exposed", Severity.MEDIUM, 3389, "0.0.0.0"
         )
         result = engine.evaluate(finding, {})
         assert result.adjusted == Severity.CRITICAL
@@ -146,7 +146,7 @@ class TestSeverityContextEngine:
     def test_database_port_exposed(self):
         engine = SeverityContextEngine()
         finding = _make_finding_with_network(
-            "NET-001-001", "db exposed", Severity.MEDIUM, 5432, "0.0.0.0"
+            "NET-101-001", "db exposed", Severity.MEDIUM, 5432, "0.0.0.0"
         )
         result = engine.evaluate(finding, {})
         assert result.adjusted == Severity.HIGH
@@ -154,8 +154,8 @@ class TestSeverityContextEngine:
     def test_apply_all_returns_dict(self):
         engine = SeverityContextEngine()
         findings = [
-            _make_finding("SSH-001-001", "ssh", Severity.HIGH),
-            _make_finding("KERN-001-001", "kernel", Severity.HIGH),
+            _make_finding("SSH-101-001", "ssh", Severity.HIGH),
+            _make_finding("KERN-101-001", "kernel", Severity.HIGH),
         ]
         collectors = {
             "sockets": {
@@ -166,7 +166,7 @@ class TestSeverityContextEngine:
         }
         result = engine.apply_all(findings, collectors)
         assert len(result) == 2
-        ssh_result = result["SSH-001-001"]
+        ssh_result = result["SSH-101-001"]
         assert ssh_result.changed
 
     def test_no_findings_returns_empty(self):
@@ -179,7 +179,7 @@ class TestSeverityContextEngine:
         cas = ContextAwareSeverity(
             original=Severity.HIGH,
             adjusted=Severity.CRITICAL,
-            check_id="SSH-001",
+            check_id="SSH-101",
             context_reason="public exposure",
         )
         assert "HIGH→CRITICAL" in repr(cas)
@@ -196,13 +196,13 @@ class TestSeverityContextEngine:
 
     def test_ssh_not_listening_no_adjustment(self):
         engine = SeverityContextEngine()
-        finding = _make_finding("SSH-001-001", "ssh", Severity.HIGH)
+        finding = _make_finding("SSH-101-001", "ssh", Severity.HIGH)
         result = engine.evaluate(finding, {"sockets": {"connections": []}})
         assert not result.changed
 
     def test_ssh_unspecified_address(self):
         engine = SeverityContextEngine()
-        finding = _make_finding("SSH-001-001", "ssh", Severity.HIGH)
+        finding = _make_finding("SSH-101-001", "ssh", Severity.HIGH)
         collectors = {
             "sockets": {
                 "connections": [
@@ -215,44 +215,44 @@ class TestSeverityContextEngine:
 
     def test_permission_no_path_no_adjustment(self):
         engine = SeverityContextEngine()
-        finding = _make_finding("PRM-001-001", "perm issue", Severity.HIGH)
+        finding = _make_finding("PRM-101-001", "perm issue", Severity.HIGH)
         result = engine.evaluate(finding, {})
         assert not result.changed
 
     def test_permission_var_tmp_reduces_to_low(self):
         engine = SeverityContextEngine()
-        finding = _make_finding_with_path("PRM-002-001", "world-writable", Severity.HIGH, "/var/tmp/foo")
+        finding = _make_finding_with_path("PRM-201-001", "world-writable", Severity.HIGH, "/var/tmp/foo")
         result = engine.evaluate(finding, {})
         assert result.adjusted == Severity.LOW
 
     def test_permission_bin_reduces_to_medium(self):
         engine = SeverityContextEngine()
-        finding = _make_finding_with_path("PRM-001-001", "suid binary", Severity.HIGH, "/bin/su")
+        finding = _make_finding_with_path("PRM-101-001", "suid binary", Severity.HIGH, "/bin/su")
         result = engine.evaluate(finding, {})
         assert result.adjusted == Severity.MEDIUM
 
     def test_user_missing_in_collectors(self):
         engine = SeverityContextEngine()
-        finding = _make_finding("USR-002-001", "empty password", Severity.CRITICAL)
+        finding = _make_finding("USR-201-001", "empty password", Severity.CRITICAL)
         result = engine.evaluate(finding, {"users": {}})
         assert not result.changed
 
     def test_user_non_dict_info(self):
         engine = SeverityContextEngine()
-        finding = _make_finding("USR-002-001", "empty password", Severity.CRITICAL,
+        finding = _make_finding("USR-201-001", "empty password", Severity.CRITICAL,
                                 affected_component="nobody")
         result = engine.evaluate(finding, {"users": {"nobody": "not-a-dict"}})
         assert not result.changed
 
     def test_network_no_evidence(self):
         engine = SeverityContextEngine()
-        finding = _make_finding("NET-001-001", "port check", Severity.MEDIUM)
+        finding = _make_finding("NET-101-001", "port check", Severity.MEDIUM)
         result = engine.evaluate(finding, {})
         assert not result.changed
 
     def test_network_non_sensitive_port(self):
         engine = SeverityContextEngine()
-        finding = _make_finding_with_network("NET-001-001", "port check", Severity.MEDIUM, 8080, "0.0.0.0")
+        finding = _make_finding_with_network("NET-101-001", "port check", Severity.MEDIUM, 8080, "0.0.0.0")
         result = engine.evaluate(finding, {})
         assert not result.changed
 

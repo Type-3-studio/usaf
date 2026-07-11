@@ -10,7 +10,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 class RootAccountCheck(AuditCheck):
     """Check that only root has UID 0."""
 
-    id = "USR-001"
+    id = "USR-101"
     name = "Unique UID 0 (Root)"
     category = CheckCategory.USERS
     severity = Severity.CRITICAL
@@ -70,7 +70,7 @@ class RootAccountCheck(AuditCheck):
 class EmptyPasswordCheck(AuditCheck):
     """Check for users with empty passwords."""
 
-    id = "USR-002"
+    id = "USR-201"
     name = "Empty Password Accounts"
     category = CheckCategory.USERS
     severity = Severity.CRITICAL
@@ -135,7 +135,7 @@ class EmptyPasswordCheck(AuditCheck):
 class ShadowedPasswordsCheck(AuditCheck):
     """Check that all accounts use shadowed passwords."""
 
-    id = "USR-003"
+    id = "USR-102"
     name = "Shadowed Passwords"
     category = CheckCategory.USERS
     severity = Severity.HIGH

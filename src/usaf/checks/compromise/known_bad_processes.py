@@ -8,7 +8,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 
 @register_check
 class KnownBadProcessCheck(AuditCheck):
-    id = "COM-001"
+    id = "COM-101"
     name = "Known Malicious Process Detection"
     category = CheckCategory.COMPROMISE
     severity = Severity.HIGH

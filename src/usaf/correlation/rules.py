@@ -22,7 +22,7 @@ class SSHBruteForceSurface(CorrelationRule):
     def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
         ssh_findings = [f for f in findings if f.check_id.startswith("SSH-")]
         net_findings = [
-            f for f in findings if f.check_id == "NET-001" and self._is_ssh_port(f)
+            f for f in findings if f.check_id == "NET-101" and self._is_ssh_port(f)
         ]
 
         if not ssh_findings or not net_findings:
@@ -137,10 +137,10 @@ class SuspiciousPersistence(CorrelationRule):
         unknown_services = [
             f for f in findings
             if ("service" in f.check_id.lower() or "systemd" in f.check_id.lower())
-            and f.id not in ("SVC-001",)
+            and f.id not in ("SVC-101",)
         ]
         suid_findings = [
-            f for f in findings if f.check_id == "PRM-001"
+            f for f in findings if f.check_id == "PRM-101"
         ]
 
         is_suspicious = len(user_anomalies) >= 1 and len(unknown_services) >= 1
@@ -200,16 +200,16 @@ class UnauthorizedService(CorrelationRule):
     def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
         unexpected_ports = [
             f for f in findings
-            if f.check_id == "NET-001"
+            if f.check_id == "NET-101"
             and getattr(f.evidence, "local_port", None) not in (22, 80, 443, 53, 0, None)
         ]
         unknown_binaries = [
             f for f in findings
-            if f.check_id == "PRM-001"
+            if f.check_id == "PRM-101"
         ]
         service_findings = [
             f for f in findings
-            if f.check_id.startswith("SVC-") or f.check_id == "NET-002"
+            if f.check_id.startswith("SVC-") or f.check_id == "NET-201"
         ]
 
         if len(unexpected_ports) < 1:
@@ -275,16 +275,16 @@ class DataExfilSurface(CorrelationRule):
     def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
         promiscuous = [
             f for f in findings
-            if f.check_id == "NET-002"
+            if f.check_id == "NET-201"
         ]
         unexpected_ports = [
             f for f in findings
-            if f.check_id == "NET-001"
+            if f.check_id == "NET-101"
             and getattr(f.evidence, "local_port", None) not in (22, 80, 443, 53, 0, None)
         ]
         suid_findings = [
             f for f in findings
-            if f.check_id == "PRM-001"
+            if f.check_id == "PRM-101"
         ]
 
         if not promiscuous and (len(unexpected_ports) < 2 or not suid_findings):
@@ -330,8 +330,8 @@ class DataExfilSurface(CorrelationRule):
 class SuidArmingChain(CorrelationRule):
     """Detects privilege escalation chains via SUID + world-writable files.
 
-    Combines world-writable critical files (PRM-002) with unexpected SUID
-    binaries (PRM-001). An attacker who can write to a file that is then
+    Combines world-writable critical files (PRM-201) with unexpected SUID
+    binaries (PRM-101). An attacker who can write to a file that is then
     executed by a SUID binary can trivially escalate to root.
     """
 
@@ -341,8 +341,8 @@ class SuidArmingChain(CorrelationRule):
     severity = Severity.CRITICAL
 
     def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
-        ww_findings = [f for f in findings if f.check_id == "PRM-002"]
-        suid_findings = [f for f in findings if f.check_id == "PRM-001"]
+        ww_findings = [f for f in findings if f.check_id == "PRM-201"]
+        suid_findings = [f for f in findings if f.check_id == "PRM-101"]
 
         if not ww_findings or not suid_findings:
             return []
@@ -396,8 +396,8 @@ class SuidArmingChain(CorrelationRule):
 class DefenseEvasionIndicators(CorrelationRule):
     """Detects systems where multiple security controls are disabled.
 
-    Combines firewall inactive (FIREWALL-001), disabled auditd (FOR-001),
-    disabled AppArmor (SEC-001), and disabled USB storage (USB-001) to
+    Combines firewall inactive (FW-101), disabled auditd (FOR-101),
+    disabled AppArmor (SEC-101), and disabled USB storage (USB-101) to
     identify potential defense evasion by an attacker.
     """
 
@@ -407,10 +407,10 @@ class DefenseEvasionIndicators(CorrelationRule):
     severity = Severity.HIGH
 
     REQUIRED_CHECK_IDS = {
-        "FIREWALL-001",
-        "FOR-001",
-        "SEC-001",
-        "USB-001",
+        "FW-101",
+        "FOR-101",
+        "SEC-101",
+        "USB-101",
     }
 
     def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
@@ -425,13 +425,13 @@ class DefenseEvasionIndicators(CorrelationRule):
             return []
 
         control_names: list[str] = []
-        for cid in ["FIREWALL-001", "FOR-001", "SEC-001", "USB-001"]:
+        for cid in ["FW-101", "FOR-101", "SEC-101", "USB-101"]:
             if cid in disabled_controls:
                 name = {
-                    "FIREWALL-001": "firewall",
-                    "FOR-001": "auditd",
-                    "SEC-001": "AppArmor",
-                    "USB-001": "USB storage restriction",
+                    "FW-101": "firewall",
+                    "FOR-101": "auditd",
+                    "SEC-101": "AppArmor",
+                    "USB-101": "USB storage restriction",
                 }.get(cid, cid)
                 control_names.append(name)
 
@@ -473,8 +473,8 @@ class DefenseEvasionIndicators(CorrelationRule):
 class ExposedVulnerableService(CorrelationRule):
     """Detects vulnerable/risky packages exposed on network ports.
 
-    Combines PKG-001 findings (risky packages like cups, samba, telnet)
-    with NET-001 findings (listening ports) to identify services that
+    Combines PKG-101 findings (risky packages like cups, samba, telnet)
+    with NET-101 findings (listening ports) to identify services that
     are both installed and network-accessible.
     """
 
@@ -494,14 +494,14 @@ class ExposedVulnerableService(CorrelationRule):
     def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
         risky_pkgs: dict[str, Finding] = {}
         for f in findings:
-            if f.check_id == "PKG-001":
+            if f.check_id == "PKG-101":
                 ev = f.evidence
                 if isinstance(ev, PackageEvidence) and ev.name:
                     risky_pkgs[ev.name] = f
 
         listening_ports: dict[int, Finding] = {}
         for f in findings:
-            if f.check_id == "NET-001":
+            if f.check_id == "NET-101":
                 port = getattr(f.evidence, "local_port", None)
                 if isinstance(port, int):
                     listening_ports[port] = f
@@ -563,5 +563,206 @@ class ExposedVulnerableService(CorrelationRule):
                 tags=["exposed-service", "remote-exploit", "vulnerability", "attack-surface"],
                 mitre_attack_ids=["T1190", "T1043", "T1505"],
                 cis_benchmarks=["CIS Ubuntu 22.04: 2.1", "CIS Ubuntu 22.04: 4.4"],
+            )
+        ]
+
+
+class SupplyChainAttack(CorrelationRule):
+    """Detects supply chain attack indicators.
+
+    Combines unknown repositories (PKG-301), unsigned/broken package
+    signatures (PKG-202), and modified package files (PKG-201) to
+    identify potential software supply chain compromise.
+    """
+
+    id = "SUPPLY-CHAIN"
+    name = "Supply Chain Attack Detection"
+    description = "Detects indicators of software supply chain compromise"
+    severity = Severity.CRITICAL
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        unknown_repos = [f for f in findings if f.check_id == "PKG-301"]
+        broken_sigs = [f for f in findings if f.check_id == "PKG-202"]
+        modified_files = [f for f in findings if f.check_id == "PKG-201"]
+
+        if not unknown_repos:
+            return []
+
+        if len(unknown_repos) + len(broken_sigs) + len(modified_files) < 2:
+            return []
+
+        details: list[str] = []
+        if unknown_repos:
+            details.append(f"{len(unknown_repos)} unknown repository/repositories")
+        if broken_sigs:
+            details.append(f"{len(broken_sigs)} broken/missing signature(s)")
+        if modified_files:
+            details.append(f"{len(modified_files)} modified package file(s)")
+
+        source_findings: list[Finding] = unknown_repos + broken_sigs + modified_files
+
+        return [
+            self._make_finding(
+                finding_id="001",
+                title="Supply Chain Attack Indicators Detected",
+                description=(
+                    f"Found evidence of possible supply chain compromise: "
+                    f"{'; '.join(details)}. "
+                    "This pattern indicates the software supply chain may have been "
+                    "tampered with or compromised."
+                ),
+                rationale=(
+                    "Supply chain attacks target the software distribution pipeline. "
+                    "Unknown repositories can host malicious packages, while unsigned "
+                    "packages cannot be verified as authentic. Modified package files "
+                    "indicate post-installation tampering. The combination of these "
+                    "indicators significantly increases the likelihood of a supply "
+                    "chain compromise, where an attacker has inserted malicious code "
+                    "into the software update process."
+                ),
+                remediation=(
+                    "1. Remove unknown repositories: 'add-apt-repository --remove <repo>'\n"
+                    "2. Reinstall affected packages: 'apt-get --reinstall install <package>'\n"
+                    "3. Update GPG keys: 'apt install --reinstall ubuntu-keyring'\n"
+                    "4. Scan for malware: 'apt install clamav && freshclam && clamscan -r /'\n"
+                    "5. Investigate package origin and authenticity"
+                ),
+                source_findings=source_findings,
+                severity=Severity.CRITICAL,
+                tags=["supply-chain", "tampering", "compromise"],
+                mitre_attack_ids=["T1195", "T1195.001", "T1554"],
+                cis_benchmarks=["CIS Ubuntu 22.04: 2.1", "CIS Ubuntu 22.04: 2.2", "CIS Ubuntu 22.04: 2.3"],
+            )
+        ]
+
+
+class BootIntegrityFailure(CorrelationRule):
+    """Detects boot integrity failures.
+
+    Combines Secure Boot disabled (BOOT-101), unsigned kernels (BOOT-501),
+    and no GRUB password (BOOT-401) to identify systems vulnerable to
+    boot-level attacks.
+    """
+
+    id = "BOOT-FAIL"
+    name = "Boot Integrity Failure Chain"
+    description = "Detects multiple boot security controls disabled"
+    severity = Severity.CRITICAL
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        sb_disabled = [f for f in findings if f.check_id == "BOOT-101"]
+        no_grub_pw = [f for f in findings if f.check_id == "BOOT-401"]
+        unsigned_kernels = [f for f in findings if f.check_id == "BOOT-501"]
+
+        if len(sb_disabled) + len(no_grub_pw) + len(unsigned_kernels) < 2:
+            return []
+
+        details: list[str] = []
+        if sb_disabled:
+            details.append("Secure Boot disabled")
+        if no_grub_pw:
+            details.append("no GRUB password")
+        if unsigned_kernels:
+            details.append("unsigned kernel(s)")
+
+        source_findings = sb_disabled + no_grub_pw + unsigned_kernels
+
+        return [
+            self._make_finding(
+                finding_id="001",
+                title=f"Boot Security Chain Broken ({len(source_findings)} controls failed)",
+                description=(
+                    f"Multiple boot security controls are disabled or misconfigured: "
+                    f"{'; '.join(details)}. "
+                    "This significantly weakens boot integrity and allows bootkit installation."
+                ),
+                rationale=(
+                    "Boot-level attacks are among the most dangerous because they "
+                    "persist across OS reinstalls and can bypass full-disk encryption. "
+                    "Secure Boot prevents unsigned bootloaders, a GRUB password prevents "
+                    "unauthorized boot parameter changes, and signed kernels ensure "
+                    "kernel authenticity. When multiple boot controls are missing, the "
+                    "system is vulnerable to bootkits (BlackLotus, BootHole) that install "
+                    "before the OS loads."
+                ),
+                remediation=(
+                    "1. Enable Secure Boot in UEFI settings\n"
+                    "2. Set a GRUB password: 'grub-mkpasswd-pbkdf2' and configure\n"
+                    "3. Install signed kernels: 'apt install linux-image-generic-signed'\n"
+                    "4. Verify: 'mokutil --sb-state && sbverify --list /boot/vmlinuz-*'\n"
+                    "5. Review UEFI boot entries: 'efibootmgr -v'"
+                ),
+                source_findings=source_findings,
+                severity=Severity.CRITICAL,
+                tags=["boot", "secure-boot", "integrity", "bootkit"],
+                mitre_attack_ids=["T1542", "T1542.001", "T1542.003"],
+                cis_benchmarks=["CIS Ubuntu 22.04: 1.6", "CIS Ubuntu 22.04: 1.7"],
+            )
+        ]
+
+
+class DNSHijacking(CorrelationRule):
+    """Detects DNS hijacking indicators.
+
+    Combines unexpected DNS servers (NET-301), modified /etc/hosts (NET-302),
+    and disabled DNSSEC (NET-501) to identify potential DNS hijacking.
+    """
+
+    id = "DNS-HIJACK"
+    name = "DNS Hijacking Detection"
+    description = "Detects indicators of DNS manipulation or hijacking"
+    severity = Severity.HIGH
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        unexpected_dns = [f for f in findings if f.check_id == "NET-301"]
+        modified_hosts = [f for f in findings if f.check_id == "NET-302"]
+        no_dnssec = [f for f in findings if f.check_id == "NET-501"]
+
+        if not unexpected_dns and not modified_hosts:
+            return []
+
+        if len(unexpected_dns) + len(modified_hosts) + len(no_dnssec) < 2:
+            return []
+
+        details: list[str] = []
+        if unexpected_dns:
+            details.append(f"{len(unexpected_dns)} unexpected DNS server(s)")
+        if modified_hosts:
+            details.append(f"{len(modified_hosts)} suspicious hosts entry/entries")
+        if no_dnssec:
+            details.append("DNSSEC validation disabled")
+
+        source_findings = unexpected_dns + modified_hosts + no_dnssec
+
+        return [
+            self._make_finding(
+                finding_id="001",
+                title="DNS Hijacking Indicators Detected",
+                description=(
+                    f"Found evidence consistent with DNS manipulation: "
+                    f"{'; '.join(details)}. "
+                    "This pattern suggests DNS traffic may be intercepted or redirected."
+                ),
+                rationale=(
+                    "DNS hijacking enables attackers to redirect traffic to malicious "
+                    "servers, capture credentials through fake login pages, and "
+                    "intercept email. Unexpected DNS servers may be rogue resolvers, "
+                    "modified hosts entries can override legitimate DNS responses, "
+                    "and disabled DNSSEC removes the cryptographic verification that "
+                    "ensures DNS responses are authentic. When combined, these indicators "
+                    "strongly suggest DNS manipulation."
+                ),
+                remediation=(
+                    "1. Check /etc/resolv.conf and systemd-resolved config\n"
+                    "2. Enable DNSSEC: 'resolvectl dnssec yes'\n"
+                    "3. Fix /etc/hosts entries: remove unauthorized mappings\n"
+                    "4. Review DNS server configuration: only use trusted resolvers\n"
+                    "5. Check for DNS changes in auth.log: 'grep -i dns /var/log/auth.log'"
+                ),
+                source_findings=source_findings,
+                severity=Severity.HIGH,
+                tags=["dns", "hijacking", "redirection", "tampering"],
+                mitre_attack_ids=["T1553", "T1553.001", "T1553.002"],
+                cis_benchmarks=["CIS Ubuntu 22.04: 4.3", "CIS Ubuntu 22.04: 4.4", "CIS Ubuntu 22.04: 4.5"],
             )
         ]

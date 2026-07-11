@@ -10,7 +10,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 class KernelASLRCheck(AuditCheck):
     """Check that kernel ASLR is enabled (randomize_va_space = 2)."""
 
-    id = "KERN-001"
+    id = "KERN-101"
     name = "Kernel ASLR Status"
     category = CheckCategory.KERNEL
     severity = Severity.HIGH
@@ -64,7 +64,7 @@ class KernelASLRCheck(AuditCheck):
 class KernelPtrRestrictCheck(AuditCheck):
     """Check that kernel pointer restriction is enabled."""
 
-    id = "KERN-002"
+    id = "KERN-201"
     name = "Kernel Pointer Restriction"
     category = CheckCategory.KERNEL
     severity = Severity.MEDIUM
@@ -151,7 +151,7 @@ class KernelPtrRestrictCheck(AuditCheck):
 class KernelCoreDumpCheck(AuditCheck):
     """Check that core dumps are restricted."""
 
-    id = "KERN-003"
+    id = "KERN-301"
     name = "Core Dump Restriction"
     category = CheckCategory.KERNEL
     severity = Severity.MEDIUM

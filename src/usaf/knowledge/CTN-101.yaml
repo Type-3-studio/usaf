@@ -1,4 +1,4 @@
-id: CTN-001
+id: CTN-101
 title: Docker Socket Permissions
 threat: The Docker socket provides root-equivalent access to the Docker daemon. Any user or group with access can create privileged containers, mount host filesystems, and escalate to root.
 exploit: "A developer account with access to the docker group (via /var/run/docker.sock) creates a privileged container mounting the host root filesystem. The attacker then chroots into the mounted filesystem and gains root on the host."
@@ -20,8 +20,8 @@ known_exceptions:
   - "Systems using rootless Docker (socket not world-accessible)"
   - "Podman environments that don't use a central Docker socket"
 related_findings:
-  - "PRM-001"
-  - "USR-001"
+  - "PRM-101"
+  - "USR-101"
 severity_override: null
 tags:
   - "containers"

@@ -31,15 +31,15 @@ from usaf.checks.users.user_checks import (
 )
 
 COLLECTOR_CHECK_MAP: dict[str, list[str]] = {
-    "kernel_params": ["KERN-001", "KERN-002", "KERN-003"],
-    "users": ["USR-001", "USR-002", "USR-003"],
-    "sockets": ["NET-001"],
-    "interfaces": ["NET-002"],
-    "kernel": ["CMP-001"],
-    "processes": ["COM-001"],
-    "apt": ["PKG-001"],
-    "systemd": ["PER-001"],
-    "firewall": ["FIREWALL-001"],
+    "kernel_params": ["KERN-101", "KERN-201", "KERN-301"],
+    "users": ["USR-101", "USR-201", "USR-102"],
+    "sockets": ["NET-101"],
+    "interfaces": ["NET-201"],
+    "kernel": ["CMP-101"],
+    "processes": ["COM-101"],
+    "apt": ["PKG-101"],
+    "systemd": ["PER-201"],
+    "firewall": ["FW-101"],
 }
 
 _REALISTIC_COLLECTORS: dict[str, dict] = {
@@ -109,7 +109,7 @@ _REALISTIC_COLLECTORS: dict[str, dict] = {
 
 
 class TestKernelChecksIntegration:
-    """Integration tests for KERN-001, KERN-002, KERN-003 with realistic data."""
+    """Integration tests for KERN-101, KERN-201, KERN-301 with realistic data."""
 
     def test_kern001_passes_when_aslr_full(self):
         result = KernelASLRCheck().evaluate(_REALISTIC_COLLECTORS)
@@ -153,7 +153,7 @@ class TestKernelChecksIntegration:
 
 
 class TestUserChecksIntegration:
-    """Integration tests for USR-001, USR-002, USR-003 with realistic data."""
+    """Integration tests for USR-101, USR-201, USR-102 with realistic data."""
 
     def test_usr001_passes_when_only_root_has_uid_zero(self):
         result = RootAccountCheck().evaluate(_REALISTIC_COLLECTORS)
@@ -205,7 +205,7 @@ class TestUserChecksIntegration:
 
 
 class TestNetworkChecksIntegration:
-    """Integration tests for NET-001, NET-002 with realistic data."""
+    """Integration tests for NET-101, NET-201 with realistic data."""
 
     def test_net001_passes_with_known_safe_ports(self):
         result = UnexpectedListeningPortsCheck().evaluate(_REALISTIC_COLLECTORS)
@@ -243,7 +243,7 @@ class TestNetworkChecksIntegration:
 
 
 class TestComplianceCheckIntegration:
-    """Integration tests for CMP-001 with realistic data."""
+    """Integration tests for CMP-101 with realistic data."""
 
     def test_cmp001_passes_with_supported_version(self):
         result = UbuntuVersionCheck().evaluate(_REALISTIC_COLLECTORS)
@@ -263,7 +263,7 @@ class TestComplianceCheckIntegration:
 
 
 class TestCompromiseCheckIntegration:
-    """Integration tests for COM-001 with realistic data."""
+    """Integration tests for COM-101 with realistic data."""
 
     def test_com001_passes_clean_process_list(self):
         result = KnownBadProcessCheck().evaluate(_REALISTIC_COLLECTORS)
@@ -295,7 +295,7 @@ class TestCompromiseCheckIntegration:
 
 
 class TestPackageCheckIntegration:
-    """Integration tests for PKG-001 with realistic data."""
+    """Integration tests for PKG-101 with realistic data."""
 
     def test_pkg001_passes_no_risky_packages(self):
         result = UnnecessaryPackagesCheck().evaluate(_REALISTIC_COLLECTORS)
@@ -324,7 +324,7 @@ class TestPackageCheckIntegration:
 
 
 class TestPersistenceCheckIntegration:
-    """Integration tests for PER-001 with realistic data."""
+    """Integration tests for PER-201 with realistic data."""
 
     def test_per001_passes_clean_services(self):
         result = UnauthorizedServicesCheck().evaluate(_REALISTIC_COLLECTORS)
@@ -345,7 +345,7 @@ class TestPersistenceCheckIntegration:
 
 
 class TestFirewallCheckIntegration:
-    """Integration tests for FIREWALL-001 with realistic data."""
+    """Integration tests for FW-101 with realistic data."""
 
     def test_firewall001_passes_with_active_ufw(self):
         result = FirewallActiveCheck().evaluate(_REALISTIC_COLLECTORS)

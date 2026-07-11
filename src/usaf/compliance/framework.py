@@ -44,154 +44,154 @@ class ComplianceResult(BaseModel):
 CIS_MAPPINGS: dict[str, dict[str, Any]] = {
     "CIS Ubuntu 22.04: 1.1.1": {
         "title": "Ensure mounting of unused filesystems is disabled",
-        "check_ids": ["KERN-003"],
+        "check_ids": ["KERN-301"],
     },
     "CIS Ubuntu 22.04: 1.5.1": {
         "title": "Ensure address space layout randomization (ASLR) is enabled",
-        "check_ids": ["KERN-001"],
+        "check_ids": ["KERN-101"],
     },
     "CIS Ubuntu 22.04: 1.5.2": {
         "title": "Ensure ptrace_scope is restricted",
-        "check_ids": ["KERN-002"],
+        "check_ids": ["KERN-201"],
     },
     "CIS Ubuntu 22.04: 1.5.3": {
         "title": "Ensure core dumps are restricted",
-        "check_ids": ["KERN-003"],
+        "check_ids": ["KERN-301"],
     },
     "CIS Ubuntu 22.04: 5.2.1": {
         "title": "Ensure permissions on /etc/ssh/sshd_config are configured",
-        "check_ids": ["SSH-001", "SSH-002", "SSH-003"],
+        "check_ids": ["SSH-101", "SSH-102", "SSH-201"],
     },
     "CIS Ubuntu 22.04: 5.2.2": {
         "title": "Ensure SSH Protocol is set to 2",
-        "check_ids": ["SSH-001"],
+        "check_ids": ["SSH-101"],
     },
     "CIS Ubuntu 22.04: 5.2.3": {
         "title": "Ensure SSH LogLevel is appropriate",
-        "check_ids": ["SSH-001"],
+        "check_ids": ["SSH-101"],
     },
     "CIS Ubuntu 22.04: 5.2.4": {
         "title": "Ensure SSH X11 forwarding is disabled",
-        "check_ids": ["SSH-001"],
+        "check_ids": ["SSH-101"],
     },
     "CIS Ubuntu 22.04: 5.2.5": {
         "title": "Ensure SSH MaxAuthTries is set to 4 or less",
-        "check_ids": ["SSH-001"],
+        "check_ids": ["SSH-101"],
     },
     "CIS Ubuntu 22.04: 5.2.6": {
         "title": "Ensure SSH IgnoreRhosts is enabled",
-        "check_ids": ["SSH-001"],
+        "check_ids": ["SSH-101"],
     },
     "CIS Ubuntu 22.04: 5.2.7": {
         "title": "Ensure SSH HostbasedAuthentication is disabled",
-        "check_ids": ["SSH-001"],
+        "check_ids": ["SSH-101"],
     },
     "CIS Ubuntu 22.04: 5.2.8": {
         "title": "Ensure SSH root login is disabled",
-        "check_ids": ["SSH-002"],
+        "check_ids": ["SSH-102"],
     },
     "CIS Ubuntu 22.04: 5.2.9": {
         "title": "Ensure SSH PermitEmptyPasswords is disabled",
-        "check_ids": ["SSH-002"],
+        "check_ids": ["SSH-102"],
     },
     "CIS Ubuntu 22.04: 5.2.10": {
         "title": "Ensure SSH PermitUserEnvironment is disabled",
-        "check_ids": ["SSH-001"],
+        "check_ids": ["SSH-101"],
     },
     "CIS Ubuntu 22.04: 5.2.11": {
         "title": "Ensure only approved MAC algorithms are used",
-        "check_ids": ["SSH-003"],
+        "check_ids": ["SSH-201"],
     },
     "CIS Ubuntu 22.04: 5.2.12": {
         "title": "Ensure SSH Idle Timeout Interval is configured",
-        "check_ids": ["SSH-001"],
+        "check_ids": ["SSH-101"],
     },
     "CIS Ubuntu 22.04: 5.2.13": {
         "title": "Ensure SSH LoginGraceTime is set to one minute or less",
-        "check_ids": ["SSH-001"],
+        "check_ids": ["SSH-101"],
     },
     "CIS Ubuntu 22.04: 5.2.14": {
         "title": "Ensure SSH warning banner is configured",
-        "check_ids": ["SSH-001"],
+        "check_ids": ["SSH-101"],
     },
     "CIS Ubuntu 22.04: 5.4.1": {
         "title": "Ensure password creation requirements are configured",
-        "check_ids": ["USR-002"],
+        "check_ids": ["USR-201"],
     },
     "CIS Ubuntu 22.04: 5.4.2": {
         "title": "Ensure lockout for failed password attempts is configured",
-        "check_ids": ["USR-002"],
+        "check_ids": ["USR-201"],
     },
     "CIS Ubuntu 22.04: 5.5.1": {
         "title": "Ensure password expiration is 365 days or less",
-        "check_ids": ["USR-003"],
+        "check_ids": ["USR-102"],
     },
     "CIS Ubuntu 22.04: 6.1.1": {
         "title": "Ensure permissions on /etc/passwd are configured",
-        "check_ids": ["USR-003"],
+        "check_ids": ["USR-102"],
     },
     "CIS Ubuntu 22.04: 6.1.2": {
         "title": "Ensure permissions on /etc/shadow are configured",
-        "check_ids": ["USR-003"],
+        "check_ids": ["USR-102"],
     },
     "CIS Ubuntu 22.04: 6.1.3": {
         "title": "Ensure permissions on /etc/group are configured",
-        "check_ids": ["USR-003"],
+        "check_ids": ["USR-102"],
     },
     "CIS Ubuntu 22.04: 6.1.4": {
         "title": "Ensure permissions on /etc/gshadow are configured",
-        "check_ids": ["USR-003"],
+        "check_ids": ["USR-102"],
     },
     "CIS Ubuntu 22.04: 6.1.10": {
         "title": "Ensure no duplicate UIDs exist",
-        "check_ids": ["USR-001"],
+        "check_ids": ["USR-101"],
     },
     "CIS Ubuntu 22.04: 6.1.11": {
         "title": "Ensure no duplicate GIDs exist",
-        "check_ids": ["USR-001"],
+        "check_ids": ["USR-101"],
     },
     "CIS Ubuntu 22.04: 6.1.12": {
         "title": "Ensure no duplicate user names exist",
-        "check_ids": ["USR-001"],
+        "check_ids": ["USR-101"],
     },
     "CIS Ubuntu 22.04: 6.1.13": {
         "title": "Ensure no duplicate group names exist",
-        "check_ids": ["USR-001"],
+        "check_ids": ["USR-101"],
     },
     "CIS Ubuntu 22.04: 6.2.1": {
         "title": "Ensure accounts in /etc/passwd use shadowed passwords",
-        "check_ids": ["USR-003"],
+        "check_ids": ["USR-102"],
     },
     "CIS Ubuntu 22.04: 6.2.2": {
         "title": "Ensure password fields are not empty",
-        "check_ids": ["USR-002"],
+        "check_ids": ["USR-201"],
     },
 }
 
 NIST_MAPPINGS: dict[str, dict[str, Any]] = {
     "NIST 800-53: AC-3": {
         "title": "Access Enforcement — enforce approved authorizations",
-        "check_ids": ["PRM-001", "PRM-002", "USR-001"],
+        "check_ids": ["PRM-101", "PRM-201", "USR-101"],
     },
     "NIST 800-53: AC-6": {
         "title": "Least Privilege — employ least privilege principle",
-        "check_ids": ["PRM-001", "USR-001", "USR-002"],
+        "check_ids": ["PRM-101", "USR-101", "USR-201"],
     },
     "NIST 800-53: CM-6": {
         "title": "Configuration Settings — establish and enforce configuration settings",
-        "check_ids": ["KERN-001", "KERN-002", "KERN-003", "SSH-001", "SSH-002", "SSH-003"],
+        "check_ids": ["KERN-101", "KERN-201", "KERN-301", "SSH-101", "SSH-102", "SSH-201"],
     },
     "NIST 800-53: IA-5": {
         "title": "Authenticator Management — manage system authenticators",
-        "check_ids": ["USR-002", "USR-003"],
+        "check_ids": ["USR-201", "USR-102"],
     },
     "NIST 800-53: SC-7": {
         "title": "Boundary Protection — monitor and control communications at boundaries",
-        "check_ids": ["NET-001", "NET-002"],
+        "check_ids": ["NET-101", "NET-201"],
     },
     "NIST 800-53: SI-4": {
         "title": "System Monitoring — monitor, analyze, and protect communications",
-        "check_ids": ["NET-002", "PRM-002"],
+        "check_ids": ["NET-201", "PRM-201"],
     },
 }
 

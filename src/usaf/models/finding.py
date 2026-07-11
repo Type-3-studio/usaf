@@ -10,7 +10,7 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 
 
 class Finding(BaseModel):
-    id: str = Field(description="Unique finding identifier (e.g., SSH-001-001)")
+    id: str = Field(description="Unique finding identifier (e.g., SSH-101-001)")
     check_id: str = Field(description="Parent check plugin ID")
     category: CheckCategory = Field(description="Finding category")
     severity: Severity = Field(description="Severity level")

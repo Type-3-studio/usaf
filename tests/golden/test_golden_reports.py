@@ -63,14 +63,14 @@ def _make_sample_result() -> ScanResult:
         ),
         results=[
             CheckResult(
-                check_id="KERN-001",
+                check_id="KERN-101",
                 name="Kernel ASLR Status",
                 category=CheckCategory.SYSTEM,
                 passed=False,
                 findings=[
                     Finding(
-                        id="KERN-001-001",
-                        check_id="KERN-001",
+                        id="KERN-101-001",
+                        check_id="KERN-101",
                         category=CheckCategory.SYSTEM,
                         severity=Severity.HIGH,
                         risk_score=7.5,
@@ -94,7 +94,7 @@ def _make_sample_result() -> ScanResult:
                 ],
             ),
             CheckResult(
-                check_id="SSH-001",
+                check_id="SSH-101",
                 name="SSH Protocol Version",
                 category=CheckCategory.SYSTEM,
                 passed=True,

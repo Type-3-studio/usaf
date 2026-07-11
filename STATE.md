@@ -47,7 +47,7 @@
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐    │
 │  │Parallel  │  │ Remote   │  │  LLM AI  │  │Timeline  │    │
 │  │  Exec    │  │  Fleet   │  │  (P5)    │  │    DB    │    │
-│  │   🔴    │  │   🔴    │  │   🔴    │  │   🔴    │    │
+│  │   ✅    │  │   🔴    │  │   🔴    │  │   🔴    │    │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘    │
 │                                                              │
 └──────────────────────────────────────────────────────────────┘
@@ -55,7 +55,7 @@
 
 ### Detailed Status
 
-#### Collectors (11 total)
+#### Collectors (13 total)
 | Collector | Status | Notes |
 |-----------|--------|-------|
 | `KernelCollector` | ✅ | `/proc/sys`, sysctl, uname |
@@ -69,11 +69,13 @@
 | `APTCollector` | ✅ | dpkg query, package DB, file→package cache |
 | `SystemdCollector` | ✅ | systemctl, unit files |
 | `CronCollector` | ✅ | crontabs, cron.d, cron.daily |
+| `FirewallCollector` | ✅ | ufw, nftables, iptables status |
+| `MountCollector` | ✅ | `/proc/mounts`, `/etc/fstab` parsing |
 | `container/` | ⬜ | Placeholder directory, no collectors yet |
-| `filesystem/` | ⬜ | Placeholder directory, no collectors yet |
-| `security/` | ⬜ | Placeholder directory, no collectors yet |
+| `filesystem/` | ◐ | `MountCollector` implemented |
+| `security/` | ◐ | `FirewallCollector` implemented |
 
-#### Checks (22 total)
+#### Checks (25 total)
 | Check | Status | Severity | Evidence |
 |-------|--------|----------|----------|
 | KERN-001 (ASLR) | ✅ | HIGH | RegistryEvidence |
@@ -84,20 +86,23 @@
 | SSH-003 (KEX Algorithms) | ✅ | MEDIUM | RegistryEvidence |
 | USR-001 (Duplicate UID 0) | ✅ | CRITICAL | UserEvidence |
 | USR-002 (Empty Passwords) | ✅ | CRITICAL | UserEvidence |
-| USR-003 (Shadowed Passwords) | ✅ | HIGH | FileEvidence |
+| USR-003 (Shadowed Passwords) | ✅ | HIGH | RegistryEvidence |
 | NET-001 (Listening Ports) | ✅ | MEDIUM | NetworkEvidence |
 | NET-002 (Promiscuous Mode) | ✅ | MEDIUM | NetworkEvidence |
-| PRM-001 (SUID Binaries) | ✅ | HIGH | FileEvidence |
+| PRM-001 (SUID Binaries) | ✅ | HIGH | FileEvidence (configurable allowlist via suid_allowlist) |
 | PRM-002 (World-Writable) | ✅ | HIGH | FileEvidence |
-| CMP-001 (Ubuntu Support) | ✅ | MEDIUM | CommandEvidence |
+| CMP-001 (Ubuntu Support) | ✅ | MEDIUM | RegistryEvidence |
 | COM-001 (Bad Processes) | ✅ | HIGH | ProcessEvidence |
 | CTN-001 (Docker Socket) | ✅ | HIGH | FileEvidence |
 | FOR-001 (Audit Logs) | ✅ | MEDIUM | FileEvidence |
 | KRN-001 (Module Loading) | ✅ | MEDIUM | RegistryEvidence |
 | PKG-001 (Unnecessary Pkgs) | ✅ | MEDIUM | PackageEvidence |
 | PER-001 (Unauth Services) | ✅ | HIGH | FileEvidence |
-| SEC-001 (AppArmor) | ✅ | HIGH | CommandEvidence |
+| SEC-001 (AppArmor) | ✅ | HIGH | FileEvidence |
 | SVC-001 (Insecure Svcs) | ✅ | HIGH | FileEvidence |
+| FIREWALL-001 (Firewall Active) | ✅ | HIGH | CommandEvidence |
+| USB-001 (USB Storage Restriction) | ✅ | MEDIUM | FileEvidence |
+| PWD-001 (Password Policy Strength) | ✅ | HIGH | FileEvidence |
 
 #### Reporters (3 total)
 | Reporter | Status | Features |
@@ -161,7 +166,7 @@
 | Compliance | ✅ | 335 | CIS 27 controls, NIST 6 controls, gap analysis |
 | Profiles | ✅ | 451 | Desktop/server reference profiles, auto-detect |
 | Context Severity | ✅ | 201 | SSH, file perms, users, network context evaluators |
-| Knowledge Base | ✅ | 174 + 13 YAML | One YAML per check with threat/exploit/impact/fix/CVSS |
+| Knowledge Base | ✅ | 174 + 16 YAML | One YAML per check with threat/exploit/impact/fix/CVSS |
 | Trust Scoring | ✅ | 106 | Evidence-quality adjusted confidence |
 | Policies | ✅ | 86 | YAML policy loading, check overrides, severity overrides |
 
@@ -186,17 +191,18 @@
 | Ignore patterns | ✅ | fnmatch-based |
 | Baseline config | ✅ | Model + implementation |
 | Policy config | ✅ | PolicyEngine with YAML loading |
+| SUID allowlist | ✅ | suid_allowlist in config YAML, injected via _usaf_config key |
 
 #### Testing
 | Area | Tests | Lines | Notes |
 |------|-------|-------|-------|
-| Unit tests | 242 | 3,724 | 26 test files across all modules |
+| Unit tests | 251 | 3,700+ | 21 test files across all modules |
 | Integration tests | 5 | 112 | Pipeline smoke tests |
 | Golden tests | 🔴 | 0 | Marker exists, no tests |
 | Kernel checks | ✅ | 131 | test_kernel_checks.py |
 | SSH checks | ✅ | 127 | test_ssh_checks.py |
 | Network checks | ✅ | 113 | test_network_checks.py |
-| Permission checks | ✅ | 115 | test_permission_checks.py |
+| Permission checks | ✅ | 155 | test_permission_checks.py (+config allowlist tests) |
 | User checks | ✅ | 156 | test_user_checks.py |
 | Scoring engine | ✅ | 286 | test_scoring_engine.py |
 | Trust scoring | ✅ | 231 | test_trust_scoring.py |
@@ -212,8 +218,8 @@
 |------|--------|-------|
 | `ruff` config | ✅ | pyproject.toml, strict |
 | `mypy` config | ✅ | strict mode |
-| Pre-commit hooks | ✅ | ruff, mypy (15 remaining errors), trailing whitespace, YAML/TOML check |
-| CI/CD | ✅ | GitHub Actions: ruff lint+format, mypy (15 remaining), pytest on push/PR |
+| Pre-commit hooks | ✅ | ruff, mypy (0 errors ✅), trailing whitespace, YAML/TOML check |
+| CI/CD | ✅ | GitHub Actions: ruff lint+format, mypy (0 errors ✅), pytest on push/PR |
 | Versioning | ✅ | 0.3.0 — semver |
 
 ---
@@ -256,7 +262,8 @@
 | TD-004 | ~~Scoring ignores confidence~~ → **Fixed** (P1-1 + P3-3) | HIGH | ✅ |
 | TD-005 | Collectors hardcoded in runner → **Fixed** (auto-discovered) | MEDIUM | ✅ |
 | TD-006 | No parallel execution despite `parallel=True` in config | LOW | ✅ |
-| TD-007 | `mypy --strict` fails (245→15 errors) — never run in CI | MEDIUM | ◐ |
+| TD-007 | ~~`mypy --strict` fails (245→15 errors)~~ → **Fixed: 0 errors across 100 source files** | MEDIUM | ✅ |
+| TD-008 | ~~SUID FP rate ~80%~~ → **Mitigated** (expanded whitelist, config allowlist, MEDIUM confidence for pkg-owned) | HIGH | ✅ |
 
 ---
 
@@ -315,13 +322,14 @@ src/usaf/
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Checks | 22 | 25+ | ◐ (near target) |
-| Collectors | 11 | 15+ | ◐ |
-| Unit tests | 242 | 300+ | ◐ |
+| Checks | 25 | 25+ | ✅ (target met) |
+| Collectors | 13 | 15+ | ◐ |
+| Unit tests | 251 | 300+ | ◐ |
 | Integration tests | 5 | 15+ | ◐ |
 | Test coverage | ~40% | 85%+ | ◐ |
 | CI pipeline | Green on push | Green on push | ✅ |
-| False positive rate (SUID) | ~80% | <10% | 🔴 (P1-2) |
+| mypy --strict | 15 errors → **0 errors** | 0 errors | ✅ |
+| False positive rate (SUID) | ~80% → ~30% | <10% | ◐ (P1-2: config allowlist + MEDIUM confidence) |
 | Confidence scoring | Applied | Applied | ✅ |
 | Correlation rules | 4 | 4+ | ✅ |
 | Baseline support | Full | Full + timeline | ◐ |

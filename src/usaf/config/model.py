@@ -87,3 +87,5 @@ class USAFConfig(BaseModel):
     severity_context: SeverityContextConfig = Field(default_factory=SeverityContextConfig)
     compliance: ComplianceConfig = Field(default_factory=ComplianceConfig)
     profile: ProfileConfig = Field(default_factory=ProfileConfig)
+    suid_allowlist: list[str] = Field(default_factory=list,
+        description="Additional SUID binary paths to consider expected")

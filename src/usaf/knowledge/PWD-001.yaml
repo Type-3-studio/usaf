@@ -1,0 +1,31 @@
+id: PWD-001
+title: Weak Password Policy
+threat: Short and simple passwords can be brute-forced or guessed in seconds with modern GPU-accelerated tools, leading to unauthorized account access.
+exploit: "An attacker obtains a password hash from /etc/shadow (via SQL injection or local file read) and cracks it using hashcat with a GPU cluster. A 6-character lowercase password cracks in under a minute. A 12-character mixed-case password would take centuries."
+impact: Account takeover, privilege escalation (if the account has sudo), lateral movement, and data access. Weak password policies are a root cause of the majority of account compromises.
+fix: "Set minimum password length in PAM:
+  Edit /etc/pam.d/common-password and add 'minlen=12' to the pam_unix.so line.
+  Set PASS_MIN_LEN in /etc/login.defs:
+  PASS_MIN_LEN 12
+  Install pwquality for complexity enforcement:
+  apt install libpam-pwquality
+  Add 'password requisite pam_pwquality.so retry=3 minlen=12 ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1' to common-password"
+breakage: "Very strict policies (minlen > 16, multiple complexity requirements) may cause user frustration and support tickets. 12-character minimum with mixed case is the recommended balance."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "LDAP/SSSD-managed authentication where policy is enforced on the server side"
+  - "Systems using SSH key-only authentication with disabled password login"
+related_findings:
+  - "SSH-002"
+severity_override: null
+tags:
+  - "passwords"
+  - "authentication"
+  - "brute-force"
+mitre_mappings:
+  - "T1110"

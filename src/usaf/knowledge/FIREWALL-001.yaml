@@ -1,0 +1,30 @@
+id: FIREWALL-001
+title: Firewall Inactive or Not Installed
+threat: Without an active firewall, every network service listening on the system is exposed to potential attackers on the network, including adjacent compromised hosts.
+exploit: "An attacker on the same network scans for open ports, finds an unpatched Samba or Redis service exposed due to the missing firewall, and exploits a known CVE to gain initial access."
+impact: Full network exposure of all listening services. Any vulnerable service becomes an entry point for remote code execution, lateral movement, and data exfiltration.
+fix: "Install and enable UFW:
+  apt install ufw
+  ufw default deny incoming
+  ufw default allow outgoing
+  ufw allow ssh
+  ufw enable"
+breakage: "Some Kubernetes and Docker setups manage their own iptables/nftables rules and may conflict with UFW. Disable UFW in those environments but ensure container network policies are enforced."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H (10.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.01
+known_exceptions:
+  - "Containers/VMs behind a network firewall may intentionally disable host-based firewalls"
+  - "Air-gapped systems with no network connectivity"
+related_findings:
+  - "NET-001"
+severity_override: null
+tags:
+  - "firewall"
+  - "network-hardening"
+  - "access-control"
+mitre_mappings:
+  - "T1562.004"

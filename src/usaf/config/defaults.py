@@ -61,4 +61,9 @@ profile:
   name: null
   auto_detect: true
   path: null
+
+# SUID binaries to consider expected (beyond the built-in allowlist)
+# Add paths here to suppress false positives for legitimate SUID binaries
+# installed by packages like virtualbox, docker, flatpak, etc.
+suid_allowlist: []
 """

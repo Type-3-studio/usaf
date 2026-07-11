@@ -1,0 +1,31 @@
+id: USB-001
+title: USB Storage Not Restricted
+threat: Unrestricted USB ports allow anyone with physical access to exfiltrate data or introduce malware via USB devices, bypassing network security controls entirely.
+exploit: "An attacker with brief physical access plugs in a USB drive preloaded with malware. The system auto-mounts it (via usb-storage), and the attacker executes a payload from the drive. Alternatively, a malicious USB device (Rubber Ducky, Bash Bunny) emulates a keyboard to inject keystrokes."
+impact: Data exfiltration of sensitive files, malware introduction, and potential for persistent remote access via malicious USB devices. Physical access is often sufficient for full compromise.
+fix: "Option A - Blacklist the usb-storage kernel module:
+  echo 'blacklist usb-storage' > /etc/modprobe.d/usb-storage-blacklist.conf
+  update-initramfs -u
+  Option B - Install USBGuard for allowlist-based control:
+  apt install usbguard
+  usbguard generate-policy > /etc/usbguard/rules.conf
+  systemctl enable --now usbguard"
+breakage: "Blacklisting usb-storage disables all USB mass storage (flash drives, external HDDs). USB keyboards, mice, and HIDs continue to work. Use USBGuard for more granular control."
+cvss: "CVSS:3.1/AV:P/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H (6.6)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Systems requiring frequent USB data transfers (e.g., media production, kiosks loading data)"
+  - "Thin clients that boot from USB"
+related_findings: []
+severity_override: null
+tags:
+  - "usb"
+  - "physical-security"
+  - "data-exfiltration"
+mitre_mappings:
+  - "T1091"
+  - "T1200"

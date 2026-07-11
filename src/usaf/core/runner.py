@@ -104,6 +104,11 @@ class ScanRunner:
         # Phase 1: Collect data
         collectors_data: dict[str, dict[str, Any]] = {}
         collector_names = self._resolve_collector_dependencies()
+
+        # Inject config into collectors_data so checks can access dynamic allowlists
+        collectors_data["_usaf_config"] = {
+            "suid_allowlist": self.config.suid_allowlist,
+        }
         for name in collector_names:
             try:
                 data = self.collector_manager.collect_single(name)

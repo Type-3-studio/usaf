@@ -12,10 +12,12 @@ affected_versions:
   - "Ubuntu 20.04"
   - "Ubuntu 22.04"
   - "Ubuntu 24.04"
-false_positive_rate: 0.10
+false_positive_rate: 0.30
 known_exceptions:
   - "Canonical's snap packages mount SUID binaries in /snap/*"
   - "Some display managers and authentication helpers require SUID"
+  - "Third-party packages (Docker, VirtualBox, Flatpak) install their own SUID binaries"
+  - "Add expected SUID binaries to usaf.yaml suid_allowlist to suppress findings"
 related_findings:
   - "PRM-002"
   - "NET-001"

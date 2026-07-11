@@ -21,8 +21,8 @@ SKIP_LINUX = pytest.mark.skipif(
 class TestScanPipeline:
     """Integration tests for the full scan pipeline."""
 
-    EXPECTED_COLLECTOR_COUNT = 11
-    EXPECTED_CHECK_COUNT = 22
+    EXPECTED_COLLECTOR_COUNT = 13
+    EXPECTED_CHECK_COUNT = 25
 
     def test_collector_discovery_registers_all(self):
         collector_registry.discover()
@@ -31,10 +31,12 @@ class TestScanPipeline:
         assert names == [
             "apt",
             "cron",
+            "firewall",
             "groups",
             "interfaces",
             "kernel",
             "kernel_params",
+            "mounts",
             "processes",
             "sockets",
             "sudo",
@@ -49,6 +51,7 @@ class TestScanPipeline:
             "CMP-001",
             "COM-001",
             "CTN-001",
+            "FIREWALL-001",
             "FOR-001",
             "KERN-001",
             "KERN-002",
@@ -60,11 +63,13 @@ class TestScanPipeline:
             "PKG-001",
             "PRM-001",
             "PRM-002",
+            "PWD-001",
             "SEC-001",
             "SSH-001",
             "SSH-002",
             "SSH-003",
             "SVC-001",
+            "USB-001",
             "USR-001",
             "USR-002",
             "USR-003",

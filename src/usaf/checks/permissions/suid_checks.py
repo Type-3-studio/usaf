@@ -13,7 +13,13 @@ from usaf.models.severity import CheckCategory, Confidence, Severity
 
 @register_check
 class UnexpectedSUIDCheck(AuditCheck):
-    """Check for unexpected SUID binaries that could indicate privilege escalation."""
+    """Check for unexpected SUID binaries that could indicate privilege escalation.
+
+    Uses a layered approach to minimize false positives:
+      1. Built-in allowlist (common Ubuntu SUID binaries)
+      2. Config-driven allowlist (user-defined in usaf.yaml suid_allowlist)
+      3. Package-ownership check (binaries from official packages are low-risk)
+    """
 
     id = "PRM-001"
     name = "Unexpected SUID Binaries"
@@ -23,8 +29,75 @@ class UnexpectedSUIDCheck(AuditCheck):
     depends = []
     tags = ["suid", "privilege-escalation", "permissions"]
 
+    # Built-in allowlist of common Ubuntu SUID binaries that are expected
+    # and do not represent a security concern.
+    _builtin_allowlist: set[str] = {
+        # Core system utilities
+        "/bin/su",
+        "/usr/bin/su",
+        "/bin/sudo",
+        "/usr/bin/sudo",
+        "/bin/passwd",
+        "/usr/bin/passwd",
+        "/bin/gpasswd",
+        "/usr/bin/gpasswd",
+        "/bin/newgrp",
+        "/usr/bin/newgrp",
+        "/bin/chsh",
+        "/usr/bin/chsh",
+        "/bin/chfn",
+        "/usr/bin/chfn",
+        "/bin/mount",
+        "/usr/bin/mount",
+        "/bin/umount",
+        "/usr/bin/umount",
+        "/bin/fusermount",
+        "/usr/bin/fusermount",
+        "/bin/fusermount3",
+        "/usr/bin/fusermount3",
+        # Privilege escalation
+        "/bin/pkexec",
+        "/usr/bin/pkexec",
+        "/usr/lib/polkit-1/polkit-agent-helper-1",
+        "/usr/libexec/polkit-1/polkit-agent-helper-1",
+        "/usr/lib/policykit-1/polkit-agent-helper-1",
+        # SSH
+        "/usr/lib/openssh/ssh-keysign",
+        "/usr/lib/ssh/ssh-keysign",
+        "/usr/libexec/openssh/ssh-keysign",
+        # Cron / at
+        "/bin/crontab",
+        "/usr/bin/crontab",
+        "/bin/at",
+        "/usr/bin/at",
+        "/bin/atq",
+        "/usr/bin/atq",
+        "/bin/atrm",
+        "/usr/bin/atrm",
+        "/usr/bin/batch",
+        # Shadow utilities
+        "/usr/sbin/unix_chkpwd",
+        "/usr/sbin/pam_timestamp_check",
+        "/usr/libexec/unix_chkpwd",
+        # Networking
+        "/bin/ping",
+        "/usr/bin/ping",
+        "/bin/ping6",
+        "/usr/bin/ping6",
+        # X11
+        "/usr/bin/Xorg",
+        # Snap
+        "/usr/lib/snapd/snap-confine",
+        "/usr/libexec/snapd/snap-confine",
+        # D-Bus
+        "/usr/lib/dbus-1.0/dbus-daemon-launch-helper",
+        "/usr/libexec/dbus-1.0/dbus-daemon-launch-helper",
+    }
+
     def _run_check(self, collectors: dict[str, Any]) -> list:
         findings: list = []
+        config_allowlist = self._load_config_allowlist(collectors)
+        combined_allowlist = self._builtin_allowlist | config_allowlist
         suid_binaries = self._find_suid_binaries()
 
         for path_str in suid_binaries:
@@ -36,10 +109,17 @@ class UnexpectedSUIDCheck(AuditCheck):
 
             owning_package = get_package_for_file(path_str)
             is_package_owned = owning_package is not None
-            is_expected_suid = self._is_expected_suid(path_str, owning_package)
+            is_allowlisted = path_str in combined_allowlist
 
-            if is_expected_suid:
+            if is_allowlisted:
                 continue
+
+            if is_package_owned:
+                confidence = Confidence.MEDIUM
+                fp_probability = 0.3
+            else:
+                confidence = Confidence.HIGH
+                fp_probability = 0.05
 
             evidence = FileEvidence(
                 path=path_str,
@@ -63,15 +143,17 @@ class UnexpectedSUIDCheck(AuditCheck):
                         "(usually root). Each unexpected SUID binary is a potential privilege "
                         "escalation vector. Attackers may plant SUID binaries as backdoors or "
                         "legitimate software installations may add SUID binaries that weren't "
-                        "reviewed. Every SUID binary should be justified and tracked."
+                        "reviewed. Every SUID binary should be justified and tracked. "
+                        "Add expected SUID binaries to usaf.yaml under suid_allowlist to "
+                        "dismiss this finding."
                     ),
                     remediation=self._build_remediation(path_str, owning_package),
                     evidence=evidence,
                     detected_value=f"SUID bit set on {path_str}",
-                    expected_value="No SUID bit",
+                    expected_value="No unexpected SUID binaries",
                     affected_component=path_str,
-                    confidence=Confidence.LOW if is_package_owned else Confidence.HIGH,
-                    false_positive_probability=0.8 if is_package_owned else 0.05,
+                    confidence=confidence,
+                    false_positive_probability=fp_probability,
                     mitre_attack_ids=["T1548.001"],
                     tags=["privilege-escalation", "suid", "persistence"],
                 )
@@ -79,55 +161,20 @@ class UnexpectedSUIDCheck(AuditCheck):
 
         return findings
 
-    def _is_expected_suid(self, path_str: str, owning_package: str | None) -> bool:
-        """Common SUID binaries shipped with Ubuntu that are not a concern."""
-        expected = {
-            "/bin/su",
-            "/usr/bin/su",
-            "/bin/sudo",
-            "/usr/bin/sudo",
-            "/bin/passwd",
-            "/usr/bin/passwd",
-            "/bin/gpasswd",
-            "/usr/bin/gpasswd",
-            "/bin/newgrp",
-            "/usr/bin/newgrp",
-            "/bin/chsh",
-            "/usr/bin/chsh",
-            "/bin/chfn",
-            "/usr/bin/chfn",
-            "/bin/mount",
-            "/usr/bin/mount",
-            "/bin/umount",
-            "/usr/bin/umount",
-            "/bin/fusermount",
-            "/usr/bin/fusermount",
-            "/bin/fusermount3",
-            "/usr/bin/fusermount3",
-            "/bin/pkexec",
-            "/usr/bin/pkexec",
-            "/bin/crontab",
-            "/usr/bin/crontab",
-            "/bin/at",
-            "/usr/bin/at",
-            "/bin/atq",
-            "/usr/bin/atq",
-            "/bin/atrm",
-            "/usr/bin/atrm",
-            "/usr/lib/polkit-1/polkit-agent-helper-1",
-            "/usr/lib/dbus-1.0/dbus-daemon-launch-helper",
-            "/usr/lib/openssh/ssh-keysign",
-            "/usr/sbin/unix_chkpwd",
-            "/usr/libexec/polkit-1/polkit-agent-helper-1",
-        }
-        return path_str in expected
+    def _load_config_allowlist(self, collectors: dict[str, Any]) -> set[str]:
+        """Load user-defined SUID allowlist from configuration."""
+        config_data = collectors.get("_usaf_config", {})
+        raw_list = config_data.get("suid_allowlist", [])
+        if isinstance(raw_list, list):
+            return {str(p) for p in raw_list if p}
+        return set()
 
     def _build_description(self, path_str: str, owning_package: str | None) -> str:
         if owning_package:
             return (
                 f"'{path_str}' has the SUID bit set. It is owned by the "
-                f"'{owning_package}' package, which may be legitimate, but "
-                f"should be verified against your security policy."
+                f"'{owning_package}' package. To suppress this finding, "
+                f"add it to suid_allowlist in usaf.yaml."
             )
         return (
             f"'{path_str}' has the SUID bit set and is not owned by any "
@@ -137,10 +184,10 @@ class UnexpectedSUIDCheck(AuditCheck):
     def _build_remediation(self, path_str: str, owning_package: str | None) -> str:
         if owning_package:
             return (
-                f"Review whether the '{owning_package}' package requires SUID on {path_str}. "
-                f"If not: 'chmod u-s {path_str}'. To find the package: "
-                f"'dpkg -S {path_str}'. If the package was intentionally installed, "
-                f"add it to your policy allowlist."
+                f"Review whether '{path_str}' requires SUID. "
+                f"If legitimate: add to suid_allowlist in usaf.yaml under checks. "
+                f"If not: 'chmod u-s {path_str}'. "
+                f"Package: '{owning_package}'."
             )
         return (
             f"Investigate '{path_str}' immediately. It is not owned by any installed package. "

@@ -8,6 +8,8 @@ src/usaf.egg-info/dependency_links.txt
 src/usaf.egg-info/entry_points.txt
 src/usaf.egg-info/requires.txt
 src/usaf.egg-info/top_level.txt
+src/usaf/baseline/__init__.py
+src/usaf/baseline/manager.py
 src/usaf/cache/__init__.py
 src/usaf/cache/engine.py
 src/usaf/checks/__init__.py
@@ -25,6 +27,7 @@ src/usaf/cli/app.py
 src/usaf/collectors/__init__.py
 src/usaf/collectors/base.py
 src/usaf/collectors/manager.py
+src/usaf/collectors/registry.py
 src/usaf/collectors/network/__init__.py
 src/usaf/collectors/network/sockets.py
 src/usaf/collectors/packages/__init__.py
@@ -37,6 +40,8 @@ src/usaf/collectors/system/__init__.py
 src/usaf/collectors/system/kernel.py
 src/usaf/collectors/users/__init__.py
 src/usaf/collectors/users/passwd.py
+src/usaf/compliance/__init__.py
+src/usaf/compliance/framework.py
 src/usaf/config/__init__.py
 src/usaf/config/defaults.py
 src/usaf/config/loader.py
@@ -47,6 +52,9 @@ src/usaf/core/interfaces.py
 src/usaf/core/plugin.py
 src/usaf/core/registry.py
 src/usaf/core/runner.py
+src/usaf/correlation/__init__.py
+src/usaf/correlation/engine.py
+src/usaf/correlation/rules.py
 src/usaf/models/__init__.py
 src/usaf/models/evidence.py
 src/usaf/models/finding.py
@@ -56,6 +64,8 @@ src/usaf/models/score.py
 src/usaf/models/severity.py
 src/usaf/parsers/__init__.py
 src/usaf/policies/__init__.py
+src/usaf/profiles/__init__.py
+src/usaf/profiles/manager.py
 src/usaf/reporting/__init__.py
 src/usaf/reporting/base.py
 src/usaf/reporting/json.py
@@ -63,4 +73,6 @@ src/usaf/reporting/markdown.py
 src/usaf/reporting/terminal.py
 src/usaf/scoring/__init__.py
 src/usaf/scoring/engine.py
+src/usaf/severity/__init__.py
+src/usaf/severity/engine.py
 src/usaf/utils/__init__.py

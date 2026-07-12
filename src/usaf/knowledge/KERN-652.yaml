@@ -1,0 +1,26 @@
+affected_versions:
+- Ubuntu 20.04
+- Ubuntu 22.04
+- Ubuntu 24.04
+breakage: Security hardening may break functionality depending on permissive configurations.
+cvss: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N (5.5)
+exploit: An attacker exploits a security misconfiguration to gain unauthorized access
+  or privileges.
+false_positive_rate: 0.0
+fix: Remove 'mitigations=off' from GRUB_CMDLINE_LINUX and run update-grub.
+id: KERN-652
+impact: Reduced security posture, potential unauthorized access, or data exposure.
+mitre_mappings:
+- T1204.002
+affected_versions:
+- Ubuntu 20.04
+- Ubuntu 22.04
+- Ubuntu 24.04
+related_findings: []
+tags:
+- kernel
+- boot
+- mitigations
+threat: Disabling CPU mitigations (Spectre, Meltdown, MDS) exposes the system to side-channel
+  attacks.
+title: CPU Mitigations Disabled

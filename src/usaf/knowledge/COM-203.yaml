@@ -1,0 +1,26 @@
+id: COM-203
+title: Orphaned or Anomalous Process Parentage
+threat: Orphaned processes or unexpected parent-child relationships may indicate malware spawned by short-lived scripts.
+exploit: "An attacker runs a one-liner that downloads and executes a payload. The parent shell exits immediately, leaving the malware process orphaned with no visible parent."
+impact: Hidden malicious processes that evade parent-based detection.
+fix: "Investigate the orphaned process and its binary. Kill if malicious."
+breakage: "Some legitimate daemons may orphan intentionally."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N (4.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Processes intentionally daemonized by short-lived launchers"
+  - "Container processes managed by orchestrators"
+related_findings:
+  - "COM-201"
+  - "COM-205"
+severity_override: null
+tags:
+  - "compromise"
+  - "anomaly"
+  - "process"
+mitre_mappings:
+  - "T1059"

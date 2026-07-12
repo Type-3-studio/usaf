@@ -1,0 +1,27 @@
+id: NET-203
+title: Interface in ALLMULTI Mode
+threat: ALLMULTI mode causes the NIC to receive all multicast traffic, which may indicate packet sniffing by an attacker or monitoring tool.
+exploit: "An attacker who gained initial access enables ALLMULTI on a network interface to capture multicast traffic containing service announcements, cluster heartbeats, or discovery protocols."
+impact: Information disclosure via multicast traffic capture. Network reconnaissance.
+fix: "Disable ALLMULTI: 'ip link set <interface> allmulti off'. Investigate which process enabled it."
+breakage: "Some legitimate services (VMware, clustering, multicast DNS) require ALLMULTI."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N (3.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "VMware ESXi/vSphere management interfaces"
+  - "Clustering software (Kubernetes, Pacemaker)"
+  - "Multicast routing daemons"
+related_findings:
+  - "NET-201"
+  - "NET-202"
+severity_override: null
+tags:
+  - "network"
+  - "sniffing"
+  - "interfaces"
+mitre_mappings:
+  - "T1040"

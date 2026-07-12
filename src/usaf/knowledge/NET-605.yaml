@@ -1,0 +1,23 @@
+id: NET-605
+title: No DNS Servers Configured
+threat: Without DNS resolution, the system cannot resolve hostnames, breaking core services.
+fix: "Add nameserver entries to /etc/resolv.conf or configure systemd-resolved."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H (5.9)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+tags:
+  - "network"
+  - "dns"
+  - "configuration"
+mitre_mappings:
+  - "T1562"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

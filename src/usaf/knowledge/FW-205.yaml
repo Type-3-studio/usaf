@@ -1,0 +1,26 @@
+id: FW-205
+title: Firewall Default Outgoing Policy Allow
+threat: Default allow outgoing means any application can send traffic to any destination, enabling data exfiltration and C2 communication.
+exploit: "An attacker installs malware that beacons to a C2 server on port 443. With default allow outgoing, the traffic passes through without restriction."
+impact: Data exfiltration, C2 communication, malware propagation — all with no firewall restriction.
+fix: "'ufw default deny outgoing' then explicitly allow only needed outbound services (DNS, NTP, HTTP/HTTPS)."
+breakage: "Significant — package updates, DNS, NTP, and most network services will stop working until explicitly allowed."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.5
+known_exceptions:
+  - "Default Ubuntu configuration — standard for most environments"
+  - "Only high-security environments typically restrict outgoing traffic"
+related_findings:
+  - "FW-201"
+  - "FW-101"
+severity_override: null
+tags:
+  - "firewall"
+  - "outgoing"
+  - "hardening"
+mitre_mappings:
+  - "T1562"

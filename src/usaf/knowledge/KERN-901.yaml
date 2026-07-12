@@ -1,0 +1,25 @@
+id: KERN-901
+title: "Security Check"
+threat: "Kernel hardening gaps weaken system-level defenses against exploits."
+exploit: "Attackers exploit weak kernel settings to bypass ASLR, execute arbitrary code, or load malicious modules."
+impact: "Kernel compromise, rootkit installation, and bypass of security mechanisms."
+fix: "Apply recommended kernel sysctl settings and restrict unnecessary kernel features."
+breakage: "Kernel hardening may affect performance or break specialized applications."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "KERN-101"
+  - "KERN-401"
+severity_override: null
+tags:
+  - "kern"
+  - "hardening"
+mitre_mappings:
+  - "T1562"

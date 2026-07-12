@@ -1,0 +1,26 @@
+id: FW-203
+title: IPv6 Firewall Rules Missing
+threat: Without IPv6 firewall rules, IPv6 traffic may bypass the firewall entirely if IPv6 is enabled on the system.
+exploit: "An attacker uses IPv6 to bypass the IPv4-only firewall. The system has IPv6 enabled but no ip6tables rules, allowing direct access to services via IPv6 addresses."
+impact: Complete bypass of firewall protection for IPv6 traffic.
+fix: "Add IPv6 family rules to nftables or enable ip6tables. For UFW, ensure IPV6=yes in /etc/default/ufw."
+breakage: "IPv6 connectivity may be affected if rules are too restrictive."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N (5.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Systems with IPv6 disabled at kernel level"
+  - "nftables inet family rules that cover both IPv4 and IPv6"
+related_findings:
+  - "FW-101"
+  - "NET-402"
+severity_override: null
+tags:
+  - "firewall"
+  - "ipv6"
+  - "hardening"
+mitre_mappings:
+  - "T1562.004"

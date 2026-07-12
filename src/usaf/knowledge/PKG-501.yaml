@@ -1,0 +1,26 @@
+id: PKG-501
+title: Many Third-Party Repositories
+threat: Having many third-party repositories significantly increases supply chain risk. Each repository represents an additional trust point that if compromised, can serve malicious packages.
+exploit: "One of many third-party repositories is compromised or discontinued. The repository serves malicious updates or is hijacked to distribute malware."
+impact: Supply chain compromise via any of the configured third-party repositories.
+fix: "Review all third-party repositories and remove those no longer needed from /etc/apt/sources.list.d/"
+breakage: "Software from removed repos will stop receiving updates."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Systems intentionally configured with multiple vendor repos for development"
+related_findings:
+  - "PKG-203"
+  - "PKG-102"
+severity_override: null
+tags:
+  - "packages"
+  - "repositories"
+  - "supply-chain"
+mitre_mappings:
+  - "T1195"
+  - "T1475"

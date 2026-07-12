@@ -1,0 +1,25 @@
+id: CTN-704
+title: "Security Check"
+threat: "Container misconfigurations break isolation and allow container escape."
+exploit: "A compromised container with excessive privileges or host mounts can escape to the host system."
+impact: "Host compromise from within a container, access to other containers and host resources."
+fix: "Remove unnecessary capabilities, drop seccomp/apparmor profiles only when necessary, avoid privileged mode."
+breakage: "Removing capabilities may break container functionality. Test before applying."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:H (8.2)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "CTN-101"
+  - "CTN-201"
+severity_override: null
+tags:
+  - "ctn"
+  - "hardening"
+mitre_mappings:
+  - "T1611"

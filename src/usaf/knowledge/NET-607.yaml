@@ -1,0 +1,25 @@
+affected_versions:
+- Ubuntu 20.04
+- Ubuntu 22.04
+- Ubuntu 24.04
+breakage: Security hardening may break functionality depending on permissive configurations.
+cvss: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L (3.3)
+exploit: An attacker exploits a security misconfiguration to gain unauthorized access
+  or privileges.
+false_positive_rate: 0.2
+fix: 'If unused: physically disconnect. If needed: ''ip link set <interface> up''.'
+id: NET-607
+impact: Reduced security posture, potential unauthorized access, or data exposure.
+mitre_mappings:
+- T1562
+affected_versions:
+- Ubuntu 20.04
+- Ubuntu 22.04
+- Ubuntu 24.04
+related_findings: []
+tags:
+- network
+- interfaces
+- configuration
+threat: Interfaces in 'down' state may indicate misconfiguration or unused hardware.
+title: Interface Is Down

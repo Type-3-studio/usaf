@@ -1,0 +1,23 @@
+id: KERN-152
+title: Kernel Console Log Level
+threat: High console log levels print kernel messages containing addresses and memory layout to the console.
+fix: "Set kernel.printk = 3 3 3 1 in /etc/sysctl.d/"
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N (3.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+tags:
+  - "kernel"
+  - "logging"
+  - "hardening"
+mitre_mappings:
+  - "T1562"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

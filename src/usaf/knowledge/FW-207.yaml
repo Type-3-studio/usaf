@@ -1,0 +1,28 @@
+id: FW-207
+title: SSH Without Firewall Rate Limiting
+threat: SSH exposed without rate limiting at the firewall level increases brute-force attack effectiveness.
+exploit: "An attacker launches a distributed SSH brute-force attack from multiple IPs. Without rate limiting, each IP can attempt unlimited connections per minute, accelerating credential theft."
+impact: Faster brute-force attacks against SSH. Increased risk of credential compromise.
+fix: "'ufw limit ssh' replaces 'ufw allow ssh' to rate-limit connections to 20 per 6 minutes per IP."
+breakage: "Rate limiting may affect legitimate automated SSH connections from the same IP."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Automated SSH deployments connecting from the same IP"
+  - "SSH behind a load balancer or NAT"
+related_findings:
+  - "SSH-103"
+  - "SSH-104"
+  - "LOG-402"
+severity_override: null
+tags:
+  - "firewall"
+  - "ssh"
+  - "brute-force"
+  - "rate-limit"
+mitre_mappings:
+  - "T1110"

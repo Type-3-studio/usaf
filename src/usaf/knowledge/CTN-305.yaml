@@ -1,0 +1,25 @@
+id: CTN-305
+title: Container With Writable Root Filesystem
+threat: A writable root filesystem allows compromised containers to modify system binaries, install malware, and persist changes.
+exploit: "An attacker exploits a web application in a container, downloads a backdoor, and writes it to /usr/bin/. The backdoor persists across container restarts because the root filesystem is writable."
+impact: Persistent container compromise, malware installation, data tampering.
+fix: "Add --read-only to the container. Use --tmpfs for directories that need writes."
+breakage: "Containers that write to the filesystem (e.g., databases, loggers) need --tmpfs or volumes for writable directories."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N (4.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Containers that must write to the filesystem without using volumes"
+related_findings:
+  - "CTN-204"
+  - "CTN-304"
+  - "CTN-201"
+severity_override: null
+tags:
+  - "containers"
+  - "hardening"
+mitre_mappings:
+  - "T1204.002"

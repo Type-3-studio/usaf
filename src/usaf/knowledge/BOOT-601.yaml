@@ -1,0 +1,25 @@
+id: BOOT-601
+title: "Security Check"
+threat: "Boot security misconfigurations allow bootkits and firmware-level persistence."
+exploit: "An attacker with physical or root access modifies boot configuration to load unsigned or malicious boot components."
+impact: "Bootkits can survive OS reinstalls, bypass full-disk encryption, and remain undetected by OS-level security tools."
+fix: "Enable Secure Boot, set kernel lockdown to confidentiality, and protect bootloader with password."
+breakage: "Secure Boot may prevent booting unsigned third-party drivers or custom kernels."
+cvss: "CVSS:3.1/AV:P/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:H (6.6)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "BOOT-101"
+  - "BOOT-201"
+severity_override: null
+tags:
+  - "boot"
+  - "hardening"
+mitre_mappings:
+  - "T1542"

@@ -1,0 +1,25 @@
+id: NET-104
+title: Admin Port Exposed on All Interfaces
+threat: Admin/management ports exposed on all interfaces allow unauthorized access to sensitive services.
+fix: "Bind admin services to localhost. Use firewall rules for external access."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+tags:
+  - "network"
+  - "ports"
+  - "exposure"
+  - "attack-surface"
+mitre_mappings:
+  - "T1046"
+  - "T1190"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

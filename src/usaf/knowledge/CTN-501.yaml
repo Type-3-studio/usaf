@@ -1,0 +1,25 @@
+id: CTN-501
+title: Container Runtime Socket World-Writable
+threat: A world-writable container runtime socket allows any user to create, start, and exec into containers, leading to privilege escalation.
+exploit: "An unprivileged user on the host uses the world-writable Docker socket to create a privileged container with host filesystem mounts, then escapes to become root on the host."
+impact: Immediate root privilege escalation from any user on the system.
+fix: "chmod 660 /var/run/docker.sock and chown root:docker /var/run/docker.sock"
+breakage: "Users not in the docker group will lose access to Docker commands."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "None — world-writable sockets are never legitimate"
+related_findings:
+  - "CTN-101"
+  - "CTN-502"
+severity_override: null
+tags:
+  - "containers"
+  - "sockets"
+  - "privilege-escalation"
+mitre_mappings:
+  - "T1611"

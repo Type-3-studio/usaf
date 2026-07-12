@@ -1,0 +1,26 @@
+id: FW-206
+title: Firewall Logging Disabled
+threat: Without firewall logging, blocked connection attempts, port scans, and network probes go unnoticed, reducing detection capability.
+exploit: "An attacker performs a slow port scan of the network. The firewall blocks the probes but logs nothing. The security team has no record of the reconnaissance activity."
+impact: Blindness to network reconnaissance and intrusion attempts. Reduced incident response capability.
+fix: "'ufw logging on'. For production: 'ufw logging medium' balances detail and log volume."
+breakage: "Increased log volume. 'ufw logging high' can generate significant logs."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "High-volume servers where log volume is a concern"
+related_findings:
+  - "LOG-501"
+  - "LOG-401"
+  - "FW-101"
+severity_override: null
+tags:
+  - "firewall"
+  - "logging"
+  - "monitoring"
+mitre_mappings:
+  - "T1562.001"

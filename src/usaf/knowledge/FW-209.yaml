@@ -1,0 +1,24 @@
+id: FW-209
+title: "Security Check"
+threat: "Firewall misconfigurations expose network services to unauthorized access."
+exploit: "Attackers scan for exposed ports and services that should be blocked by firewall rules."
+impact: "Unauthorized network access, service compromise, and data exfiltration."
+fix: "Configure firewall with default deny policy and enable at boot."
+breakage: "Enabling firewalls may block legitimate traffic. Test rules before applying."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N (6.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "FW-101"
+severity_override: null
+tags:
+  - "fw"
+  - "hardening"
+mitre_mappings:
+  - "T1562"

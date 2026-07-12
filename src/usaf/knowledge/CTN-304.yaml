@@ -1,0 +1,26 @@
+id: CTN-304
+title: Container Missing Security Options
+threat: Containers without no-new-privileges can escalate privileges via setuid binaries within the container.
+exploit: "An attacker who gains code execution in a container runs a setuid binary to escalate to root within the container, then uses other misconfigurations to escape to the host."
+impact: Privilege escalation within container, enabling further compromise.
+fix: "Add --security-opt=no-new-privileges to the container. Also consider AppArmor and seccomp profiles."
+breakage: "Containers that need to elevate privileges (e.g., through setuid binaries) will be restricted."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Containers that legitimately escalate privileges within the container"
+related_findings:
+  - "CTN-201"
+  - "CTN-303"
+  - "CTN-305"
+severity_override: null
+tags:
+  - "containers"
+  - "hardening"
+  - "security"
+mitre_mappings:
+  - "T1548.001"

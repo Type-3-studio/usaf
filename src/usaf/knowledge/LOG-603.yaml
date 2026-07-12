@@ -1,0 +1,26 @@
+id: LOG-603
+title: "Security Check"
+threat: "Insufficient logging configuration impairs incident detection and forensic investigation."
+exploit: "Attackers disable or limit logging to cover their tracks during and after an attack."
+impact: "Blind spots in security monitoring, inability to detect breaches, and insufficient forensic evidence."
+fix: "Configure adequate log retention, rotation, and forwarding to a central logging system."
+breakage: "Increased logging may consume more disk space. Ensure adequate log storage."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N (5.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.25
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "LOG-101"
+  - "LOG-501"
+severity_override: null
+tags:
+  - "log"
+  - "hardening"
+mitre_mappings:
+  - "T1070"
+  - "T1562"

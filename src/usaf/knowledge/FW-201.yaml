@@ -1,0 +1,25 @@
+id: FW-201
+title: Firewall Default Incoming Policy Not Deny
+threat: A default allow incoming policy means all inbound connections are accepted unless explicitly blocked, exposing every listening service to the network.
+exploit: "An attacker scans the network and finds an unexpected service listening on a high port. With default allow incoming, the service is immediately accessible and can be targeted for exploitation."
+impact: Every listening service is exposed by default. Significantly expanded attack surface.
+fix: "'ufw default deny incoming' then explicitly allow only needed services."
+breakage: "Services that were accessible without explicit allow rules will be blocked after changing the default policy."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N (6.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "None — default deny is always recommended"
+related_findings:
+  - "FW-101"
+  - "FW-202"
+severity_override: null
+tags:
+  - "firewall"
+  - "default-policy"
+  - "hardening"
+mitre_mappings:
+  - "T1562.004"

@@ -1,0 +1,29 @@
+id: COM-202
+title: Known Malicious Process
+threat: Process names matching known malware, cryptominers, or C2 implants are strong indicators of compromise.
+exploit: "An attacker deploys the XMRig cryptominer on a compromised server. The process 'xmrig' consumes CPU cycles mining Monero, degrading server performance."
+impact: Resource theft, potential breach of sensitive data, system instability.
+fix: "Kill the process, remove the binary, and investigate persistence mechanisms."
+breakage: "None — these process names should never be present on a legitimate system."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Security research or malware analysis systems intentionally running samples"
+related_findings:
+  - "COM-101"
+  - "COM-201"
+  - "COM-208"
+severity_override: null
+tags:
+  - "compromise"
+  - "malware"
+  - "incident-response"
+  - "high"
+mitre_mappings:
+  - "T1071"
+  - "T1059"
+  - "T1496"

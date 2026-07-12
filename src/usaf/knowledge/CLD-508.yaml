@@ -1,0 +1,19 @@
+id: CLD-508
+title: K8s Secrets on Node
+threat: Kubernetes secrets stored on the node filesystem can be accessed by any process with node-level access.
+fix: "Use external secrets management or KMS encryption."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N (5.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+tags:
+  - "cloud"
+  - "kubernetes"
+  - "secrets"
+mitre_mappings:
+  - "T1552.007"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

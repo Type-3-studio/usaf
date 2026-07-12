@@ -1,0 +1,29 @@
+id: SSH-104
+title: SSH Permits Empty Passwords
+threat: Empty passwords eliminate authentication entirely — anyone who knows the username can log in without any credential. This is a critical security failure.
+exploit: "An attacker enumerates local usernames (via SMTP, SMB, or other leaks), then SSH's as that user. Without a password check, the login succeeds immediately. Automated scanners detect this in seconds."
+impact: Complete unauthorized access to the system. Attacker gains a shell with the privileges of the empty-password account.
+fix: "Set 'PermitEmptyPasswords no' in /etc/ssh/sshd_config:
+  echo 'PermitEmptyPasswords no' >> /etc/ssh/sshd_config
+  systemctl restart sshd"
+breakage: "No legitimate breakage. Empty passwords should never be permitted on any system."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Single-user offline systems with no network access"
+related_findings:
+  - "USR-201"
+  - "SSH-102"
+severity_override: null
+tags:
+  - "ssh"
+  - "authentication"
+  - "passwords"
+  - "critical"
+mitre_mappings:
+  - "T1110"
+  - "T1078"

@@ -1,0 +1,30 @@
+id: SSH-103
+title: SSH MaxAuthTries Not Restricted
+threat: High MaxAuthTries allows attackers to attempt many password guesses per connection, accelerating brute-force attacks without needing to re-establish TCP connections.
+exploit: "An attacker opens a single SSH connection and uses a tool like hydra to attempt 6+ passwords before the connection resets, tripling the brute-force rate versus the recommended limit of 4."
+impact: Faster password guessing — each extra attempt per connection reduces the time needed for successful brute-force credential theft.
+fix: "Set 'MaxAuthTries 4' in /etc/ssh/sshd_config:
+  echo 'MaxAuthTries 4' >> /etc/ssh/sshd_config
+  systemctl restart sshd"
+breakage: "Users who mistype passwords repeatedly will be disconnected sooner. This is desirable security behavior."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N (5.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Environments with users who frequently mistype passwords may see increased disconnections"
+  - "Default Ubuntu value (6) is not configured"
+related_findings:
+  - "SSH-104"
+  - "SSH-108"
+  - "USR-201"
+severity_override: null
+tags:
+  - "ssh"
+  - "authentication"
+  - "brute-force"
+  - "hardening"
+mitre_mappings:
+  - "T1110"

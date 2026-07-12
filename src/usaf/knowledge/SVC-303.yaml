@@ -1,0 +1,25 @@
+id: SVC-303
+title: Timer Without Target Service
+threat: A systemd timer whose target service is missing will fail when triggered, potentially losing scheduled tasks or masking incomplete removal.
+exploit: "An attacker removes a security audit service but leaves its timer, creating a false sense of security that audits are still running."
+impact: Silent failure of scheduled tasks. Incomplete software removal leaving orphaned timers.
+fix: "Install the missing service, or disable the timer: 'systemctl disable <timer>'."
+breakage: "No breakage — the timer was already non-functional."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L (3.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Timers that trigger services with different names via Unit= directive"
+related_findings:
+  - "SVC-301"
+  - "SVC-503"
+severity_override: null
+tags:
+  - "services"
+  - "timers"
+  - "systemd"
+mitre_mappings:
+  - "T1562"

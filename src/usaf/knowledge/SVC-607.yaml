@@ -1,0 +1,25 @@
+id: SVC-607
+title: "Security Check"
+threat: "Service misconfigurations allow privilege escalation and unauthorized service execution."
+exploit: "Attackers exploit poorly configured services to execute arbitrary code or escalate privileges."
+impact: "Privilege escalation, service disruption, and unauthorized code execution."
+fix: "Review service configurations, restrict permissions, and remove unnecessary services."
+breakage: "Disabling services may break application functionality. Test before disabling."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "SVC-101"
+  - "SVC-301"
+severity_override: null
+tags:
+  - "svc"
+  - "hardening"
+mitre_mappings:
+  - "T1543"

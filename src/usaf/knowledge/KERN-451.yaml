@@ -1,0 +1,27 @@
+id: KERN-451
+title: Unprivileged BPF Enabled
+threat: Unprivileged BPF allows non-root users to load BPF programs into the kernel. BPF has a history of critical vulnerabilities enabling privilege escalation from unprivileged contexts.
+exploit: "An attacker loads a crafted eBPF program using the unprivileged BPF interface. They exploit CVE-2020-8835 (bpf_check), a verifier bug, to achieve arbitrary kernel memory read/write, then overwrite cred struct to gain root."
+impact: Kernel privilege escalation from unprivileged user context. Multiple real-world exploits have targeted BPF.
+fix: "Set 'kernel.unprivileged_bpf_disabled = 1' in /etc/sysctl.d/99-security.conf and run 'sysctl -w kernel.unprivileged_bpf_disabled=1'."
+breakage: "Container runtimes (Docker, Kubernetes) may use BPF for networking and security policies. Disabling unprivileged BPF may affect some container network plugins."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Systems using BPF-based container networking (Cilium, Calico) may need unprivileged BPF"
+related_findings:
+  - "KERN-401"
+  - "KERN-151"
+  - "KERN-513"
+severity_override: null
+tags:
+  - "kernel"
+  - "bpf"
+  - "privilege-escalation"
+  - "exploit-mitigation"
+mitre_mappings:
+  - "T1204.002"

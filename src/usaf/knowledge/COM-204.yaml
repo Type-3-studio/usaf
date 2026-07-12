@@ -1,0 +1,26 @@
+id: COM-204
+title: Running Process With World-Writable Binary
+threat: A running process whose binary is world-writable can be replaced by any user, leading to privilege escalation when the process restarts.
+exploit: "An attacker replaces a running service's world-writable binary with a malicious version. When the service restarts, the malicious code executes with the service's privileges."
+impact: Privilege escalation from unprivileged user to the service user (possibly root).
+fix: "chmod o-w <binary>. Verify binary integrity with package manager."
+breakage: "No legitimate reason for a running binary to be world-writable."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "None — this is never legitimate"
+related_findings:
+  - "PRM-304"
+  - "SVC-501"
+  - "COM-201"
+severity_override: null
+tags:
+  - "compromise"
+  - "privilege-escalation"
+  - "world-writable"
+mitre_mappings:
+  - "T1574.002"

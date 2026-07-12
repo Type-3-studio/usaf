@@ -1,0 +1,25 @@
+id: CTN-601
+title: Container in Restart Loop
+threat: A container repeatedly restarting indicates a crash loop that can cause service disruption and fill logs rapidly.
+exploit: "An attacker exploits a vulnerability that causes the container to crash, triggering a restart loop that masks the attack and generates noise in the logs."
+impact: Service disruption, log flooding, potentially masked attack activity.
+fix: "Check logs: 'docker logs <container>'. Review configuration and fix the startup issue."
+breakage: "No breakage from investigating and fixing a restarting container."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L (3.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Containers that intentionally restart as part of their design pattern"
+related_findings:
+  - "CTN-401"
+  - "SVC-301"
+severity_override: null
+tags:
+  - "containers"
+  - "stability"
+  - "monitoring"
+mitre_mappings:
+  - "T1562"

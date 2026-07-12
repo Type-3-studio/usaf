@@ -1,0 +1,23 @@
+id: NET-505
+title: Service on Ephemeral Port
+threat: Services listening on ephemeral port ranges (49152+) may bypass firewall rules intended for standard service ports.
+fix: "Configure the service to use a static port below 49152."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.3
+tags:
+  - "network"
+  - "ports"
+  - "anomaly"
+mitre_mappings:
+  - "T1562"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

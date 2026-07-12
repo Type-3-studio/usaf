@@ -1,0 +1,26 @@
+id: PRM-303
+title: Missing Sticky Bit on World-Writable Directory
+threat: World-writable directories without the sticky bit allow any user to delete or rename files owned by other users, enabling TOC/TOU attacks and file replacement.
+exploit: "An attacker identifies /var/shared (mode 0777, no sticky bit). They delete 'app.pid' owned by root and replace it with a symlink to /etc/shadow. The service writes to the pid file, overwriting shadow."
+impact: Arbitrary file overwrite, privilege escalation via symlink attacks, data destruction.
+fix: "chmod +t /path/to/directory. If the directory should not be world-writable, restrict permissions: 'chmod o-w /path/to/directory'."
+breakage: "Some application-managed temporary directories may rely on non-sticky behavior for inter-process file ownership changes."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L (6.1)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "/tmp, /var/tmp, /dev/shm have sticky bit by default on Ubuntu"
+related_findings:
+  - "PRM-101"
+  - "PRM-304"
+severity_override: null
+tags:
+  - "sticky-bit"
+  - "permissions"
+  - "file-system"
+mitre_mappings:
+  - "T1548.001"
+  - "T1574.002"

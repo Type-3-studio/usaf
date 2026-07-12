@@ -1,0 +1,26 @@
+id: FW-208
+title: Firewall Rules Not Persistent
+threat: Firewall rules that are not saved will be lost on system reboot, leaving the system unprotected after restart.
+exploit: "An attacker triggers a system reboot (power outage, kernel panic). The firewall rules are lost. After reboot, the system is exposed to the network until the firewall is manually reconfigured."
+impact: Loss of firewall protection after reboot. Extended window of exposure.
+fix: "Save nftables rules: 'nft list ruleset > /etc/nftables.conf'. For iptables: 'apt install iptables-persistent'."
+breakage: "No breakage — persistence only improves reliability of firewall rules."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L (3.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.3
+known_exceptions:
+  - "Systems that load firewall rules via cloud-init or orchestration"
+  - "UFW rules persist automatically — this check targets nftables/iptables"
+related_findings:
+  - "FW-101"
+  - "FW-202"
+severity_override: null
+tags:
+  - "firewall"
+  - "persistence"
+  - "hardening"
+mitre_mappings:
+  - "T1562.004"

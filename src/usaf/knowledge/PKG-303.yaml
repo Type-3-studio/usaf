@@ -1,0 +1,25 @@
+id: PKG-303
+title: Held Packages Blocking Updates
+threat: Packages on hold are excluded from all updates, including security patches, creating a security gap.
+exploit: "An attacker exploits a known CVE in a held package. The vulnerability goes unpatched because the package is on hold and excluded from apt upgrades."
+impact: Unpatched vulnerabilities in held packages.
+fix: "Review each held package: 'apt-mark showhold'. Remove hold: 'apt-mark unhold <package>'."
+breakage: "Packages may be held for compatibility reasons. Unholding may introduce breaking changes."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Packages intentionally held due to known compatibility issues with newer versions"
+related_findings:
+  - "PKG-402"
+  - "PKG-401"
+severity_override: null
+tags:
+  - "packages"
+  - "updates"
+  - "patching"
+mitre_mappings:
+  - "T1562.001"

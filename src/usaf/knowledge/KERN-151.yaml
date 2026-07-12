@@ -1,0 +1,25 @@
+id: KERN-151
+title: TTY Line Discipline Autoloading Enabled
+threat: TTY line discipline autoloading allows unprivileged users to load kernel modules by opening a TTY device with an unregistered line discipline number, enabling kernel exploitation.
+exploit: "An attacker runs a simple C program that opens a PTY and sets an arbitrary line discipline number via TIOCSETD. The kernel loads the corresponding kernel module, which may have vulnerabilities the attacker exploits for privilege escalation."
+impact: Kernel module loading from user space, expanding attack surface. Multiple past exploits have used this technique.
+fix: "Set 'dev.tty.ldisc_autoload = 0' in /etc/sysctl.d/99-security.conf and run 'sysctl -w dev.tty.ldisc_autoload=0'."
+breakage: "Some specialized serial communication software may need to load custom line disciplines. This is rare on modern systems."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L (3.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Systems using specialized serial/TTY hardware requiring custom line disciplines"
+related_findings:
+  - "KERN-401"
+  - "KERN-451"
+severity_override: null
+tags:
+  - "kernel"
+  - "tty"
+  - "hardening"
+mitre_mappings:
+  - "T1204.002"

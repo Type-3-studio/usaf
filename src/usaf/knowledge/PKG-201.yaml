@@ -1,0 +1,25 @@
+id: PKG-201
+title: "Security Check"
+threat: "Insecure package configurations allow supply chain attacks and vulnerable software."
+exploit: "Attackers exploit unpatched packages, malicious repositories, or unsigned packages to compromise the system."
+impact: "Malware installation via package manager, vulnerable software running on the system, and supply chain compromise."
+fix: "Remove unnecessary packages, update regularly, and verify repository authenticity."
+breakage: "Package removal may break dependent software. Verify dependencies before removing."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "PKG-101"
+  - "PKG-401"
+severity_override: null
+tags:
+  - "pkg"
+  - "hardening"
+mitre_mappings:
+  - "T1070"

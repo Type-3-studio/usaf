@@ -1,0 +1,27 @@
+id: CTN-303
+title: Dangerous Container Capabilities
+threat: Linux capabilities like CAP_SYS_ADMIN and CAP_DAC_OVERRIDE in containers grant privileges equivalent to root, enabling container escape.
+exploit: "A compromised container with CAP_SYS_ADMIN mounts the host filesystem using 'mount --bind' and executes code on the host, escaping the container."
+impact: Full host compromise from a container with dangerous capabilities.
+fix: "Remove --cap-add for dangerous capabilities. Use --cap-drop=ALL and add only needed caps."
+breakage: "Some containers may require specific capabilities for legitimate functionality."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H (8.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Containers that legitimately need SYS_ADMIN for device management"
+  - "Privileged infrastructure containers (monitoring, backups)"
+related_findings:
+  - "CTN-201"
+  - "CTN-304"
+  - "CTN-306"
+severity_override: null
+tags:
+  - "containers"
+  - "capabilities"
+  - "privilege-escalation"
+mitre_mappings:
+  - "T1548.003"

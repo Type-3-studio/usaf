@@ -1,0 +1,26 @@
+id: SVC-103
+title: Service Missing Systemd Hardening
+threat: Services without NoNewPrivileges, PrivateTmp, and ProtectSystem have full system access, increasing the impact of any compromise.
+exploit: "An attacker exploiting a web service without PrivateTmp can read/write files in /tmp used by other services. Without NoNewPrivileges, they can escalate privileges via setuid binaries."
+impact: Increased blast radius from service compromise. Easier privilege escalation via missing sandboxing.
+fix: "Add hardening directives: 'systemctl edit <service>' and add [Service] section with NoNewPrivileges=yes, PrivateTmp=yes, ProtectSystem=strict."
+breakage: "Some services require full filesystem access or privilege escalation capability. Test after applying hardening."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N (4.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Services that need to execute child processes with different privileges"
+  - "Services that need access to shared temporary directories"
+related_findings:
+  - "SVC-201"
+  - "SVC-501"
+severity_override: null
+tags:
+  - "services"
+  - "systemd"
+  - "hardening"
+mitre_mappings:
+  - "T1543.002"

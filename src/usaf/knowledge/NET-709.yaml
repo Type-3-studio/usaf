@@ -1,0 +1,25 @@
+id: NET-709
+title: "Security Check"
+threat: "Network misconfigurations expose services and weaken network-level defenses."
+exploit: "Attackers exploit exposed services, weak network parameters, or promiscuous interfaces for reconnaissance."
+impact: "Service compromise, network reconnaissance, and man-in-the-middle attacks."
+fix: "Restrict service binding, harden network kernel parameters, and ensure proper firewall configuration."
+breakage: "Network hardening may affect application connectivity. Test in staging first."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N (6.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "NET-101"
+  - "NET-401"
+severity_override: null
+tags:
+  - "net"
+  - "hardening"
+mitre_mappings:
+  - "T1046"

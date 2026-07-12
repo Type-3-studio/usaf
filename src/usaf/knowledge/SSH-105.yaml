@@ -1,0 +1,30 @@
+id: SSH-105
+title: SSH Idle Timeout Not Configured
+threat: Abandoned SSH sessions remain open indefinitely, allowing session hijacking, unauthorized access via unlocked terminals, and resource exhaustion.
+exploit: "An attacker gains physical access to an unattended workstation with an active SSH session. They use the open session to execute commands as the original user without authentication."
+impact: Privilege escalation via session reuse. Increased attack surface from orphaned sessions on bastion hosts and jump boxes.
+fix: "Set idle timeout in /etc/ssh/sshd_config:
+  echo 'ClientAliveInterval 300' >> /etc/ssh/sshd_config
+  echo 'ClientAliveCountMax 0' >> /etc/ssh/sshd_config
+  systemctl restart sshd"
+breakage: "Long-running SSH sessions (e.g., overnight builds, data transfers) may disconnect. Set ClientAliveCountMax higher (e.g., 3) for such use cases."
+cvss: "CVSS:3.1/AV:P/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N (4.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Environments with long-running SSH sessions (transfers, builds)"
+  - "Bastion hosts where disconnecting idle sessions is acceptable"
+related_findings:
+  - "SSH-101"
+  - "SSH-107"
+severity_override: null
+tags:
+  - "ssh"
+  - "session"
+  - "timeout"
+  - "hardening"
+mitre_mappings:
+  - "T1078"

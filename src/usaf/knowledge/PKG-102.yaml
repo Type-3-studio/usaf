@@ -1,0 +1,26 @@
+id: PKG-102
+title: APT Repository Using HTTP
+threat: Package repositories accessed over HTTP are vulnerable to man-in-the-middle attacks where an attacker can intercept and modify package metadata.
+exploit: "An attacker on the same network intercepts an HTTP connection to the APT repository. They modify the Release file to serve malicious package versions containing backdoors."
+impact: Installation of malicious packages via tampered repository metadata.
+fix: "Replace http:// with https:// in repository URLs in /etc/apt/sources.list and /etc/apt/sources.list.d/"
+breakage: "Some repositories may not support HTTPS. Consider whether those repos are still needed."
+cvss: "CVSS:3.1/AV:A/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (8.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Repositories that do not support HTTPS (rare in modern environments)"
+related_findings:
+  - "PKG-203"
+  - "PKG-301"
+severity_override: null
+tags:
+  - "packages"
+  - "repositories"
+  - "tls"
+  - "supply-chain"
+mitre_mappings:
+  - "T1553"

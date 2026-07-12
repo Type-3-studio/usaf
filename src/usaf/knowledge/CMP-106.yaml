@@ -1,0 +1,23 @@
+id: CMP-106
+title: No File Integrity Tool
+threat: Without file integrity monitoring, unauthorized file changes go undetected.
+fix: "'apt install aide && aideinit'"
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+tags:
+  - "compliance"
+  - "integrity"
+  - "monitoring"
+mitre_mappings:
+  - "T1562"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

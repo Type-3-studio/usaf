@@ -1,0 +1,27 @@
+id: COM-208
+title: High Memory Usage
+threat: Processes consuming excessive memory may indicate cryptominers, memory scraping malware, or memory leaks.
+exploit: "An attacker deploys a Monero cryptominer on the server. The miner consumes 1GB+ of RAM and 100% CPU, degrading system performance and increasing electricity costs."
+impact: Resource exhaustion, performance degradation, increased operational costs.
+fix: "Investigate the process: check cmdline and binary. Kill if malicious. Remove persistence."
+breakage: "Some legitimate applications (databases, Java apps) use significant memory."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L (5.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.35
+known_exceptions:
+  - "Java/Python/Node applications may use >500MB legitimately"
+  - "Database servers (MySQL, PostgreSQL) typically use significant memory"
+related_findings:
+  - "COM-101"
+  - "COM-202"
+  - "KERN-501"
+severity_override: null
+tags:
+  - "compromise"
+  - "cryptominer"
+  - "anomaly"
+mitre_mappings:
+  - "T1496"

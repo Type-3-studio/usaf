@@ -1,0 +1,19 @@
+id: CLD-509
+title: Multiple Cloud Provider Credentials
+threat: Credentials for multiple cloud providers increase blast radius if the system is compromised.
+fix: "Remove credential files for unused cloud providers."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N (6.1)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+tags:
+  - "cloud"
+  - "credentials"
+  - "secrets"
+mitre_mappings:
+  - "T1552.004"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

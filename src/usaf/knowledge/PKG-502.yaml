@@ -1,0 +1,26 @@
+id: PKG-502
+title: Package Manager Integrity Issues
+threat: Package manager configuration issues can compromise system security by preventing timely security updates or introducing untrusted software.
+exploit: "A stale package cache prevents detection of available security updates. Critical patches are missed, leaving the system vulnerable to known exploits."
+impact: Missing security updates, untrusted repositories, degraded package management.
+fix: "Address each identified issue: run 'apt update', remove insecure repos, apply pending updates."
+breakage: "No breakage from fixing package manager issues."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Air-gapped systems without repository access"
+related_findings:
+  - "PKG-102"
+  - "PKG-203"
+  - "PKG-402"
+severity_override: null
+tags:
+  - "packages"
+  - "integrity"
+  - "maintenance"
+mitre_mappings:
+  - "T1562"

@@ -1,0 +1,30 @@
+id: SSH-202
+title: Weak SSH Cipher Algorithms Enabled
+threat: CBC-mode ciphers are vulnerable to padding oracle attacks (CVE-2008-5161). Arcfour (RC4) has known statistical biases. The 'none' cipher disables encryption.
+exploit: "An attacker performs a man-in-the-middle attack and forces the SSH connection to use a CBC-mode cipher, then exploits the padding oracle to decrypt traffic byte-by-byte, recovering passwords and session data."
+impact: Partial or complete session decryption. Passive attackers can recover sensitive data from SSH sessions using weak ciphers.
+fix: "Remove weak ciphers from /etc/ssh/sshd_config:
+  echo 'Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com' >> /etc/ssh/sshd_config
+  systemctl restart sshd"
+breakage: "Old SSH clients (OpenSSH < 6.2, some embedded systems) may fail to connect if GCM/ChaCha20 are the only options."
+cvss: "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N (5.9)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Interoperability with legacy SSH implementations requiring CBC ciphers"
+  - "Default Ubuntu configs include aes*-cbc for compatibility"
+related_findings:
+  - "SSH-201"
+  - "SSH-203"
+severity_override: null
+tags:
+  - "ssh"
+  - "cryptography"
+  - "ciphers"
+  - "hardening"
+mitre_mappings:
+  - "T1190"
+  - "T1573"

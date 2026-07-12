@@ -1,0 +1,19 @@
+id: CLD-503
+title: Kubelet Anonymous Auth
+threat: Anonymous authentication allows anyone who can reach the kubelet to query and execute commands.
+fix: "Set authentication.anonymous.enabled: false in kubelet config."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+tags:
+  - "cloud"
+  - "kubernetes"
+  - "kubelet"
+mitre_mappings:
+  - "T1078"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

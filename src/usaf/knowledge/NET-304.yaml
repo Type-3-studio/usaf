@@ -1,0 +1,25 @@
+id: NET-304
+title: Internal Domain Names in DNS Search Path
+threat: Internal domain names in the DNS search path leak internal naming conventions and network structure to anyone who can trigger a DNS lookup.
+exploit: "An attacker sends a DNS lookup for 'mail' to a system with search domain '.corp.internal'. The resolver tries 'mail.corp.internal', which reveals the internal domain structure and potentially resolves to internal IPs."
+impact: Information disclosure of internal network naming and structure. Aids network reconnaissance.
+fix: "Remove internal TLDs (.local, .internal, .corp) from the search path in /etc/resolv.conf. Use fully qualified domain names."
+breakage: "Unqualified hostname resolution for internal resources will stop working."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N (5.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Corporate environments where internal domain naming is not considered sensitive"
+related_findings:
+  - "NET-301"
+  - "NET-303"
+severity_override: null
+tags:
+  - "network"
+  - "dns"
+  - "information-disclosure"
+mitre_mappings:
+  - "T1590"

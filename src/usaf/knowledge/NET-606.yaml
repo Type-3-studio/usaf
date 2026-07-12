@@ -1,0 +1,23 @@
+id: NET-606
+title: SSH Exposed on Default Port
+threat: SSH on port 22 is constantly scanned by automated attackers. Moving to a non-standard port reduces attack noise.
+fix: "Consider moving SSH to a non-standard port >1024 with firewall rules."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.5
+tags:
+  - "network"
+  - "ssh"
+  - "ports"
+mitre_mappings:
+  - "T1046"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

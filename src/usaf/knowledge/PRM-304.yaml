@@ -1,0 +1,28 @@
+id: PRM-304
+title: World-Writable Executable in PATH
+threat: World-writable executables in system PATH allow any user to replace the binary. When root runs the trojaned command, arbitrary code executes with root privileges.
+exploit: "An attacker finds /usr/local/bin/cleanup.sh is world-writable. They replace it with a script that copies /bin/bash to /tmp/rootshell and sets SUID. When root's daily cron runs cleanup.sh, the attacker gets a root backdoor."
+impact: Immediate root privilege escalation. Persistence via trojaned binaries surviving reboots.
+fix: "chmod o-w /path/to/binary. Investigate why it is world-writable — this often indicates a misconfiguration or compromise."
+breakage: "Multi-user systems where users need to modify shared scripts should use a dedicated group with group-writable permission instead."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:U/C:H/I:H/A:H (7.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.02
+known_exceptions:
+  - "None. No system executable should be world-writable."
+related_findings:
+  - "PRM-101"
+  - "PRM-308"
+  - "FS-402"
+severity_override: null
+tags:
+  - "world-writable"
+  - "privilege-escalation"
+  - "persistence"
+  - "critical"
+mitre_mappings:
+  - "T1574.001"
+  - "T1574.002"

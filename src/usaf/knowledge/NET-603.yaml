@@ -1,0 +1,26 @@
+id: NET-603
+title: Certificate Store Integrity Issue
+threat: Broken symlinks or missing CA certificates indicate a corrupted trust store that can cause TLS verification failures.
+exploit: "An attacker replaces a CA certificate symlink with a broken one, causing trust verification to fall back to an alternative CA path under their control."
+impact: TLS verification failures, inability to verify HTTPS connections, APT update failures.
+fix: "Remove broken symlinks: 'sudo rm <path>'. Reinstall CA certs: 'sudo apt install --reinstall ca-certificates'."
+breakage: "No breakage from fixing broken symlinks or reinstalling CA certs."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L (3.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "None. Broken symlinks should always be fixed."
+related_findings:
+  - "NET-601"
+  - "NET-602"
+  - "SECR-501"
+severity_override: null
+tags:
+  - "tls"
+  - "certificates"
+  - "integrity"
+mitre_mappings:
+  - "T1562"

@@ -1,0 +1,26 @@
+id: KERN-251
+title: Ptrace Scope Unrestricted
+threat: Unrestricted ptrace (ptrace_scope=0) allows any process to debug any other process owned by the same user, enabling credential theft, memory manipulation, and code injection.
+exploit: "An attacker with a low-privilege shell runs a ptrace-based injector (e.g., 'shikata ga nai') to attach to an SSH agent process, extracting private keys from its memory. They use the keys for lateral movement to other systems."
+impact: Credential theft from process memory, arbitrary code injection into running processes, privilege escalation via process injection.
+fix: "Set 'kernel.yama.ptrace_scope = 1' in /etc/sysctl.d/99-security.conf and run 'sysctl -w kernel.yama.ptrace_scope=1'. For high-security environments, use 2 or 3."
+breakage: "Debuggers (gdb, strace) will only work on child processes. Developers may need CAP_SYS_PTRACE or sudo for debugging non-child processes."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N (7.1)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Developer workstations where debugging arbitrary processes is required"
+related_findings:
+  - "KERN-201"
+  - "PER-401"
+severity_override: null
+tags:
+  - "kernel"
+  - "ptrace"
+  - "process-injection"
+  - "hardening"
+mitre_mappings:
+  - "T1055"

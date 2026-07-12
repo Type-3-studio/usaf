@@ -1,0 +1,23 @@
+id: KERN-352
+title: SysRq Key Enabled
+threat: SysRq key allows performing system operations from keyboard — including immediate reboot and process killing.
+fix: "Set kernel.sysrq = 0 in /etc/sysctl.d/"
+cvss: "CVSS:3.1/AV:L/AC:L/PR:P/UI:N/S:U/C:N/I:N/A:L (3.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+tags:
+  - "kernel"
+  - "access-control"
+  - "hardening"
+mitre_mappings:
+  - "T1496"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

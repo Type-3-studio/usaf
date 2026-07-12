@@ -1,0 +1,24 @@
+id: SEC-205
+title: "Security Check"
+threat: "Security module misconfigurations weaken mandatory access controls."
+exploit: "Attackers exploit unconfined processes or disabled security modules to perform unauthorized actions."
+impact: "Bypass of mandatory access controls, unrestricted process privileges, and kernel exploitation."
+fix: "Enable AppArmor/LSM enforcement, load security profiles, and restrict kernel module loading."
+breakage: "Enforcing AppArmor may break applications without proper profiles."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "SEC-101"
+severity_override: null
+tags:
+  - "sec"
+  - "hardening"
+mitre_mappings:
+  - "T1562"

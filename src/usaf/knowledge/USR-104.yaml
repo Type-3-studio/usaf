@@ -1,0 +1,24 @@
+id: USR-104
+title: "Security Check"
+threat: "User account misconfigurations allow unauthorized access and privilege escalation."
+exploit: "Attackers exploit dormant accounts, excessive group memberships, or weak home directory permissions."
+impact: "Unauthorized access, lateral movement, and privilege escalation."
+fix: "Audit user accounts, remove unnecessary privileges, and lock inactive accounts."
+breakage: "Locking accounts may affect legitimate users. Coordinate with stakeholders."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "USR-101"
+severity_override: null
+tags:
+  - "usr"
+  - "hardening"
+mitre_mappings:
+  - "T1078"

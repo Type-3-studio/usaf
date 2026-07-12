@@ -1,0 +1,28 @@
+id: COM-201
+title: Process Running From Suspicious Location
+threat: Malware often executes from world-writable directories like /tmp or /dev/shm to avoid detection and persistence mechanisms.
+exploit: "An attacker downloads a payload to /tmp, makes it executable, and runs it. The process runs from /tmp, avoiding standard binary directories monitored by security tools."
+impact: Running malware with persistence and potential privilege escalation.
+fix: "Kill the process and remove the binary. Investigate how the binary was placed."
+breakage: "Some legitimate software may run from /tmp temporarily."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (8.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Some installer frameworks run from /tmp temporarily"
+  - "Live USB sessions may have processes from /tmp"
+related_findings:
+  - "COM-101"
+  - "COM-204"
+severity_override: null
+tags:
+  - "compromise"
+  - "malware"
+  - "incident-response"
+  - "high"
+mitre_mappings:
+  - "T1059"
+  - "T1204"

@@ -1,0 +1,23 @@
+id: SSH-501
+title: SSH X11Forwarding Enabled
+threat: X11 forwarding allows keystroke logging, screen capture, and remote code exec via the X11 display protocol.
+fix: "Set 'X11Forwarding no' in sshd_config"
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N (6.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+tags:
+  - "ssh"
+  - "network"
+  - "hardening"
+mitre_mappings:
+  - "T1571"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

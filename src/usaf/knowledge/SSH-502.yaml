@@ -1,0 +1,23 @@
+id: SSH-502
+title: SSH AllowTcpForwarding Enabled
+threat: TCP forwarding bypasses firewalls and can be used to tunnel out of restricted networks from bastion hosts.
+fix: "Set 'AllowTcpForwarding no' in sshd_config"
+cvss: "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:N (8.1)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+tags:
+  - "ssh"
+  - "network"
+  - "hardening"
+mitre_mappings:
+  - "T1572"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

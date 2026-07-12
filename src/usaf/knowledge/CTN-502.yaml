@@ -1,0 +1,25 @@
+id: CTN-502
+title: Multiple Container Runtimes Installed
+threat: Each container runtime socket is a potential privilege escalation vector. Installing multiple runtimes unnecessarily increases attack surface.
+exploit: "An attacker discovers an unused containerd socket with weak permissions and uses it to launch a privileged container, escaping to the host."
+impact: Privilege escalation via unused runtime sockets with weak security.
+fix: "Remove unused container runtimes with apt remove."
+breakage: "Removing a runtime will break services that depend on it."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N (4.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.3
+known_exceptions:
+  - "Systems intentionally running multiple runtimes (Docker + containerd + CRI-O)"
+related_findings:
+  - "CTN-101"
+  - "CTN-501"
+severity_override: null
+tags:
+  - "containers"
+  - "runtimes"
+  - "attack-surface"
+mitre_mappings:
+  - "T1562"

@@ -1,0 +1,28 @@
+id: NET-303
+title: mDNS/Avahi Service Running
+threat: Avahi mDNS broadcasts hostname and service information to the local network without authentication, enabling network reconnaissance and information disclosure.
+exploit: "An attacker on the same network listens for mDNS responses to discover all local systems and their services. They identify a 'developer-laptop' running SSH and target it for credential theft."
+impact: Information disclosure (hostnames, services, user names). Network reconnaissance enabler. Typically unnecessary on servers.
+fix: "systemctl stop avahi-daemon && systemctl disable avahi-daemon && apt remove avahi-daemon"
+breakage: "Network printer discovery, service discovery on home networks, and some collaborative applications may rely on mDNS."
+cvss: "CVSS:3.1/AV:A/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N (4.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Desktop/workstation systems that use printer discovery"
+  - "Home media servers using DLNA/UPnP"
+related_findings:
+  - "NET-301"
+  - "NET-304"
+severity_override: null
+tags:
+  - "network"
+  - "mdns"
+  - "avahi"
+  - "discovery"
+mitre_mappings:
+  - "T1595"
+  - "T1046"

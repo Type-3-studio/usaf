@@ -1,0 +1,29 @@
+id: SSH-107
+title: SSH PermitUserEnvironment Enabled
+threat: PermitUserEnvironment allows users to inject arbitrary environment variables, enabling LD_PRELOAD, PATH hijacking, and other code execution attacks.
+exploit: "An attacker with a valid SSH account adds 'environment=\"LD_PRELOAD=/tmp/malicious.so\"' to their authorized_keys file. When they SSH in, the malicious library loads and executes code with their privileges."
+impact: Privilege escalation, arbitrary code execution, and persistence via environment variable manipulation.
+fix: "Set 'PermitUserEnvironment no' in /etc/ssh/sshd_config:
+  echo 'PermitUserEnvironment no' >> /etc/ssh/sshd_config
+  systemctl restart sshd"
+breakage: "Users who rely on ~/.ssh/environment for automated workflows will lose that functionality. Use AcceptEnv with whitelisted variables instead."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Environments that intentionally use SSH environment passing for automation"
+related_findings:
+  - "SSH-107"
+  - "PER-401"
+  - "PER-402"
+severity_override: null
+tags:
+  - "ssh"
+  - "environment"
+  - "privilege-escalation"
+  - "hardening"
+mitre_mappings:
+  - "T1574.001"

@@ -1,0 +1,29 @@
+id: SSH-109
+title: SSH HostbasedAuthentication Enabled
+threat: Host-based authentication trusts the source host identity rather than user credentials. A compromised host can authenticate as any user, bypassing individual authentication.
+exploit: "An attacker who compromises host A can SSH as 'root' or any user on host B by claiming the connection originates from a trusted host, without knowing the target user's password or key."
+impact: Lateral movement across trusted hosts. Complete bypass of user authentication for hosts in the trust relationship.
+fix: "Set 'HostbasedAuthentication no' in /etc/ssh/sshd_config:
+  echo 'HostbasedAuthentication no' >> /etc/ssh/sshd_config
+  systemctl restart sshd"
+breakage: "Legacy HPC clusters or automated systems using rhosts-style authentication between trusted hosts will need alternative configuration."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H (9.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Tightly controlled HPC or research clusters explicitly using host-based auth"
+related_findings:
+  - "SSH-101"
+  - "SSH-107"
+  - "SSH-503"
+severity_override: null
+tags:
+  - "ssh"
+  - "authentication"
+  - "network"
+  - "hardening"
+mitre_mappings:
+  - "T1078"

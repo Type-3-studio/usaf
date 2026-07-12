@@ -1,0 +1,27 @@
+id: PKG-403
+title: Auto-Removable Packages
+threat: Packages that are no longer needed accumulate over time, increasing attack surface by providing additional code that may contain vulnerabilities.
+exploit: "A vulnerability is discovered in an auto-removable library that is no longer depended on by any active package. The library remains on disk with its vulnerabilities intact."
+impact: Increased attack surface from unused software.
+fix: "Review: 'apt-get --dry-run autoremove'. Remove: 'apt autoremove'."
+breakage: "Some auto-removable packages may still be needed by user-installed software not tracked by dpkg."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Packages pinned or held by user configuration"
+  - "Packages needed by manually compiled software"
+related_findings:
+  - "PKG-101"
+  - "PKG-304"
+severity_override: null
+tags:
+  - "packages"
+  - "cleanup"
+  - "maintenance"
+  - "attack-surface"
+mitre_mappings:
+  - "T1562"

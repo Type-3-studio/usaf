@@ -1,0 +1,28 @@
+id: SVC-501
+title: Service With World-Writable ExecStart Binary
+threat: A world-writable service binary allows any user to replace it. When systemd starts the service (often as root), the attacker's code runs with elevated privileges.
+exploit: "An attacker with unprivileged access replaces /usr/local/bin/custom-service (mode 0777) with a script that copies /bin/bash to /tmp/shroot with SUID. When systemd restarts the service, they gain root."
+impact: Immediate root privilege escalation from any user account.
+fix: "chmod o-w /path/to/binary. Verify binary integrity with package manager."
+breakage: "No legitimate operation requires a world-writable service binary."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "None — this combination is never legitimate"
+related_findings:
+  - "SVC-202"
+  - "PRM-304"
+  - "PRM-308"
+severity_override: null
+tags:
+  - "services"
+  - "privilege-escalation"
+  - "world-writable"
+  - "critical"
+mitre_mappings:
+  - "T1543.002"
+  - "T1574.002"

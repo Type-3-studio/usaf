@@ -1,0 +1,26 @@
+id: PRM-302
+title: Dangerous File Capability
+threat: Linux capabilities like cap_sys_admin, cap_dac_override, and cap_setuid grant privileges equivalent to root. A compromised binary with these capabilities allows complete system takeover.
+exploit: "An attacker exploits a buffer overflow in a binary with cap_sys_admin+cap_setuid. They execute arbitrary code that uses cap_setuid to switch to UID 0, gaining root shell from a non-root process."
+impact: Full root privilege escalation from a single vulnerable capability-bearing binary.
+fix: "Remove dangerous capabilities: 'sudo setcap -r /path/to/binary'. Replace with finer-grained capabilities or drop all capabilities after initial setup."
+breakage: "Services depending on specific capabilities (e.g., Wireshark with cap_net_admin+cap_dac_override) will stop working."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Development/debugging tools intentionally granted wide capabilities"
+  - "Container runtimes may grant capabilities to helper binaries"
+related_findings:
+  - "PRM-307"
+  - "PRM-101"
+severity_override: null
+tags:
+  - "capabilities"
+  - "privilege-escalation"
+  - "security"
+mitre_mappings:
+  - "T1548.003"

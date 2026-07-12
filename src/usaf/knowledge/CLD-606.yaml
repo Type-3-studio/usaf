@@ -1,0 +1,26 @@
+id: CLD-606
+title: "Security Check"
+threat: "Cloud configuration exposures allow credential theft and unauthorized cloud resource access."
+exploit: "Attackers exploit SSRF vulnerabilities or exposed credentials to access cloud metadata services and steal instance credentials."
+impact: "Cloud account compromise, data exfiltration from cloud storage, and lateral movement across cloud services."
+fix: "Enable IMDSv2, restrict metadata service access, use IAM roles instead of keys, and rotate exposed credentials."
+breakage: "Enabling IMDSv2 may break legacy applications that rely on IMDSv1."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H (10.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "CLD-101"
+  - "CLD-501"
+severity_override: null
+tags:
+  - "cld"
+  - "hardening"
+mitre_mappings:
+  - "T1525"
+  - "T1552"

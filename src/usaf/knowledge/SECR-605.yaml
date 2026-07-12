@@ -1,0 +1,24 @@
+id: SECR-605
+title: "Security Check"
+threat: "Exposed secrets and credentials allow unauthorized access to external services."
+exploit: "Automated scanners harvest credentials from code repositories, config files, and environment variables."
+impact: "Account compromise, data breach, financial fraud, and lateral movement to cloud services."
+fix: "Revoke exposed credentials immediately. Use secrets managers instead of storing in files."
+breakage: "False positives possible for test credentials or example code. Verify before revoking."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H (10.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "SECR-101"
+severity_override: null
+tags:
+  - "secr"
+  - "hardening"
+mitre_mappings:
+  - "T1552"

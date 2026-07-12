@@ -1,0 +1,23 @@
+id: SSH-301
+title: Deprecated DSA Host Key
+threat: DSA SSH keys are deprecated due to known weaknesses and are disabled by default in OpenSSH 9.x.
+fix: "Generate a new Ed25519 host key: ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key"
+breakage: "Old SSH clients that only support DSA will not be able to connect."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U:C/H:I/A:N (7.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+tags:
+  - "ssh"
+  - "keys"
+  - "cryptography"
+mitre_mappings:
+  - "T1552.004"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."

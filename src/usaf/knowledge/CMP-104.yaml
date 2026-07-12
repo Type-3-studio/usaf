@@ -1,0 +1,23 @@
+id: CMP-104
+title: Missing Mount Options
+threat: Missing nodev/nosuid/noexec on /tmp, /home, /dev/shm allows privilege escalation.
+fix: "Add missing mount options in /etc/fstab."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N (4.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+tags:
+  - "compliance"
+  - "mount"
+  - "hardening"
+mitre_mappings:
+  - "T1562"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

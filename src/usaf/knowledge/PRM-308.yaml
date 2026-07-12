@@ -1,0 +1,29 @@
+id: PRM-308
+title: World-Writable SUID/SGID File
+threat: A world-writable SUID/SGID binary allows any user to replace it with arbitrary code. When executed, the replacement runs with the elevated privileges — immediate root or group compromise.
+exploit: "An attacker spots /usr/local/bin/helper has SUID root AND mode 0777. They overwrite it with: 'echo \"#!/bin/sh\ncp /bin/bash /tmp/shroot; chmod u+s /tmp/shroot\" > /usr/local/bin/helper && chmod +x /usr/local/bin/helper'. They run the helper and get a root shell via /tmp/shroot."
+impact: Immediate, trivial root privilege escalation. No exploit development required.
+fix: "chmod o-w /path/to/file. Also remove SUID/SGID if not required: 'chmod u-s /path/to/file' and 'chmod g-s /path/to/file'."
+breakage: "No legitimate operation requires a world-writable SUID/SGID binary."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "None. This combination is never legitimate."
+related_findings:
+  - "PRM-101"
+  - "PRM-301"
+  - "PRM-304"
+  - "PRM-305"
+severity_override: null
+tags:
+  - "suid"
+  - "sgid"
+  - "world-writable"
+  - "privilege-escalation"
+  - "critical"
+mitre_mappings:
+  - "T1548.001"

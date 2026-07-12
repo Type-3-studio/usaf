@@ -1,0 +1,23 @@
+id: NET-504
+title: Wireless Interface Active
+threat: Wireless interfaces on server systems extend the attack surface and may allow close-proximity attacks.
+fix: "Disable WiFi: ip link set <interface> down, or remove the hardware."
+cvss: "CVSS:3.1/AV:A/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N (5.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+tags:
+  - "network"
+  - "wireless"
+  - "attack-surface"
+mitre_mappings:
+  - "T1557"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

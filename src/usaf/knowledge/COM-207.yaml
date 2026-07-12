@@ -1,0 +1,27 @@
+id: COM-207
+title: Unexpected Process Running as Root
+threat: Unexpected processes running with root privileges may indicate a backdoor, cryptominer, or unauthorized service.
+exploit: "An attacker installs a backdoor that runs as root, providing full system access on connection."
+impact: Full system compromise with root-level persistence.
+fix: "Kill the process and investigate its origin. Remove the binary and any persistence mechanisms."
+breakage: "Some legitimate but lesser-known services run as root."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.3
+known_exceptions:
+  - "Administrative or monitoring tools intentionally running as root"
+  - "Container processes sharing the host namespace"
+related_findings:
+  - "SVC-201"
+  - "COM-201"
+  - "COM-202"
+severity_override: null
+tags:
+  - "compromise"
+  - "privilege-escalation"
+  - "anomaly"
+mitre_mappings:
+  - "T1068"

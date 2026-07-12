@@ -1,0 +1,26 @@
+id: SVC-203
+title: Service With Missing ExecStart Binary
+threat: A service whose ExecStart binary is missing will fail to start, potentially causing service disruption or indicating incomplete installation.
+exploit: "An attacker removes a legitimate service binary to cause a denial of service, then replaces it with a malicious version that executes when the service restarts."
+impact: Service failure, potential for binary replacement attacks.
+fix: "Reinstall the package providing the missing binary, or disable the service if no longer needed."
+breakage: "No breakage from fixing a missing binary — the service was already non-functional."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L (3.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Services that generate ExecStart paths dynamically"
+  - "Services installed but not yet fully configured"
+related_findings:
+  - "SVC-202"
+  - "SVC-501"
+severity_override: null
+tags:
+  - "services"
+  - "integrity"
+  - "systemd"
+mitre_mappings:
+  - "T1543.002"

@@ -1,0 +1,25 @@
+id: SSH-606
+title: "Security Check"
+threat: "SSH misconfigurations enable remote brute-force and man-in-the-middle attacks."
+exploit: "Attackers brute-force weak SSH passwords, exploit weak key exchange algorithms, or use forwarded agents."
+impact: "Remote unauthorized access, credential theft, and lateral movement across the network."
+fix: "Disable password authentication, restrict root login, use strong key exchange algorithms."
+breakage: "SSH hardening may break automation tools that rely on password authentication."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "SSH-101"
+severity_override: null
+tags:
+  - "ssh"
+  - "hardening"
+mitre_mappings:
+  - "T1110"
+  - "T1046"

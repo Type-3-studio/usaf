@@ -1,0 +1,27 @@
+id: PRM-306
+title: SUID/SGID File Not Owned by Root
+threat: SUID/SGID files owned by non-root users allow escalation to that user's privileges. This can bypass access controls intended to isolate users.
+exploit: "A SUID binary owned by UID 1003 (service account with Docker access) allows an attacker to execute commands as that user, inheriting Docker group membership and escalating via container escape."
+impact: Lateral movement and privilege escalation to the owning user account. Combined with other misconfigurations, can lead to full compromise.
+fix: "chown root /path/to/binary. If the binary legitimately needs non-root ownership, add it to the allowlist and document the exception."
+breakage: "Some daemon-managed SUID binaries use dedicated user accounts for privilege separation."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N (4.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Some service binaries (e.g., Dovecot) use dedicated users for privilege separation"
+related_findings:
+  - "PRM-101"
+  - "PRM-301"
+  - "PRM-305"
+severity_override: null
+tags:
+  - "suid"
+  - "sgid"
+  - "ownership"
+  - "permissions"
+mitre_mappings:
+  - "T1548.001"

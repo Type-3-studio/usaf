@@ -1,0 +1,25 @@
+id: KERN-351
+title: Core Dump PID Naming Disabled
+threat: Without PID in core dump filenames, forensic analysis is more difficult when multiple processes of the same name crash, potentially hindering incident response.
+exploit: "An attacker crashes multiple daemon instances to obscure their exploit attempt. Without PID tracking, the analyst cannot determine which crash was the actual exploit versus normal crashes."
+impact: Reduced forensic value of core dumps. Harder to correlate crashes with specific process instances.
+fix: "Set 'kernel.core_uses_pid = 1' in /etc/sysctl.d/99-security.conf and run 'sysctl -w kernel.core_uses_pid=1'."
+breakage: "Automated core dump analysis tools that expect fixed filenames may need updates to handle PID suffixes."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Systems with automated core dump tools expecting fixed filename patterns"
+related_findings:
+  - "KERN-301"
+  - "FOR-101"
+severity_override: null
+tags:
+  - "kernel"
+  - "core-dump"
+  - "forensics"
+mitre_mappings:
+  - "T1562"

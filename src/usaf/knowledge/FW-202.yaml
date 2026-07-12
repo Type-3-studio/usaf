@@ -1,0 +1,26 @@
+id: FW-202
+title: Firewall With Minimal Rules
+threat: A firewall with only default chain policies and no explicit rules provides minimal protection and no granular control.
+exploit: "An attacker probes the network and finds services accessible despite an active firewall. The firewall only has default policies without specific rules to block or limit access."
+impact: Ineffective firewall protection. No granular control over which services are exposed.
+fix: "Add explicit allow rules for each necessary service. Review and audit all listening ports."
+breakage: "No breakage — adding rules only improves security posture."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N (5.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Systems with only default chain policies and no services listening"
+related_findings:
+  - "FW-101"
+  - "FW-201"
+  - "NET-101"
+severity_override: null
+tags:
+  - "firewall"
+  - "rules"
+  - "hardening"
+mitre_mappings:
+  - "T1562.004"

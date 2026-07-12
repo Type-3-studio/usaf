@@ -1,0 +1,19 @@
+id: CLD-507
+title: Cloud Provider Info
+threat: Informational — reports detected cloud provider.
+fix: "No action needed."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+tags:
+  - "cloud"
+  - "provider"
+  - "info"
+mitre_mappings:
+  - "T1525"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

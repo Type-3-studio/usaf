@@ -1,0 +1,27 @@
+id: PKG-304
+title: Running Kernel Not Latest Installed
+threat: Running an older kernel means the system lacks the latest kernel security fixes, which often address critical vulnerabilities.
+exploit: "A kernel privilege escalation vulnerability (e.g., Dirty Pipe, Dirty COW) is discovered. The updated kernel package is installed but the system hasn't rebooted. An attacker exploits the vulnerability on the running older kernel."
+impact: Unpatched kernel vulnerabilities despite having the fix installed.
+fix: "Reboot the system to load the latest installed kernel: 'sudo reboot'."
+breakage: "Temporary service disruption during reboot. Use live patching (Canonical Livepatch) to reduce reboots if needed."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Systems that cannot be rebooted (scheduled maintenance windows)"
+  - "Livepatch systems where kernel is patched at runtime"
+related_findings:
+  - "PKG-402"
+  - "KERN-101"
+severity_override: null
+tags:
+  - "packages"
+  - "kernel"
+  - "patching"
+  - "reboot"
+mitre_mappings:
+  - "T1204.002"

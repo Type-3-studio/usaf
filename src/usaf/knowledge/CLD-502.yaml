@@ -1,0 +1,25 @@
+id: CLD-502
+title: Cloud Credentials in Environment
+threat: Cloud credentials in environment variables can leak via process listings and debug endpoints.
+exploit: "Any local user can read /proc/<PID>/environ to extract cloud credentials from process environments."
+impact: "Cloud account compromise, data exfiltration from cloud storage, and lateral movement across cloud services."
+fix: "Use instance profiles (AWS), service accounts (GCP), or managed identities (Azure)."
+breakage: "Some legacy applications require environment variable credentials. Plan migration carefully."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Development environments may have credentials in environment variables intentionally"
+related_findings:
+  - "CLD-101"
+  - "CLD-601"
+severity_override: null
+tags:
+  - "cloud"
+  - "credentials"
+  - "secrets"
+mitre_mappings:
+  - "T1552.004"

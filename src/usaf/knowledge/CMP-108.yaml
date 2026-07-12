@@ -1,0 +1,23 @@
+id: CMP-108
+title: Root Login on Multiple TTYs
+threat: Allowing root login on many TTYs increases the risk of local unauthorized access.
+fix: "Edit /etc/securetty to only allow console and tty1."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N (4.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+tags:
+  - "compliance"
+  - "authentication"
+  - "access-control"
+mitre_mappings:
+  - "T1562"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

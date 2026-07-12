@@ -1,0 +1,23 @@
+id: CMP-107
+title: GRUB Password Not Set
+threat: Without a GRUB password, boot-level access can bypass all OS security.
+fix: "grub-mkpasswd-pbkdf2 and add to /etc/grub.d/40_custom"
+cvss: "CVSS:3.1/AV:P/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (6.6)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+tags:
+  - "compliance"
+  - "boot"
+  - "access-control"
+mitre_mappings:
+  - "T1542.001"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

@@ -1,0 +1,29 @@
+id: NET-601
+title: Untrusted CA Certificate
+threat: Unknown or untrusted CA certificates in the system trust store can enable man-in-the-middle attacks by unauthorized certificate issuers.
+exploit: "A corporate proxy's self-signed CA is installed as a trusted root. An attacker who compromises the proxy can issue valid TLS certificates for any domain, intercepting all HTTPS traffic."
+impact: Widespread TLS interception. Loss of TLS integrity and confidentiality for all HTTPS connections.
+fix: "Review unrecognized certificates in /etc/ssl/certs/. Remove unauthorized ones: 'sudo rm /etc/ssl/certs/<name>' then 'sudo update-ca-certificates --fresh'."
+breakage: "Corporate proxies or security software that install custom CAs will trigger this finding."
+cvss: "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N (8.2)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.4
+known_exceptions:
+  - "Corporate CA certificates installed by IT for SSL inspection"
+  - "Enterprise security software CAs"
+  - "Development/internal CAs"
+related_findings:
+  - "NET-602"
+  - "NET-603"
+  - "SECR-502"
+severity_override: null
+tags:
+  - "tls"
+  - "certificates"
+  - "pki"
+  - "trust"
+mitre_mappings:
+  - "T1553.004"

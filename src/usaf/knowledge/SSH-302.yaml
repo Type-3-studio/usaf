@@ -1,0 +1,23 @@
+id: SSH-302
+title: Weak Authorized Keys Permissions
+threat: authorized_keys files with weak permissions allow other users to add their own SSH keys.
+fix: "chmod 600 ~/.ssh/authorized_keys"
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N (6.1)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+tags:
+  - "ssh"
+  - "keys"
+  - "permissions"
+mitre_mappings:
+  - "T1098"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

@@ -1,0 +1,28 @@
+id: NET-102
+title: Sensitive Service Exposed on All Interfaces
+threat: Sensitive services (databases, admin panels) listening on 0.0.0.0 are accessible from any reachable network, dramatically expanding the attack surface.
+exploit: "An attacker on the same network scans for port 3306 (MySQL). They find it exposed and attempt brute-force or known CVE exploitation, gaining database access."
+impact: Unauthorized database access, data exfiltration, lateral movement into the network.
+fix: "Bind sensitive services to localhost (127.0.0.1) or specific internal IPs. Use firewall rules to restrict access if remote connections are required."
+breakage: "Remote database access will stop working. Configure SSH tunneling or VPN for remote administration."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N (9.1)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Services intentionally exposed for legitimate remote access"
+  - "Database replicas requiring network-level replication"
+related_findings:
+  - "NET-101"
+  - "FW-101"
+severity_override: null
+tags:
+  - "network"
+  - "ports"
+  - "exposure"
+  - "attack-surface"
+mitre_mappings:
+  - "T1046"
+  - "T1190"

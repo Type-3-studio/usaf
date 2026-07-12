@@ -1,0 +1,23 @@
+id: KERN-552
+title: Perf Event Paranoid
+threat: Perf events allow monitoring hardware performance counters, which can leak kernel information.
+fix: "Set kernel.perf_event_paranoid = 3 in /etc/sysctl.d/"
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N (3.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+tags:
+  - "kernel"
+  - "information-disclosure"
+  - "hardening"
+mitre_mappings:
+  - "T1592"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

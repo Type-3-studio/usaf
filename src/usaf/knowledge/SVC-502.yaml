@@ -1,0 +1,28 @@
+id: SVC-502
+title: Suspicious Service Description
+threat: Service descriptions containing keywords associated with cryptominers, backdoors, or credential stealers may indicate a compromised system.
+exploit: "An attacker deploys a cryptominer as a systemd service named 'systemd-update.service' with description 'Monero CPU miner' to maintain persistence. The description keyword triggers detection."
+impact: Unauthorized cryptocurrency mining, backdoor persistence, resource theft.
+fix: "Investigate the service: 'systemctl cat <service>'. If malicious: 'systemctl disable --now <service>' and remove the unit file."
+breakage: "False positives are possible if legitimate software uses similar keywords in descriptions."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Research or security tools that reference malware terms in their descriptions"
+related_findings:
+  - "COM-101"
+  - "SVC-101"
+  - "PER-201"
+severity_override: null
+tags:
+  - "services"
+  - "persistence"
+  - "malware"
+  - "systemd"
+mitre_mappings:
+  - "T1543.002"
+  - "T1505"

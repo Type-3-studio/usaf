@@ -1,0 +1,25 @@
+id: SVC-504
+title: Masked Service With Existing Unit File
+threat: A masked service that still has a unit file present may not be properly masked, or the mask was improperly applied, potentially allowing re-activation.
+exploit: "An attacker masks a security service but leaves the unit file, then later reverses the mask by removing the /dev/null symlink, restoring the service in a modified state."
+impact: Bypass of service disabling. Potential for service resurrection by attackers.
+fix: "Properly mask: 'systemctl mask <service>'. Verify: 'systemctl status <service>' shows masked."
+breakage: "No breakage. A properly masked service points to /dev/null."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N (3.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "None — masking should always remove or redirect the unit file"
+related_findings:
+  - "SVC-402"
+  - "SVC-503"
+severity_override: null
+tags:
+  - "services"
+  - "persistence"
+  - "systemd"
+mitre_mappings:
+  - "T1562.001"

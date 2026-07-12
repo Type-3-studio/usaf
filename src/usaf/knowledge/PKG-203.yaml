@@ -1,0 +1,29 @@
+id: PKG-203
+title: Non-Standard APT Repository
+threat: Third-party and PPA repositories are not vetted by Ubuntu security and may contain outdated, vulnerable, or malicious packages.
+exploit: "An attacker compromises a PPA maintainer's account and uploads a malicious package version. Systems using that PPA receive the malicious update as part of normal apt upgrades."
+impact: Supply chain compromise via untrusted package sources.
+fix: "Review whether each third-party repository is still needed. Remove unused repos from /etc/apt/sources.list.d/"
+breakage: "Software installed from third-party repos will stop receiving updates."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.3
+known_exceptions:
+  - "Vendor repositories for Docker, Microsoft, Google, Elastic, etc. are expected"
+  - "Ubuntu PPAs for necessary software not in main repos"
+related_findings:
+  - "PKG-102"
+  - "PKG-301"
+  - "PKG-501"
+severity_override: null
+tags:
+  - "packages"
+  - "repositories"
+  - "supply-chain"
+  - "third-party"
+mitre_mappings:
+  - "T1195"
+  - "T1475"

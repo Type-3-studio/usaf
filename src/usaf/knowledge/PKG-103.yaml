@@ -1,0 +1,25 @@
+id: PKG-103
+title: Source Repositories Enabled
+threat: deb-src source repositories are unnecessary on production systems and increase attack surface.
+exploit: "An attacker who compromises a source repository can inject malicious code into package source that may be built and installed by unsuspecting users."
+impact: Increased attack surface and metadata download time. Source repos are not needed on production systems.
+fix: "Comment out deb-src lines in /etc/apt/sources.list and files in /etc/apt/sources.list.d/"
+breakage: "Developers who build packages from source will lose access to source packages."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Development workstations where package source is needed for building"
+related_findings:
+  - "PKG-102"
+  - "PKG-301"
+severity_override: null
+tags:
+  - "packages"
+  - "repositories"
+  - "hardening"
+mitre_mappings:
+  - "T1562"

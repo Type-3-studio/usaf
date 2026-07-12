@@ -1,0 +1,23 @@
+id: SSH-504
+title: SSH PermitTunnel Enabled
+threat: SSH tunnel forwarding creates virtual network interfaces that can bypass network controls.
+fix: "Set 'PermitTunnel no' in sshd_config"
+cvss: "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:N (5.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+tags:
+  - "ssh"
+  - "network"
+  - "hardening"
+mitre_mappings:
+  - "T1562"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

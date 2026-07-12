@@ -1,0 +1,25 @@
+id: COM-305
+title: "Security Check"
+threat: "Running processes exhibit indicators of compromise consistent with malware or attacker activity."
+exploit: "Attackers deploy malware, establish persistence, or execute post-exploitation tools on the compromised host."
+impact: "Full system compromise, data theft, lateral movement, and persistent unauthorized access."
+fix: "Immediately isolate the host, kill malicious processes, and perform forensic investigation."
+breakage: "Some security tools may trigger false positives. Investigate before taking action."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H (10.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "COM-101"
+severity_override: null
+tags:
+  - "com"
+  - "hardening"
+mitre_mappings:
+  - "T1059"
+  - "T1071"

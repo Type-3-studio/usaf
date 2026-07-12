@@ -1,0 +1,27 @@
+id: KERN-514
+title: Minimum mmap Address Too Low
+threat: A low mmap_min_addr allows user-space processes to map memory at low addresses including the NULL page, enabling NULL pointer dereference exploitation.
+exploit: "An attacker triggers a kernel NULL pointer dereference in a vulnerable driver. Because mmap_min_addr is 0, they have already mapped executable code at address 0. The kernel jumps to the attacker's code, granting immediate privilege escalation."
+impact: Kernel privilege escalation via NULL pointer dereference vulnerabilities.
+fix: "Set 'vm.mmap_min_addr = 65536' in /etc/sysctl.d/99-security.conf and run 'sysctl -w vm.mmap_min_addr=65536'."
+breakage: "Some QEMU/KVM and Wine configurations may fail with higher mmap_min_addr values."
+cvss: "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H (7.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Systems running QEMU/KVM with specific memory configurations"
+  - "Wine compatibility layers for legacy Windows applications"
+related_findings:
+  - "KERN-101"
+  - "KERN-513"
+severity_override: null
+tags:
+  - "kernel"
+  - "mmap"
+  - "exploit-mitigation"
+  - "hardening"
+mitre_mappings:
+  - "T1204.002"

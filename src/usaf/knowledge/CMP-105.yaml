@@ -1,0 +1,23 @@
+id: CMP-105
+title: No Time Synchronization
+threat: Inaccurate system time breaks audit logs, Kerberos, TLS, and compliance.
+fix: "'timedatectl set-ntp true' or install chrony."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N (4.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+tags:
+  - "compliance"
+  - "time"
+  - "audit"
+mitre_mappings:
+  - "T1070"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

@@ -1,0 +1,26 @@
+id: FS-602
+title: "Security Check"
+threat: "Weak file permissions allow unauthorized access to sensitive system files."
+exploit: "A local attacker reads or modifies world-readable/writable system files to extract secrets or escalate privileges."
+impact: "Privilege escalation, credential theft, and system file tampering."
+fix: "Restrict file and directory permissions to the minimum required. Use chmod and chown to set correct ownership."
+breakage: "Some applications require world-readable files. Document exceptions in usaf.yaml."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "FS-101"
+  - "FS-501"
+severity_override: null
+tags:
+  - "fs"
+  - "hardening"
+mitre_mappings:
+  - "T1222"
+  - "T1548"

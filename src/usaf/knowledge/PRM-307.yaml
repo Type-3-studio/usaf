@@ -1,0 +1,28 @@
+id: PRM-307
+title: Unexpected File Capabilities
+threat: Files with capabilities not owned by any package are highly suspicious — they may be attacker-placed backdoors designed to operate with elevated privileges.
+exploit: "An attacker gains initial access, plants /opt/.hidden/shell with cap_setuid+cap_net_raw, then uses it to maintain access even after the original vulnerability is patched. The file evades detection because it's not tied to any package manager."
+impact: Persistent backdoor with elevated capabilities. Difficult to detect because the file is outside package management.
+fix: "Investigate the file: 'sha256sum /path/to/binary' and check on VirusTotal. Remove: 'sudo setcap -r /path/to/binary' and delete if malicious."
+breakage: "Locally compiled or third-party software that legitimately uses capabilities will need to be allowlisted."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Locally compiled binaries from trusted developers"
+  - "Third-party software installed outside package manager"
+related_findings:
+  - "PRM-302"
+  - "PRM-101"
+  - "COM-101"
+severity_override: null
+tags:
+  - "capabilities"
+  - "persistence"
+  - "backdoor"
+  - "security"
+mitre_mappings:
+  - "T1548.003"

@@ -1,0 +1,24 @@
+id: PWD-202
+title: "Security Check"
+threat: "Weak password policies allow brute-force and credential-based attacks."
+exploit: "Attackers brute-force weak passwords, reuse compromised credentials, or exploit accounts with no password expiration."
+impact: "Account takeover, unauthorized system access, and lateral movement."
+fix: "Enforce password complexity, aging, history, and account lockout policies."
+breakage: "Strict password policies may increase helpdesk calls for password resets."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "PWD-101"
+severity_override: null
+tags:
+  - "pwd"
+  - "hardening"
+mitre_mappings:
+  - "T1110"

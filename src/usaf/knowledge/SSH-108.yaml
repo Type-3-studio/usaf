@@ -1,0 +1,29 @@
+id: SSH-108
+title: SSH MaxStartups Not Configured
+threat: Without explicit MaxStartups configuration, SSH uses the default 10:30:100 which allows too many parallel unauthenticated connections, enabling connection-based DoS and accelerated brute-force.
+exploit: "An attacker opens 100 simultaneous SSH connections, each attempting 6 passwords (via default MaxAuthTries), achieving 600 password guesses before any connection is dropped."
+impact: Accelerated brute-force attacks. Potential denial of service by exhausting SSH process slots or system resources.
+fix: "Set MaxStartups in /etc/ssh/sshd_config:
+  echo 'MaxStartups 10:30:60' >> /etc/ssh/sshd_config
+  systemctl restart sshd"
+breakage: "High-traffic SSH gateways may need more generous limits. Monitor failed connection logs after tightening."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L (5.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "SSH bastion hosts with many simultaneous connections"
+  - "Automated deployment systems that open many SSH connections"
+related_findings:
+  - "SSH-103"
+  - "NET-101"
+severity_override: null
+tags:
+  - "ssh"
+  - "dos"
+  - "rate-limiting"
+  - "hardening"
+mitre_mappings:
+  - "T1110"

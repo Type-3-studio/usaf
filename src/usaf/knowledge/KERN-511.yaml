@@ -1,0 +1,28 @@
+id: KERN-511
+title: Filesystem Hardlink/Symlink Protections Disabled
+threat: Without protected_hardlinks and protected_symlinks, unprivileged users can create hardlinks to files they cannot read and symlink attacks in world-writable directories.
+exploit: "An attacker finds a world-writable /tmp directory. They create a symlink /tmp/log pointing to /etc/shadow. The syslog daemon (running as root) writes to /tmp/log, overwriting shadow with arbitrary content. The attacker then logs in without a valid password."
+impact: Arbitrary file overwrite, privilege escalation via TOCTOU attacks, data corruption.
+fix: "Set 'fs.protected_hardlinks = 1' and 'fs.protected_symlinks = 1' in /etc/sysctl.d/99-security.conf, then run 'sysctl -w fs.protected_hardlinks=1' and 'sysctl -w fs.protected_symlinks=1'."
+breakage: "Some backup and archival tools that use hardlinks for deduplication may experience permission errors."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Backup systems relying on hardlink-based deduplication"
+related_findings:
+  - "KERN-512"
+  - "PRM-303"
+severity_override: null
+tags:
+  - "kernel"
+  - "filesystem"
+  - "symlink"
+  - "hardlink"
+  - "privilege-escalation"
+mitre_mappings:
+  - "T1574.001"
+  - "T1574.002"

@@ -1,0 +1,23 @@
+id: KERN-752
+title: Module Signing Not Enforced
+threat: Without module signing enforcement, arbitrary kernel modules can be loaded, enabling rootkits.
+fix: "Add module.sig_enforce=1 to GRUB_CMDLINE_LINUX and run update-grub."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H (6.6)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+tags:
+  - "kernel"
+  - "modules"
+  - "integrity"
+mitre_mappings:
+  - "T1542.001"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+exploit: "An attacker exploits a security misconfiguration to gain unauthorized access."
+impact: "Reduced security posture, potential unauthorized access, or data exposure."
+breakage: "Security hardening may break functionality depending on permissive configurations."

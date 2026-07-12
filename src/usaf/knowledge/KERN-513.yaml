@@ -1,0 +1,26 @@
+id: KERN-513
+title: Unprivileged Userfaultfd Enabled
+threat: Userfaultfd available to unprivileged users enables user-space page fault handling, which has been exploited in kernel privilege escalation vulnerabilities.
+exploit: "An attacker uses userfaultfd to handle page faults on a memory region being written by a privileged process (e.g., during copy-on-write). They corrupt memory during the race window (CVE-2022-2588 style) to execute arbitrary code in kernel context."
+impact: Kernel privilege escalation. Multiple CVEs have been filed against userfaultfd-based exploits.
+fix: "Set 'vm.unprivileged_userfaultfd = 0' in /etc/sysctl.d/99-security.conf and run 'sysctl -w vm.unprivileged_userfaultfd=0'."
+breakage: "Some database systems (e.g., PostgreSQL with unprivileged userfaultfd-based checkpoints) and garbage collectors may be affected."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Database systems or runtimes that use userfaultfd for optimization"
+related_findings:
+  - "KERN-451"
+  - "KERN-514"
+severity_override: null
+tags:
+  - "kernel"
+  - "userfaultfd"
+  - "privilege-escalation"
+  - "exploit-mitigation"
+mitre_mappings:
+  - "T1204.002"

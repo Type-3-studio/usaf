@@ -1,0 +1,27 @@
+id: PRM-301
+title: Unexpected SGID Binary
+threat: SGID binaries execute with the group of the file. If the group has elevated permissions, an attacker can exploit the binary for privilege escalation or lateral movement.
+exploit: "An attacker discovers a custom SGID binary owned by group 'docker' (GID 999). They execute it to gain effective group 'docker', then use /var/run/docker.sock to launch a privileged container and escape to root."
+impact: Group-level privilege escalation. Lateral movement if the group grants access to other resources.
+fix: "Remove SGID if not needed: 'chmod g-s /path/to/binary'. If required, verify it's from a trusted package and add to allowlist."
+breakage: "Legitimate applications using SGID for group-based privilege separation may stop functioning."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N (4.4)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Screen, tmux, and other session-manager binaries use SGID for utmp group access"
+  - "Write/wall commands use SGID tty for terminal broadcast"
+related_findings:
+  - "PRM-101"
+  - "PRM-305"
+  - "PRM-306"
+severity_override: null
+tags:
+  - "sgid"
+  - "privilege-escalation"
+  - "permissions"
+mitre_mappings:
+  - "T1548.001"

@@ -1,0 +1,25 @@
+id: CLD-504
+title: Kubelet Read-Only Port
+threat: The kubelet read-only port exposes node state without authentication.
+exploit: "An attacker with network access to the kubelet read-only port can enumerate pods, node state, and system metrics without authentication."
+impact: "Information disclosure about running workloads, node configuration, and cluster state."
+fix: "Set readOnlyPort: 0 in kubelet config and restart kubelet."
+breakage: "Some monitoring tools may rely on the read-only port. Migrate to authenticated endpoints."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N (5.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Read-only port is sometimes needed for legacy monitoring. Use authenticated endpoints instead."
+related_findings:
+  - "CLD-503"
+  - "CLD-606"
+severity_override: null
+tags:
+  - "cloud"
+  - "kubernetes"
+  - "kubelet"
+mitre_mappings:
+  - "T1525"

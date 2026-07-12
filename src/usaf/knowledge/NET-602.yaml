@@ -1,0 +1,28 @@
+id: NET-602
+title: Expiring or Expired TLS Certificate
+threat: Expired or soon-to-expire certificates cause TLS verification failures, breaking HTTPS, APT updates, and all TLS-dependent services.
+exploit: "An attacker exploits a system with expired TLS certificates to perform a downgrade attack, forcing connections to use unencrypted fallback protocols."
+impact: Service disruption for TLS-dependent operations. Potential downgrade to unencrypted communication.
+fix: "Renew expiring certificates. For system CA certs: 'sudo apt install --reinstall ca-certificates'. For custom certs: renew with your CA."
+breakage: "Certificate renewal may require coordination with internal PKI teams."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N (5.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "None. Expired certificates should always be addressed."
+related_findings:
+  - "NET-601"
+  - "NET-603"
+  - "SECR-501"
+severity_override: null
+tags:
+  - "tls"
+  - "certificates"
+  - "expiry"
+  - "monitoring"
+mitre_mappings:
+  - "T1553.004"
+  - "T1608"

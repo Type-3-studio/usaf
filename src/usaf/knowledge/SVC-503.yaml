@@ -1,0 +1,26 @@
+id: SVC-503
+title: Enabled But Stopped Service
+threat: Services that are enabled but not running may indicate a failed startup, crash, or misconfiguration. Attackers may stop security services and leave them enabled to avoid detection.
+exploit: "An attacker stops the auditd service and kills the process. The service remains enabled so it appears intentional. No alerts fire because the enable state is unchanged."
+impact: Silent failure of critical services (logging, security monitoring). Delayed detection of issues.
+fix: "Check why the service stopped: 'systemctl status <service>'. Start: 'systemctl start <service>'. Disable if not needed: 'systemctl disable <service>'."
+breakage: "Some services intentionally remain stopped until triggered (socket-activated)."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L (3.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.3
+known_exceptions:
+  - "Socket-activated services that start on-demand"
+  - "One-shot services that exit after completion"
+related_findings:
+  - "SVC-301"
+  - "LOG-301"
+severity_override: null
+tags:
+  - "services"
+  - "monitoring"
+  - "systemd"
+mitre_mappings:
+  - "T1562"

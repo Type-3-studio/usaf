@@ -1,0 +1,27 @@
+id: PRM-305
+title: SUID/SGID Shell Script
+threat: Setuid shell scripts are easily subverted through environment variable manipulation (SHELLOPTS, IFS, PATH), shell metacharacters, and race conditions. Most modern Linux kernels ignore setuid on scripts.
+exploit: "An attacker runs a SUID-root bash script with IFS=/. They create /tmp/bin/sh as a copy of /bin/sh. When the script calls '/bin/program', the IFS manipulation causes it to execute '/tmp/bin/sh' with root privileges."
+impact: Root privilege escalation from unprivileged user context.
+fix: "Remove SUID/SGID from the script: 'chmod u-s /path/to/script' and 'chmod g-s /path/to/script'. Use a compiled wrapper binary with capabilities instead."
+breakage: "Some legacy administrative scripts rely on setuid for operation. These should be rewritten as compiled setuid helpers or sudo rules."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "No legitimate reason for setuid shell scripts in modern Ubuntu"
+related_findings:
+  - "PRM-101"
+  - "PRM-306"
+  - "PRM-308"
+severity_override: null
+tags:
+  - "suid"
+  - "sgid"
+  - "scripts"
+  - "privilege-escalation"
+mitre_mappings:
+  - "T1548.001"

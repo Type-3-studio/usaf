@@ -1,0 +1,26 @@
+id: KERN-512
+title: Special File Open Protections Disabled
+threat: Without protected_regular and protected_fifos, unprivileged users can create regular files and named pipes in sticky-bit world-writable directories owned by other users.
+exploit: "An attacker creates a malicious FIFO at /tmp/socket expecting a privileged daemon to write to it. When the daemon opens the FIFO, the attacker controls the data flow, potentially injecting commands or causing a denial of service."
+impact: Data corruption, denial of service, and potential privilege escalation via file-based attacks in shared directories.
+fix: "Set 'fs.protected_regular = 1' and 'fs.protected_fifos = 1' in /etc/sysctl.d/99-security.conf, then run 'sysctl -w fs.protected_regular=1' and 'sysctl -w fs.protected_fifos=1'."
+breakage: "Some applications may rely on creating files in sticky-bit directories owned by other users (rare in modern Ubuntu)."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L (5.6)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Legacy applications creating temporary files in shared directories"
+related_findings:
+  - "KERN-511"
+  - "PRM-303"
+severity_override: null
+tags:
+  - "kernel"
+  - "filesystem"
+  - "fifo"
+  - "hardening"
+mitre_mappings:
+  - "T1574.002"

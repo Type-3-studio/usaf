@@ -1,0 +1,26 @@
+id: CTN-306
+title: Container Using Host IPC Namespace
+threat: Host IPC namespace allows the container to access host IPC resources including shared memory, enabling cross-container attacks.
+exploit: "An attacker in a container with --ipc=host reads shared memory segments used by other containers or the host to steal sensitive data (e.g., encryption keys, passwords)."
+impact: Information disclosure across containers and host. Privilege escalation via host IPC manipulation.
+fix: "Remove --ipc=host. Use a shared IPC namespace only when required by multiple cooperating containers."
+breakage: "Applications that use IPC for inter-process communication with host processes will break."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N (6.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Performance monitoring containers that need host IPC"
+related_findings:
+  - "CTN-202"
+  - "CTN-203"
+  - "CTN-204"
+severity_override: null
+tags:
+  - "containers"
+  - "ipc"
+  - "privilege-escalation"
+mitre_mappings:
+  - "T1611"

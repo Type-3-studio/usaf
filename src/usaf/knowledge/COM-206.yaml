@@ -1,0 +1,26 @@
+id: COM-206
+title: Misleading Process Name
+threat: Malware using system binary names but running from different paths masquerades as legitimate software.
+exploit: "An attacker copies a backdoor to /tmp/sshd and runs it. The process appears as 'sshd' in process listings, blending in with the legitimate SSH daemon."
+impact: Masquerading malware evades casual inspection and basic process monitoring.
+fix: "Compare binary path with expected location: 'which <name>'. Remove malicious binary."
+breakage: "Some systems may have custom-compiled binaries in non-standard paths."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (7.8)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.2
+known_exceptions:
+  - "Custom or self-compiled binaries in non-standard locations"
+  - "Containerized environments with different filesystem layouts"
+related_findings:
+  - "COM-201"
+  - "COM-202"
+severity_override: null
+tags:
+  - "compromise"
+  - "masquerading"
+  - "defense-evasion"
+mitre_mappings:
+  - "T1036"

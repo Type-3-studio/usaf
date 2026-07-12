@@ -1,0 +1,24 @@
+id: CMP-210
+title: "Security Check"
+threat: "Non-compliance with security benchmarks leaves known vulnerabilities unaddressed."
+exploit: "Attackers exploit unpatched services or misconfigurations that CIS benchmarks are designed to prevent."
+impact: "Failed compliance audits, increased attack surface, and regulatory penalties."
+fix: "Apply the CIS benchmark recommendation for this control. Refer to CIS Ubuntu 20.04 benchmark."
+breakage: "Hardening may break functionality in environments that require permissive configurations."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N (6.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Intentional exemptions should be documented in usaf.yaml policy"
+  - "Container and cloud environments may have different security requirements"
+related_findings:
+  - "CMP-101"
+severity_override: null
+tags:
+  - "cmp"
+  - "hardening"
+mitre_mappings:
+  - "T1046"

@@ -1,0 +1,30 @@
+id: SSH-106
+title: SSH Banner Not Configured
+threat: Without a legal banner, users receive no warning about monitoring or authorized use, weakening the legal basis for logging and prosecution.
+exploit: "An intruder who accesses the system can claim they were not warned that access was monitored, potentially undermining legal action under the CFAA or similar laws."
+impact: Reduced legal protection. Non-compliance with PCI DSS (Requirement 10) and other frameworks that mandate login banners.
+fix: "Create a banner file and configure SSH:
+  echo 'Authorized uses only. All activity may be monitored.' > /etc/ssh/banner
+  echo 'Banner /etc/ssh/banner' >> /etc/ssh/sshd_config
+  systemctl restart sshd"
+breakage: "Users will see the banner before each login. No operational impact."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Internal systems where legal banner is not required"
+  - "Systems not subject to compliance frameworks"
+related_findings:
+  - "SSH-101"
+  - "CMP-401"
+severity_override: null
+tags:
+  - "ssh"
+  - "compliance"
+  - "legal"
+  - "banner"
+mitre_mappings:
+  - "T1562"

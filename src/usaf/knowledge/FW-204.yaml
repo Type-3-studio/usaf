@@ -1,0 +1,24 @@
+id: FW-204
+title: Multiple Active Firewalls
+threat: Running UFW alongside nftables or iptables can cause rule conflicts, unexpected behavior, and make firewall management confusing.
+exploit: "An operator adds an allow rule to UFW but nftables has a conflicting deny rule, or vice versa. The resulting behavior is unpredictable and may leave services exposed."
+impact: Unpredictable firewall behavior, conflicting rules, management confusion.
+fix: "Choose one firewall system. UFW is recommended for Ubuntu. Disable others: 'systemctl disable nftables'."
+breakage: "Services relying on specific iptables/nftables rules will lose them when switching to UFW."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N (4.3)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Docker and Kubernetes add iptables/nftables rules alongside UFW — this is expected"
+related_findings:
+  - "FW-101"
+  - "FW-201"
+severity_override: null
+tags:
+  - "firewall"
+  - "configuration"
+mitre_mappings:
+  - "T1562"

@@ -1,0 +1,26 @@
+id: CTN-307
+title: Container Ports Exposed to All Interfaces
+threat: Container ports bound to 0.0.0.0 are accessible from any network reachable to the host, expanding attack surface.
+exploit: "A container exposes a database port (5432) bound to 0.0.0.0. An attacker on the same network can directly connect to the database without going through the application firewall."
+impact: Direct access to container services, bypassing application-layer security controls.
+fix: "Bind ports to localhost: -p 127.0.0.1:8080:80 instead of -p 8080:80."
+breakage: "Services that need external access should use proper firewall rules."
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N (6.5)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Services intentionally exposed for external access with firewall protection"
+related_findings:
+  - "NET-101"
+  - "NET-102"
+  - "CTN-102"
+severity_override: null
+tags:
+  - "containers"
+  - "network"
+  - "exposure"
+mitre_mappings:
+  - "T1046"

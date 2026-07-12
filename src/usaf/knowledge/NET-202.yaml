@@ -1,0 +1,26 @@
+id: NET-202
+title: Interface Up Without Carrier
+threat: An interface that is up but has no carrier indicates a misconfiguration or dangling interface that may expose the system to network attacks.
+exploit: "An attacker connects a cable to a dangling interface that is still configured with an IP, gaining unexpected network access."
+impact: Potential unauthorized network access, misrouting, or information disclosure.
+fix: "Disable unused interfaces: 'ip link set <interface> down'. Or fix the physical connection."
+breakage: "Bonded interfaces may show one slave without carrier temporarily."
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L (3.1)"
+affected_versions:
+  - "Ubuntu 20.04"
+  - "Ubuntu 22.04"
+  - "Ubuntu 24.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Bonded/bridged interfaces where one slave is intentionally disconnected"
+  - "Wireless interfaces not associated with an AP"
+related_findings:
+  - "NET-101"
+  - "NET-203"
+severity_override: null
+tags:
+  - "network"
+  - "interfaces"
+  - "configuration"
+mitre_mappings:
+  - "T1562"

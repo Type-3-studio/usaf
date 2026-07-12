@@ -17,10 +17,17 @@ from usaf.models.references import (
     OWASPMapping,
 )
 from usaf.models.result import CheckResult, ScanMetadata, ScanResult
+from usaf.models.scenario import (
+    AttackScenario,
+    CounterEvidence,
+    KillChainPhase,
+    ScenarioResult,
+)
 from usaf.models.score import CategoryScore, ScanScore
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
 __all__ = [
+    "AttackScenario",
     "Evidence",
     "FileEvidence",
     "ProcessEvidence",
@@ -30,6 +37,7 @@ __all__ = [
     "LogEvidence",
     "UserEvidence",
     "PackageEvidence",
+    "CounterEvidence",
     "Finding",
     "CheckResult",
     "ScanResult",
@@ -39,6 +47,8 @@ __all__ = [
     "CheckCategory",
     "Severity",
     "Confidence",
+    "KillChainPhase",
+    "ScenarioResult",
     "CVEReference",
     "CISBenchmark",
     "MITREAttack",

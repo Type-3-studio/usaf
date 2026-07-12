@@ -557,7 +557,6 @@ class KnownCVEVulnerabilitiesCheck(AuditCheck):
                     confidence=Confidence.LOW,
                     false_positive_probability=0.5,
                     mitre_attack_ids=["T1190"],
-                    cve_ids=["CVE-XXXX-XXXX"],
                     cis_benchmarks=["CIS Ubuntu 20.04: 2.4"],
                     tags=["cve", "vulnerability", "updates"],
                 )

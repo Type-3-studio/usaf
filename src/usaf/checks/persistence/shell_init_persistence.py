@@ -36,7 +36,6 @@ KNOWN_PROFILE_SCRIPTS = {
     "bash_completion.sh",
     "apps-bin-path.sh",
     "cedilla-portuguese.sh",
-    "DEBUG.sh",
     "gawk.sh",
     "gpg-agent.sh",
     "input-method-config.sh",

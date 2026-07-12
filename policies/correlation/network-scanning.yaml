@@ -1,0 +1,52 @@
+# Network Scanning / Reconnaissance Detection (YAML-defined)
+# Detects systems that show signs of being used for network
+# reconnaissance: promiscuous mode, multiple listening ports,
+# and suspicious services.
+---
+id: NET-RECON
+name: Network Reconnaissance Detection
+description: >
+  Detects network reconnaissance activity: promiscuous mode
+  interfaces, unusual listening services, and suspicious binaries.
+severity_score: 6.0
+min_signal_count: 2
+tags:
+  - reconnaissance
+  - network-scanning
+  - sniffing
+mitre_attack_ids:
+  - T1040
+  - T1046
+  - T1595
+kill_chain_phases:
+  - reconnaissance
+  - discovery
+conditions:
+  - check_ids:
+      - NET-201
+    min_count: 1
+  - check_ids:
+      - NET-101
+    evidence_type: NetworkEvidence
+    field_matches:
+      local_port: "!22,80,443,53"
+    min_count: 2
+  - check_ids:
+      - PRM-101
+    min_count: 1
+output:
+  title: Network Reconnaissance Indicators Detected
+  description: >
+    Found indicators consistent with network reconnaissance:
+    promiscuous mode interfaces, unexpected listening ports,
+    and suspicious SUID binaries.
+  rationale: >
+    Network reconnaissance is a precursor to lateral movement and
+    data exfiltration. Promiscuous mode allows traffic sniffing,
+    while unexpected services may be backdoor listeners. When all
+    three are present, active reconnaissance is likely underway.
+  remediation: >
+    1. Investigate promiscuous mode interfaces: ip link show
+    2. Check for packet capture tools
+    3. Identify all unexpected services
+    4. Review network connections for suspicious outbound traffic

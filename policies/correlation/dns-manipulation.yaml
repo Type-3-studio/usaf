@@ -1,0 +1,51 @@
+# DNS Manipulation Correlation Rule (YAML-defined)
+# Detects systems where DNS configuration has been tampered with:
+# unexpected DNS servers, modified /etc/hosts, and disabled DNSSEC.
+---
+id: DNS-MANIP
+name: DNS Manipulation Detection
+description: >
+  Detects DNS manipulation by correlating unexpected DNS servers,
+  modified hosts files, and disabled DNSSEC validation.
+severity_score: 7.5
+min_signal_count: 2
+tags:
+  - dns
+  - hijacking
+  - manipulation
+mitre_attack_ids:
+  - T1553
+  - T1553.001
+cis_benchmarks:
+  - CIS Ubuntu 22.04: 4.3
+  - CIS Ubuntu 22.04: 4.4
+kill_chain_phases:
+  - credential-access
+  - collection
+conditions:
+  - check_ids:
+      - NET-301
+    evidence_type: RegistryEvidence
+    min_count: 1
+  - check_ids:
+      - NET-302
+    evidence_type: RegistryEvidence
+    min_count: 1
+  - check_ids:
+      - NET-501
+    min_count: 1
+output:
+  title: DNS Manipulation Detected
+  description: >
+    Found multiple DNS manipulation indicators. This pattern suggests
+    DNS traffic may be intercepted or redirected to malicious resolvers.
+  rationale: >
+    DNS manipulation is a common technique for traffic interception,
+    credential harvesting, and malware C2 concealment. Multiple
+    independent DNS anomalies significantly increase the likelihood
+    of active manipulation rather than benign misconfiguration.
+  remediation: >
+    1. Verify /etc/resolv.conf points to trusted DNS servers
+    2. Enable DNSSEC: resolvectl dnssec yes
+    3. Review /etc/hosts for unauthorized entries
+    4. Check for DNS over HTTPS/TLS configuration

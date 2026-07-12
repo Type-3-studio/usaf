@@ -1,0 +1,54 @@
+---
+# Priority Remediation Detection (YAML-defined)
+# CORR-603: Multiple compliance frameworks failing same control
+---
+id: CORR-603
+name: Priority Remediation Detection
+description: >
+  Detects compliance controls that are failing across multiple frameworks
+  (e.g., CIS, PCI DSS, HIPAA), identifying priority remediation targets
+  that improve compliance posture across all frameworks simultaneously.
+severity_score: 7.5
+min_signal_count: 2
+tags:
+  - compliance
+  - remediation
+  - priority
+  - multi-framework
+mitre_attack_ids:
+  - T1562
+kill_chain_phases:
+  - impact
+conditions:
+  - check_ids:
+      - CMP-201
+    min_count: 1
+  - check_ids:
+      - CMP-301
+    min_count: 1
+  - check_ids:
+      - CMP-401
+    min_count: 1
+  - check_ids:
+      - CMP-402
+    min_count: 1
+  - check_ids:
+      - CMP-403
+    min_count: 1
+output:
+  title: Priority Remediation — Multi-Framework Control Failures
+  description: >
+    Compliance controls are failing across multiple frameworks
+    simultaneously. These shared control failures represent fundamental
+    security gaps and should be prioritized for remediation to improve
+    compliance posture across all frameworks.
+  rationale: >
+    When the same security control fails across multiple compliance
+    frameworks (e.g., CIS, PCI DSS, HIPAA), it represents a fundamental
+    security gap that affects all compliance postures. Fixing these
+    shared controls provides the highest return on remediation effort.
+  remediation: >
+    1. Review the multi-framework failing controls listed above
+    2. Apply remediation steps for each affected control
+    3. Run 'usaf scan --compliance' to verify fix
+    4. Update security policies to prevent regression

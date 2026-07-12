@@ -1,0 +1,51 @@
+---
+# Cloud Instance Compromise Detection (YAML-defined)
+# CORR-601: Cloud credential exposure + metadata API accessible
+---
+id: CORR-601
+name: Cloud Instance Compromise Detection
+description: >
+  Detects cloud instances where IAM credentials are stored on the filesystem
+  AND the instance metadata service (IMDS) is accessible. This combination
+  allows an attacker with local access to steal both long-lived and
+  short-lived cloud credentials.
+severity_score: 10.0
+min_signal_count: 2
+tags:
+  - cloud
+  - compromise
+  - credentials
+  - imds
+  - instance-compromise
+mitre_attack_ids:
+  - T1552.005
+  - T1613
+  - T1525
+kill_chain_phases:
+  - credential-access
+  - defense-evasion
+conditions:
+  - check_ids:
+      - CLD-301
+    min_count: 1
+  - check_ids:
+      - CLD-101
+    min_count: 1
+output:
+  title: Cloud Instance Compromise — Credentials + Metadata Access
+  description: >
+    Cloud IAM credentials are present on the filesystem and the metadata
+    service is accessible. This combination allows an attacker with local
+    access to exfiltrate cloud credentials and use them from any machine.
+  rationale: >
+    When cloud IAM credentials are stored on the filesystem AND the metadata
+    service (IMDS) is accessible, an attacker who gains local access can:
+    (1) steal long-lived credentials from disk, (2) request short-lived
+    credentials from IMDS, and (3) use both to maintain persistent cloud
+    access. This is the primary attack path for cloud instance compromise.
+  remediation: >
+    1. Remove long-lived cloud credentials from the filesystem
+    2. Enforce IMDSv2 to protect metadata service access
+    3. Use IAM roles instead of access keys for EC2/GCE/Azure VMs
+    4. Rotate all exposed credentials immediately
+    5. Audit IAM policies for over-permissive roles

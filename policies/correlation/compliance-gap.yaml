@@ -1,0 +1,55 @@
+---
+# Critical Compliance Gap Detection (YAML-defined)
+# CORR-602: CIS level 1 failures > 10 + firewall disabled + auditd off
+---
+id: CORR-602
+name: Critical Compliance Gap Detection
+description: >
+  Detects systems with critical compliance gaps where multiple CIS controls
+  are failing and fundamental security controls (firewall, auditd) are
+  disabled or misconfigured.
+severity_score: 10.0
+min_signal_count: 2
+tags:
+  - compliance
+  - critical-gap
+  - remediation
+  - firewall
+  - audit
+mitre_attack_ids:
+  - T1562.001
+  - T1562.006
+kill_chain_phases:
+  - defense-evasion
+  - impact
+conditions:
+  - check_ids:
+      - CMP-201
+    min_count: 5
+  - check_ids:
+      - FW-101
+    min_count: 1
+  - check_ids:
+      - FOR-101
+    min_count: 1
+  - check_ids:
+      - LOG-501
+    min_count: 1
+output:
+  title: Critical Compliance Gap Detected
+  description: >
+    System has critical compliance gaps with multiple CIS compliance failures
+    and fundamental security controls (firewall, auditd) disabled or
+    misconfigured. This represents a systemic security control failure
+    requiring immediate remediation.
+  rationale: >
+    When multiple compliance frameworks are failing on the same system,
+    especially with fundamental controls like firewall and auditd disabled,
+    the system is operating without basic security controls. This creates
+    a critical risk of undetected compromise.
+  remediation: >
+    1. Enable firewall: 'ufw enable' or 'systemctl enable --now nftables'
+    2. Enable auditd: 'systemctl enable --now auditd'
+    3. Address the most critical CIS/STIG failures first
+    4. Run 'usaf scan --compliance' to track remediation progress
+    5. Establish a compliance remediation plan

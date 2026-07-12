@@ -1096,6 +1096,235 @@ class ActiveBreachIndicators(CorrelationRule):
         ]
 
 
+class CloudCompromiseRule(CorrelationRule):
+    id = "CORR-601"
+    name = "Cloud Credential Exposure with Metadata Access"
+    description = "Detects cloud credential exposure combined with accessible metadata API"
+    severity = Severity.CRITICAL
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        cloud_creds = [
+            f for f in findings
+            if f.check_id in ("CLD-301", "CLD-101", "CLD-102")
+        ]
+        metadata_access = [
+            f for f in findings
+            if f.check_id == "CLD-101"
+        ]
+        net_exposure = [
+            f for f in findings
+            if f.check_id in ("NET-101", "NET-201")
+        ]
+
+        has_creds = any(f.check_id == "CLD-301" for f in cloud_creds)
+        has_metadata = bool(metadata_access)
+        has_network = bool(net_exposure)
+
+        if not (has_creds and has_metadata):
+            return []
+
+        source_findings = cloud_creds
+        if has_network:
+            source_findings.extend(net_exposure[:2])
+
+        details: list[str] = []
+        cred_count = len([f for f in cloud_creds if f.check_id == "CLD-301"])
+        details.append(f"{cred_count} cloud credential finding(s)")
+        details.append("IMDS accessible" if has_metadata else "IMDS unknown")
+
+        return [
+            self._make_finding(
+                finding_id="001",
+                title="Cloud Instance Compromise — Credentials + Metadata Access",
+                description=(
+                    f"Cloud IAM credentials are present on the filesystem and the metadata "
+                    f"service is accessible. Indicators: {'; '.join(details)}. "
+                    f"Network exposure: {'yes' if has_network else 'no'}. "
+                    "This combination allows an attacker with local access to exfiltrate "
+                    "cloud credentials and use them from any machine."
+                ),
+                rationale=(
+                    "When cloud IAM credentials are stored on the filesystem AND the metadata "
+                    "service (IMDS) is accessible, an attacker who gains local access can: "
+                    "(1) steal long-lived credentials from disk, (2) request short-lived "
+                    "credentials from IMDS, and (3) use both to maintain persistent cloud access. "
+                    "This is the primary attack path for cloud instance compromise."
+                ),
+                remediation=(
+                    "1. Remove long-lived cloud credentials from the filesystem\n"
+                    "2. Enforce IMDSv2 to protect metadata service access\n"
+                    "3. Use IAM roles instead of access keys for EC2/GCE/Azure VMs\n"
+                    "4. Rotate all exposed credentials immediately\n"
+                    "5. Audit IAM policies for over-permissive roles"
+                ),
+                source_findings=source_findings,
+                severity=Severity.CRITICAL,
+                tags=["cloud", "compromise", "credentials", "imds", "instance-compromise"],
+                mitre_attack_ids=["T1552.005", "T1613", "T1525"],
+            )
+        ]
+
+
+class ComplianceGapRule(CorrelationRule):
+    id = "CORR-602"
+    name = "Critical Compliance Gap"
+    description = "Detects systems with critical compliance gaps: multiple CIS failures, firewall disabled, auditd off"
+    severity = Severity.CRITICAL
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        cis_failures = [
+            f for f in findings
+            if f.check_id.startswith("CMP-20") or f.check_id == "CMP-301"
+        ]
+        firewall_issues = [
+            f for f in findings
+            if f.check_id == "FW-101"
+        ]
+        audit_issues = [
+            f for f in findings
+            if f.check_id in ("FOR-101", "LOG-501")
+        ]
+
+        if not cis_failures and not firewall_issues and not audit_issues:
+            return []
+
+        source_findings: list[Finding] = []
+        total_cis = len(cis_failures)
+        total_fw = len(firewall_issues)
+        total_audit = len(audit_issues)
+
+        if total_cis > 0:
+            source_findings.extend(cis_failures[:3])
+        if total_fw > 0:
+            source_findings.append(firewall_issues[0])
+        if total_audit > 0:
+            source_findings.append(audit_issues[0])
+
+        threshold = 10
+        if total_cis >= threshold or (total_cis >= 5 and (total_fw > 0 or total_audit > 0)):
+            details: list[str] = []
+            if total_cis >= threshold:
+                details.append(f"{total_cis}+ CIS compliance failure(s)")
+            if total_fw > 0:
+                details.append("firewall is disabled")
+            if total_audit > 0:
+                details.append("auditd is off or has gaps")
+
+            return [
+                self._make_finding(
+                    finding_id="001",
+                    title="Critical Compliance Gap Detected",
+                    description=(
+                        f"System has critical compliance gaps: {'; '.join(details)}. "
+                        "This represents a systemic security control failure requiring "
+                        "immediate remediation."
+                    ),
+                    rationale=(
+                        "When multiple compliance frameworks are failing on the same system, "
+                        "especially with fundamental controls like firewall and auditd disabled, "
+                        "the system is operating without basic security controls. This creates "
+                        "a critical risk of undetected compromise."
+                    ),
+                    remediation=(
+                        "1. Enable firewall: 'ufw enable' or 'systemctl enable --now nftables'\n"
+                        "2. Enable auditd: 'systemctl enable --now auditd'\n"
+                        "3. Address the most critical CIS/STIG failures first\n"
+                        "4. Run 'usaf scan --compliance' to track remediation progress\n"
+                        "5. Establish a compliance remediation plan"
+                    ),
+                    source_findings=source_findings,
+                    severity=Severity.CRITICAL,
+                    tags=["compliance", "critical-gap", "remediation", "firewall", "audit"],
+                    mitre_attack_ids=["T1562.001", "T1562.006"],
+                )
+            ]
+
+        return []
+
+
+class PriorityRemediationRule(CorrelationRule):
+    id = "CORR-603"
+    name = "Priority Remediation — Multi-Framework Control Failures"
+    description = "Detects compliance controls failing across multiple frameworks, indicating priority remediation targets"
+    severity = Severity.HIGH
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        compliance_findings = [
+            f for f in findings
+            if f.check_id.startswith("CMP-")
+        ]
+
+        if len(compliance_findings) < 3:
+            return []
+
+        control_map: dict[str, list[Finding]] = {}
+        for f in compliance_findings:
+            for tag in f.tags:
+                if "compliance" in tag and tag not in ("compliance",):
+                    if tag not in control_map:
+                        control_map[tag] = []
+                    control_map[tag].append(f)
+
+        for f in compliance_findings:
+            for control_id in f.cis_benchmarks:
+                if control_id not in control_map:
+                    control_map[control_id] = []
+                control_map[control_id].append(f)
+
+        multi_framework = {
+            ctrl: findings_list
+            for ctrl, findings_list in control_map.items()
+            if len({f.check_id for f in findings_list}) >= 2
+        }
+
+        if not multi_framework:
+            return []
+
+        top_controls = sorted(
+            multi_framework.items(),
+            key=lambda x: len(x[1]),
+            reverse=True,
+        )[:3]
+
+        source_findings: list[Finding] = []
+        details: list[str] = []
+        for ctrl, findings_list in top_controls:
+            frameworks = {f.check_id for f in findings_list}
+            details.append(
+                f"'{ctrl}' failing in {len(frameworks)} framework(s)"
+            )
+            source_findings.extend(findings_list[:2])
+
+        return [
+            self._make_finding(
+                finding_id="001",
+                title="Priority Remediation — Multi-Framework Control Failures",
+                description=(
+                    f"Found {len(multi_framework)} control(s) failing across multiple "
+                    f"compliance frameworks: {'; '.join(details)}. "
+                    "These controls should be prioritized for remediation to improve "
+                    "compliance posture across all frameworks simultaneously."
+                ),
+                rationale=(
+                    "When the same security control fails across multiple compliance "
+                    "frameworks (e.g., CIS, PCI DSS, HIPAA), it represents a fundamental "
+                    "security gap that affects all compliance postures. Fixing these "
+                    "shared controls provides the highest return on remediation effort."
+                ),
+                remediation=(
+                    "1. Review the multi-framework failing controls listed above\n"
+                    "2. Apply remediation steps for each affected control\n"
+                    "3. Run 'usaf scan --compliance' to verify fix\n"
+                    "4. Update security policies to prevent regression"
+                ),
+                source_findings=source_findings,
+                severity=Severity.HIGH,
+                tags=["compliance", "remediation", "priority", "multi-framework"],
+                mitre_attack_ids=["T1562"],
+            )
+        ]
+
+
 class ExposedAttackSurface(CorrelationRule):
     id = "CORR-404"
     name = "Exposed Attack Surface"

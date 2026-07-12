@@ -21,8 +21,8 @@ SKIP_LINUX = pytest.mark.skipif(
 class TestScanPipeline:
     """Integration tests for the full scan pipeline."""
 
-    EXPECTED_COLLECTOR_COUNT = 25
-    EXPECTED_CHECK_COUNT = 122
+    EXPECTED_COLLECTOR_COUNT = 26
+    EXPECTED_CHECK_COUNT = 128
 
     def test_collector_discovery_registers_all(self):
         collector_registry.discover()
@@ -33,6 +33,7 @@ class TestScanPipeline:
             "auditd",
             "boot",
             "certificates",
+            "cloud",
             "containers",
             "cron",
             "dns",
@@ -65,6 +66,12 @@ class TestScanPipeline:
             "BOOT-301",
             "BOOT-401",
             "BOOT-501",
+            "CLD-101",
+            "CLD-102",
+            "CLD-201",
+            "CLD-301",
+            "CLD-401",
+            "CLD-501",
             "CMP-101",
             "COM-101",
             "CTN-101",

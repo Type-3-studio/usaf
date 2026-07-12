@@ -1,0 +1,16 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+  config.vm.hostname = "insecure-server"
+  config.vm.network "private_network", type: "dhcp"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "2048"
+    vb.cpus = 2
+    vb.name = "usaf-insecure-server"
+  end
+
+  # Mount shared vulnerabilities directory
+  config.vm.synced_folder "../../shared", "/vagrant/shared"
+
+  config.vm.provision "shell", path: "provision.sh"
+end

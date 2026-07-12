@@ -1,4 +1,4 @@
-.PHONY: install install-dev lint typecheck test test-cov clean pre-commit
+.PHONY: install install-dev lint typecheck test test-cov clean pre-commit test-lab test-lab-list test-lab-validate
 
 install:
 	pip install -e .
@@ -39,5 +39,24 @@ clean:
 	rm -rf htmlcov
 	rm -rf .coverage
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+
+# Phase 7a: Validation Lab
+test-lab-list:
+	cd test_lab && python3 run.py list
+
+test-lab-provision:
+	cd test_lab && python3 run.py provision $(SCENARIO)
+
+test-lab-validate:
+	cd test_lab && python3 run.py validate $(SCENARIO)
+
+test-lab-run:
+	cd test_lab && python3 run.py run $(SCENARIO)
+
+test-lab-destroy:
+	cd test_lab && python3 run.py destroy $(SCENARIO)
+
+test-lab-run-all:
+	cd test_lab && python3 run.py run-all
 
 all: lint format-check typecheck test

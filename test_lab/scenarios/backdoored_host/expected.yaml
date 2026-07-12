@@ -1,0 +1,59 @@
+scenario: backdoored-host
+description: "A compromised host with SUID backdoors, cron persistence, LD_PRELOAD injection, rogue systemd services"
+minimum_detection_rate: 0.85
+
+expected_findings:
+  - check_id: PRM-101
+    title_contains: SUID
+  - check_id: PRM-201
+    title_contains: World-Writable
+  - check_id: PRM-301
+    title_contains: SGID
+  - check_id: PRM-303
+    title_contains: Sticky
+  - check_id: PRM-304
+    title_contains: PATH
+  - check_id: PRM-308
+    title_contains: Setuid
+  - check_id: PRM-401
+    title_contains: SUID
+
+  - check_id: PER-101
+    title_contains: Cron
+  - check_id: PER-102
+    title_contains: Anacron
+  - check_id: PER-202
+    title_contains: Systemd Timer
+  - check_id: PER-203
+    title_contains: Drop-In
+  - check_id: PER-301
+    title_contains: Profile
+  - check_id: PER-302
+    title_contains: Bash
+  - check_id: PER-401
+    title_contains: LD_PRELOAD
+  - check_id: PER-402
+    title_contains: ld.so.preload
+  - check_id: PER-403
+    title_contains: LD_LIBRARY_PATH
+
+  - check_id: SVC-101
+    title_contains: Insecure
+  - check_id: SVC-201
+    title_contains: Root
+  - check_id: SVC-202
+    title_contains: Unknown
+  - check_id: SVC-301
+    title_contains: Failed
+  - check_id: SVC-402
+    title_contains: Modified
+  - check_id: SVC-501
+    title_contains: ExecStart
+
+  - check_id: FS-601
+    title_contains: Permission
+  - check_id: FS-402
+    title_contains: World-Writable Direct
+
+  - check_id: NET-302
+    title_contains: Hosts

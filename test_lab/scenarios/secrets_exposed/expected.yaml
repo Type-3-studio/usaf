@@ -1,0 +1,29 @@
+scenario: secrets-exposed
+description: "Host with cloud credentials, API tokens, SSH keys, database credentials, and secrets in source code"
+minimum_detection_rate: 0.85
+
+expected_findings:
+  - check_id: SECR-101
+    title_contains: AWS
+  - check_id: SECR-102
+    title_contains: GCP
+  - check_id: SECR-201
+    title_contains: GitHub
+  - check_id: SECR-202
+    title_contains: .env
+  - check_id: SECR-203
+    title_contains: API
+  - check_id: SECR-301
+    title_contains: SSH Key
+  - check_id: SECR-302
+    title_contains: SSH Key
+  - check_id: SECR-401
+    title_contains: Database
+  - check_id: SECR-601
+    title_contains: GitLab
+  - check_id: SECR-602
+    title_contains: Slack
+  - check_id: SECR-605
+    title_contains: Docker
+  - check_id: SECR-608
+    title_contains: Password

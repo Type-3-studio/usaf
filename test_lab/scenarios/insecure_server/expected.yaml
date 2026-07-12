@@ -1,0 +1,171 @@
+scenario: insecure-server
+description: "A poorly configured Ubuntu server with weak SSH, no firewall, weak kernel parameters, open ports, and weak user policies"
+minimum_detection_rate: 0.85
+
+expected_findings:
+  # SSH Authentication
+  - check_id: SSH-101
+    severity: HIGH
+    title_contains: Protocol
+  - check_id: SSH-102
+    severity: HIGH
+    title_contains: Root Login
+  - check_id: SSH-103
+    severity: HIGH
+    title_contains: MaxAuthTries
+  - check_id: SSH-104
+    severity: CRITICAL
+    title_contains: Empty Password
+  - check_id: SSH-105
+    severity: MEDIUM
+    title_contains: ClientAlive
+
+  # SSH Algorithms
+  - check_id: SSH-201
+    severity: MEDIUM
+    title_contains: KEX
+  - check_id: SSH-202
+    severity: MEDIUM
+    title_contains: Cipher
+
+  # SSH Network
+  - check_id: SSH-501
+    severity: MEDIUM
+    title_contains: X11
+  - check_id: SSH-603
+    severity: MEDIUM
+    title_contains: Agent
+  - check_id: SSH-604
+    severity: HIGH
+    title_contains: Pubkey
+
+  # SSH Compliance / MACs
+  - check_id: SSH-601
+    severity: MEDIUM
+    title_contains: MAC
+
+  # Kernel Memory Hardening
+  - check_id: KERN-101
+    severity: HIGH
+    title_contains: ASLR
+  - check_id: KERN-201
+    severity: MEDIUM
+    title_contains: Ptrace
+  - check_id: KERN-301
+    severity: MEDIUM
+    title_contains: Core Dump
+
+  # Kernel BPF / Modules
+  - check_id: KERN-451
+    severity: MEDIUM
+    title_contains: BPF
+
+  # Kernel FS Protections
+  - check_id: KERN-511
+    severity: MEDIUM
+    title_contains: Link
+
+  # Kernel Perf
+  - check_id: KERN-552
+    severity: MEDIUM
+    title_contains: Perf
+
+  # Firewall
+  - check_id: FW-101
+    severity: HIGH
+    title_contains: Active
+  - check_id: FW-201
+    severity: MEDIUM
+    title_contains: Default
+  - check_id: FW-202
+    severity: MEDIUM
+    title_contains: Rules
+  - check_id: FW-205
+    severity: LOW
+    title_contains: Outgoing
+
+  # Network
+  - check_id: NET-101
+    severity: MEDIUM
+    title_contains: Port
+  - check_id: NET-201
+    severity: MEDIUM
+    title_contains: Promiscuous
+  - check_id: NET-203
+    severity: MEDIUM
+    title_contains: ALLMULTI
+  - check_id: NET-301
+    severity: MEDIUM
+    title_contains: DNS
+  - check_id: NET-302
+    severity: MEDIUM
+    title_contains: Hosts
+  - check_id: NET-401
+    severity: MEDIUM
+    title_contains: Sysctl
+
+  # Users
+  - check_id: USR-101
+    severity: CRITICAL
+    title_contains: Duplicate UID 0
+  - check_id: USR-103
+    severity: HIGH
+    title_contains: Duplicate UID
+  - check_id: USR-104
+    severity: MEDIUM
+    title_contains: Disabled
+  - check_id: USR-105
+    severity: MEDIUM
+    title_contains: Expired
+  - check_id: USR-201
+    severity: CRITICAL
+    title_contains: Empty Password
+  - check_id: USR-402
+    severity: HIGH
+    title_contains: Password
+  - check_id: USR-403
+    severity: MEDIUM
+    title_contains: Timeout
+  - check_id: USR-501
+    severity: MEDIUM
+    title_contains: Service Account
+
+  # Password Policy
+  - check_id: PWD-101
+    severity: HIGH
+    title_contains: Policy
+  - check_id: PWD-202
+    severity: MEDIUM
+    title_contains: Min Age
+  - check_id: PWD-203
+    severity: HIGH
+    title_contains: Max Age
+  - check_id: PWD-204
+    severity: LOW
+    title_contains: Warning
+
+  # Permissions
+  - check_id: PRM-201
+    severity: HIGH
+    title_contains: World-Writable
+  - check_id: PRM-304
+    severity: CRITICAL
+    title_contains: PATH
+
+  # Filesystem
+  - check_id: FS-601
+    severity: HIGH
+    title_contains: Permission
+  - check_id: FS-402
+    severity: MEDIUM
+    title_contains: World-Writable Direct
+
+  # Services
+  - check_id: SVC-201
+    severity: MEDIUM
+    title_contains: Root
+
+  # Boot
+  - check_id: BOOT-607
+    severity: MEDIUM
+    title_contains: Boot Partition

@@ -1,0 +1,13 @@
+# Template Vagrantfile - used as base for scenarios
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+  config.vm.boot_timeout = 300
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "2048"
+    vb.cpus = 2
+    vb.customize ["modifyvm", :id, "--ioapic", "on"]
+  end
+
+  config.vm.synced_folder ".", "/vagrant", disabled: false
+end

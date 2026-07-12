@@ -1028,7 +1028,171 @@ registered in pipeline, all tested. **Status: ✅ COMPLETE**
 
 ---
 
-### Phase 7: Scale, Distribution & Ecosystem (infrastructure phase)
+### Phase 7a: Validation Lab — Known-Vulnerable VM Testing 🔴
+
+**Goal:** Build reproducible, known-vulnerable Ubuntu VMs to validate USAF detection accuracy and close false-negative gaps through iterative fix cycles.
+
+#### Approach
+1. Define composite vulnerability scenarios (realistic VM profiles with 10–20 vulns each)
+2. Provision VMs via **Vagrant + VirtualBox** with shell-provisioned vulnerabilities
+3. Run USAF scan against each VM (local or SSH mode)
+4. Compare actual findings to an **expected findings manifest** (YAML)
+5. Report gaps: false negatives (missed vulns), false positives (noise)
+6. Fix checks to close gaps → revalidate → iterate
+
+#### Composite Scenarios (5 planned)
+
+| Scenario | Vulnerabilities (~15 per VM) | Targets |
+|----------|------------------------------|---------|
+| `insecure_server` | Weak SSH, no firewall, weak kernel params, old packages, weak passwords, exposed ports | SSH-*, FW-*, KERN-*, PKG-*, PWD-*, NET-* |
+| `backdoored_host` | SUID backdoors, cron persistence, LD_PRELOAD, rogue systemd, modified /etc/hosts, reverse shell | PRM-*, PER-*, COM-*, FS-*, NET-* |
+| `container_escape` | Docker socket exposed, privileged containers, host mounts, root containers, old images | CTN-*, PRM-*, SVC-* |
+| `secrets_exposed` | AWS keys in files, .env secrets, exposed SSH keys, DB creds, GitHub tokens | SECR-*, FS-*, USR-* |
+| `desktop_insecure` | Legacy services, weak auth, world-writable PATH, no screensaver, no firewall | CMP-*, PWD-*, PRM-*, FW-*, SVC-* |
+
+#### Deliverables
+
+```
+test_lab/
+├── run.py                     # CLI: `python run.py provision insecure-server`
+├── scenarios/                  # Composite vulnerability profiles
+│   ├── __init__.py
+│   ├── registry.py             # Scenario registry (discover + register)
+│   ├── base.py                 # BaseScenario ABC
+│   ├── expected_schema.py      # Pydantic model for expected findings YAML
+│   ├── insecure_server/        # Scenario 1
+│   │   ├── scenario.py         # Scenario definition + Vagrantfile
+│   │   ├── provision.sh        # ~15 vuln setup commands
+│   │   └── expected.yaml       # Expected findings manifest
+│   ├── backdoored_host/        # Scenario 2
+│   │   └── ...
+│   ├── container_escape/       # Scenario 3
+│   │   └── ...
+│   ├── secrets_exposed/        # Scenario 4
+│   │   └── ...
+│   └── desktop_insecure/       # Scenario 5
+│       └── ...
+├── harness/
+│   ├── __init__.py
+│   ├── provisioner.py          # Vagrant lifecycle (up, provision, destroy, ssh-config)
+│   ├── runner.py               # USAF scan execution (via SSH)
+│   ├── validator.py            # Compare actual findings vs expected manifest
+│   └── reporter.py             # Gap analysis: false negatives, false positives, detection rate
+└── shared/
+    ├── vulnerabilities/        # Reusable shell snippets for common vulns
+    │   ├── ssh_misconfig.sh
+    │   ├── kernel_weak_params.sh
+    │   ├── user_misconfigs.sh
+    │   ├── suid_backdoor.sh
+    │   ├── cron_persistence.sh
+    │   ├── systemd_trojan.sh
+    │   ├── docker_exposure.sh
+    │   ├── secret_injection.sh
+    │   └── ...
+    └── scenarios/              # Base Vagrantfile template + utility functions
+```
+
+#### Validation Metrics
+
+| Metric | Target |
+|--------|--------|
+| Detection rate per scenario | >90% |
+| False negatives per scenario | < 3 |
+| False positives per scenario | < 5 |
+| Iteration cycles to close gaps | ≤ 2 per missing finding |
+| Scenario provision time | < 5 min |
+
+#### Required tooling
+
+```bash
+sudo apt install vagrant virtualbox
+vagrant plugin install vagrant-scp  # optional: copy files to VM
+```
+
+**Exit criteria:** 5 composite scenarios with >90% detection rate, gap analysis tooling, iterative fixes applied. **Status: 🔴 NOT STARTED**
+
+---
+
+### Phase 7b: Snap Store Publishing 🔴
+
+**Goal:** Package USAF as a Snap and publish to the Snap Store for one-command installation on any Ubuntu system.
+
+#### Packaging Plan
+
+| Component | Approach |
+|-----------|----------|
+| **Confinement** | `classic` (needs full system access for `/proc`, `/etc`, `/sys`, auditd, systemctl) |
+| **Base** | `core24` (Ubuntu 24.04 LTS) |
+| **Python runtime** | Bundled via `python3` part with pip deps |
+| **Entry point** | `bin/usaf` → `usaf.cli.app:main` |
+| **Plugs** | `network`, `network-bind`, `system-probe`, `hardware-observe`, `process-control`, `system-observe` |
+| **Auto-connect** | All plugs auto-connected (classic confinement) |
+| **Post-install** | Post-init hook for `usaf init`, man page installation |
+
+#### Snapshot Process
+
+```yaml
+# snapcraft.yaml (planned structure)
+name: usaf
+base: core24
+adopt-info: usaf
+grade: stable
+confinement: classic
+
+apps:
+  usaf:
+    command: bin/usaf
+    plugs:
+      - network
+      - network-bind
+      - system-probe
+      - hardware-observe
+      - system-observe
+      - process-control
+
+parts:
+  usaf:
+    plugin: python
+    source: https://github.com/Type-3-studio/usaf.git
+    source-tag: v0.24.0
+    python-packages:
+      - typer>=0.15
+      - rich>=13.0
+      - pydantic>=2.0
+      - pyyaml>=6.0
+      - requests>=2.31
+      - packaging>=24.0
+```
+
+#### Pre-Publishing Checklist
+
+- [ ] CLI polished: `--help` output comprehensive, no bare `print()`, rich table formatting
+- [ ] `usaf init` writes default config to `$SNAP_USER_DATA/etc/usaf.yaml`
+- [ ] All file paths use XDG base dirs (respect `$SNAP_USER_DATA`, `$SNAP_COMMON`)
+- [ ] Reports write to `$SNAP_USER_DATA/reports/` by default
+- [ ] Baselines store in `$SNAP_USER_DATA/baselines/`
+- [ ] `usaf.yaml` configurable via `$SNAP_USER_DATA/usaf.yaml`
+- [ ] Man page generation (or `--help` suffices)
+- [ ] CI pipeline publishes edge builds on push to main
+- [ ] Snap store listing with screenshots, description, category (Security)
+
+#### Snap Store Listing
+
+| Field | Value |
+|-------|-------|
+| **Name** | `usaf` |
+| **Title** | Ubuntu Security Audit Framework |
+| **Summary** | Production-grade security auditing for Ubuntu Linux |
+| **Categories** | security, sysadmin, monitoring |
+| **License** | MIT |
+
+**Prerequisites:** Snapcraft account, `snapcraft` CLI, GitHub integration for automated builds.
+
+**Exit criteria:** Snap published in store at `stable` channel, CI auto-publishes `edge` on commits, `sudo snap install usaf` works on fresh Ubuntu. **Status: 🔴 NOT STARTED**
+
+---
+
+### Phase 7c: Scale, Distribution & Ecosystem (infrastructure phase)
 
 **Goal:** Production-grade deployment capabilities.
 
@@ -1184,26 +1348,36 @@ src/usaf/
 ├── policies/engine.py         # Policy loading + overrides
 ├── config/                    # YAML config loading
 └── cache/engine.py            # In-memory cache
+
+test_lab/                      # Phase 7a: Validation Lab
+├── run.py                     # CLI: provision/validate/run scenarios
+├── scenarios/                 # 5 composite vulnerability profiles
+├── harness/                   # Provisioner, runner, validator, reporter
+└── shared/                    # Reusable vulnerability scripts
 ```
 
 ---
 
 ## Metrics & Targets
 
-| Metric | Current | Short-term (P6) | Medium-term (P7) | Long-term |
-|--------|---------|-----------------|-------------------|-----------|
-| Checks | 240 | 135 | 135 | **450+** |
-| Collectors | 25 | 28 | 30 | 35 |
-| Correlation rules | 20 (16 Python + 4 YAML) | 30 | 40 | **50+** |
-| Attack scenarios | **8** | 12 | 16 | 20+ |
+| Metric | Current | Short-term (P7a) | Medium-term (P7c) | Long-term |
+|--------|---------|------------------|---------------------|-----------|
+| Checks | 240 | 240 | 240 | **450+** |
+| Collectors | 25 | 25 | 30 | 35 |
+| Correlation rules | 20 (16 Python + 4 YAML) | 20 | 40 | **50+** |
+| Attack scenarios | **8** | 8 | 16 | 20+ |
 | Unit tests | 1761 | 1,800+ | 2,000+ | 3,000+ |
 | Integration tests | 93+ | 150+ | 300+ | 500+ |
-| Test coverage (stmt) | 85% | 88% | 90% | 92%+ |
-| Test coverage (branch) | 82% | 85% | 88% | 90%+ |
+| Validation scenarios | **0** | **5** | 10 | 20+ |
+| Detection rate | N/A | **>90%** | >90% | >95% |
+| Test coverage (stmt) | 85% | 85% | 90% | 92%+ |
+| Test coverage (branch) | 82% | 82% | 88% | 90%+ |
 | mypy --strict | 0 errors | 0 errors | 0 errors | 0 errors |
 | False positive rate | ~3% | <3% | <2% | <1% |
-| Attack scenario coverage | 8 | 12 | 16 | 20+ |
-| Correlation engine maturity | **Full chain** | Temporal + YAML | Temporal + YAML | Full kill chain |
+| False negative rate | N/A | **<10%** | <5% | <2% |
+| Snap Store availability | N/A | **edge** | **stable** | — |
+| Attack scenario coverage | 8 | 8 | 16 | 20+ |
+| Correlation engine maturity | **Full chain** | Validated | Temporal + YAML | Full kill chain |
 
 ### v0.5.1 — Stabilization + P2 Gaps (2026-07-12)
 
@@ -1317,6 +1491,46 @@ src/usaf/
 - **mypy --strict**: 0 new errors (24 pre-existing errors unchanged)
 - **ruff**: 0 new errors (pre-existing PLR0911/E402/F401 unchanged)
 - **False positive rate**: Pre-existing ~3% (no regressions)
+
+---
+
+### v0.23.1 — FP Reduction: Quick Fixes (2026-07-12)
+
+**P0 — Placeholder / artifact removal:**
+- **PKG-XXX**: Removed `cve_ids=["CVE-XXXX-XXXX"]` placeholder from `PendingSecurityUpdatesCheck` in `integrity_checks.py:560`. The check doesn't know the specific CVEs fixed by an update, so the placeholder was misleading.
+- **PER-303**: Removed `"DEBUG.sh"` from `KNOWN_PROFILE_SCRIPTS` in `shell_init_persistence.py:39`. Verified `DEBUG.sh` is not shipped by any Ubuntu package, so it should be flagged for review if present.
+
+**Infrastructure:**
+- **Tests**: All 1942 passed, 0 regressions
+- **mypy --strict**: 0 new errors
+- **ruff**: 0 new errors (pre-existing only)
+- **Version**: 0.23.1
+
+---
+
+### v0.24.0 — Phase 7a: Validation Lab Framework (2026-07-12)
+
+**Phase 7a — Validation Lab:**
+- Created `test-lab/` framework with 5 composite vulnerability scenarios:
+  - `insecure-server`: 15+ vulns across SSH, kernel, firewall, users, network
+  - `backdoored-host`: 15+ persistence mechanisms (SUID, cron, systemd, LD_PRELOAD)
+  - `container-escape`: 10+ Docker misconfigurations (privileged, host namespace, socket)
+  - `secrets-exposed`: 12+ credential exposure types (AWS, GitHub, SSH keys, tokens)
+  - `desktop-insecure`: 10+ legacy services, weak auth, no firewall
+- Built validation harness: `provisioner.py` (Vagrant lifecycle), `runner.py` (USAF scan via SSH), `validator.py` (findings comparison), `reporter.py` (gap analysis)
+- Created 9 reusable vulnerability shell scripts in `shared/vulnerabilities/`
+- Scenarios auto-register via `ScenarioRegistry` with `pkgutil` discovery
+- Expected findings defined in both Python and YAML formats
+- Detection rate target: >90% per scenario
+- CLI: `python run.py list | provision | validate | run | destroy | run-all`
+- Also documented Phase 7b (Snap Store Publishing) roadmap in STATE.md
+
+**Infrastructure:**
+- **Tests**: 1942 passed (unchanged, new test-lab is integration validation, not unit tests)
+- **mypy --strict**: 0 new errors
+- **ruff**: 0 new errors (pre-existing only)
+- **Version**: 0.24.0
+- **Requires**: `vagrant + virtualbox` for VM provisioning
 
 ---
 

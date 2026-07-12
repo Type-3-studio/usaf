@@ -1,0 +1,52 @@
+scenario: desktop-insecure
+description: "Desktop workstation with legacy services, weak auth, no firewall, and insecure configs"
+minimum_detection_rate: 0.80
+
+expected_findings:
+  - check_id: CMP-101
+    title_contains: Ubuntu
+  - check_id: CMP-201
+    title_contains: Legacy
+  - check_id: CMP-202
+    title_contains: X Window
+  - check_id: CMP-203
+    title_contains: Avahi
+  - check_id: CMP-204
+    title_contains: CUPS
+  - check_id: CMP-206
+    title_contains: NFS
+  - check_id: CMP-210
+    title_contains: Cron
+
+  - check_id: PWD-101
+    title_contains: Policy
+  - check_id: PWD-203
+    title_contains: Max Age
+
+  - check_id: FW-101
+    title_contains: Firewall
+  - check_id: FW-201
+    title_contains: Default
+
+  - check_id: PRM-201
+    title_contains: World-Writable
+  - check_id: PRM-303
+    title_contains: Sticky
+  - check_id: PRM-304
+    title_contains: PATH
+
+  - check_id: FS-402
+    title_contains: World-Writable Direct
+
+  - check_id: SVC-102
+    title_contains: Unexpected
+  - check_id: SVC-201
+    title_contains: Root
+
+  - check_id: NET-101
+    title_contains: Port
+  - check_id: NET-301
+    title_contains: DNS
+
+  - check_id: USR-501
+    title_contains: Service Account

@@ -1,0 +1,42 @@
+scenario: container-escape
+description: "Docker host with exposed socket, privileged containers, host namespace sharing, and old unsigned images"
+minimum_detection_rate: 0.85
+
+expected_findings:
+  - check_id: CTN-101
+    title_contains: Socket
+  - check_id: CTN-102
+    title_contains: TCP
+  - check_id: CTN-201
+    title_contains: Privileged
+  - check_id: CTN-202
+    title_contains: Host Network
+  - check_id: CTN-203
+    title_contains: Host PID
+  - check_id: CTN-204
+    title_contains: Host Mount
+  - check_id: CTN-301
+    title_contains: Root
+  - check_id: CTN-303
+    title_contains: Capability
+  - check_id: CTN-305
+    title_contains: Writable
+  - check_id: CTN-306
+    title_contains: Host IPC
+  - check_id: CTN-401
+    title_contains: Old
+  - check_id: CTN-501
+    title_contains: Socket
+  - check_id: CTN-701
+    title_contains: Capability
+  - check_id: CTN-703
+    title_contains: Latest
+  - check_id: CTN-706
+    title_contains: User Namespace
+
+  - check_id: SVC-201
+    title_contains: Root
+  - check_id: PRM-201
+    title_contains: World-Writable
+  - check_id: FS-601
+    title_contains: Permission

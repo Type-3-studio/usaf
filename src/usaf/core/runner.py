@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import concurrent.futures
+import logging
 import platform
 import sys
 import time
@@ -25,6 +26,8 @@ from usaf.correlation.engine import (
 from usaf.correlation.rules import (
     ActiveBreachIndicators,
     BootIntegrityFailure,
+    CloudCompromiseRule,
+    ComplianceGapRule,
     ContainerEscapePath,
     CredentialCompromise,
     DataExfilSurface,
@@ -33,6 +36,7 @@ from usaf.correlation.rules import (
     ExposedAttackSurface,
     ExposedVulnerableService,
     FileIntegrityBreach,
+    PriorityRemediationRule,
     RogueServiceDeployment,
     SSHBruteForceSurface,
     SuidArmingChain,
@@ -40,13 +44,19 @@ from usaf.correlation.rules import (
     SuspiciousPersistence,
     UnauthorizedService,
 )
+from usaf.correlation.scenarios import CORE_SCENARIOS
+from usaf.correlation.yaml_loader import YamlRuleLoader
+from usaf.core.compliance.evaluator import ComplianceEvaluator
 from usaf.knowledge.base import KnowledgeBase
 from usaf.models.result import CheckResult, ScanMetadata, ScanResult
+from usaf.models.scenario import ScenarioResult
 from usaf.models.severity import CheckCategory
 
 # Optional imports (graceful fallback if not available)
 from usaf.scoring.engine import ScoringEngine
 from usaf.severity.engine import SeverityContextEngine
+
+logger = logging.getLogger("usaf.runner")
 
 
 class ScanRunner:
@@ -71,6 +81,7 @@ class ScanRunner:
         self.correlation_engine = self._build_correlation_engine()
         self.severity_context = SeverityContextEngine()
         self.knowledge_base = KnowledgeBase()
+        self.compliance_evaluator = ComplianceEvaluator()
         self.baseline_manager: Any = None
         self.profile_manager: Any = None
 
@@ -85,8 +96,14 @@ class ScanRunner:
             return CheckCategory.GENERAL
 
     def _build_correlation_engine(self) -> CorrelationEngine:
-        """Build the correlation engine with all registered rules."""
+        """Build the correlation engine with all registered rules.
+
+        Phase 5: Loads YAML-defined rules from policies/correlation/
+        and registers 8 core attack scenarios for scenario scoring.
+        """
         engine = CorrelationEngine()
+
+        # Register built-in Python rules
         engine.register(SSHBruteForceSurface())
         engine.register(SuspiciousPersistence())
         engine.register(UnauthorizedService())
@@ -103,6 +120,25 @@ class ScanRunner:
         engine.register(CredentialCompromise())
         engine.register(ActiveBreachIndicators())
         engine.register(ExposedAttackSurface())
+
+        # Phase 6: Cloud & Compliance correlation rules
+        engine.register(CloudCompromiseRule())
+        engine.register(ComplianceGapRule())
+        engine.register(PriorityRemediationRule())
+
+        # Phase 5: Load YAML-defined rules from policies/correlation/
+        yaml_loader = YamlRuleLoader()
+        yaml_rules = yaml_loader.load_all()
+        for rule in yaml_rules:
+            try:
+                engine.register(rule)
+                logger.info("Registered YAML correlation rule: %s", rule.id)
+            except ValueError:
+                logger.debug("YAML rule '%s' already registered (skipping)", rule.id)
+
+        # Phase 5: Register core attack scenarios
+        engine.register_scenarios(CORE_SCENARIOS)
+
         return engine
 
     def _setup_collectors(self) -> None:
@@ -171,7 +207,7 @@ class ScanRunner:
             def _apply_overrides(instance: Any) -> None:
                 override = self.config.plugins.overrides.get(instance.id)
                 if override and override.max_findings is not None:
-                    setattr(instance, "max_findings", override.max_findings)
+                    instance.max_findings = override.max_findings
 
             def _run_check(check_id: str) -> CheckResult:
                 try:
@@ -229,7 +265,7 @@ class ScanRunner:
                     instance = registry.get_instance(check_id)
                     override = self.config.plugins.overrides.get(instance.id)
                     if override and override.max_findings is not None:
-                        setattr(instance, "max_findings", override.max_findings)
+                        instance.max_findings = override.max_findings
                     if verbose:
                         print(f"  -> Running {check_id}: {instance.name}...")
                     result = instance.evaluate(collectors_data)
@@ -266,6 +302,19 @@ class ScanRunner:
             if verbose:
                 print(f"  -> Correlation produced {len(correlated)} synthetic finding(s)")
 
+        # Phase 3.6: Scenario scoring — evaluate attack scenarios
+        all_findings = [f for r in results for f in r.findings]
+        scenario_correlated = [
+            f for f in all_findings
+            if isinstance(f, CorrelatedFinding)
+        ]
+        scenario_results = self.correlation_engine.evaluate_scenarios(scenario_correlated)
+        if scenario_results:
+            self._inject_scenario_results(results, scenario_results)
+            if verbose:
+                for s in scenario_results:
+                    print(f"  -> Scenario '{s.scenario_name}': triggered ({s.confidence:.0%} confidence)")
+
         # Phase 3.75: Context-aware severity adjustment
         all_findings = [f for r in results for f in r.findings]
         severity_adjustments = self.severity_context.apply_all(
@@ -297,6 +346,19 @@ class ScanRunner:
                 enriched_count += 1
         if enriched_count and verbose:
             print(f"  -> Knowledge enrichment applied to {enriched_count} finding(s)")
+
+        # Phase 3.9: Compliance evaluation — meta-evaluation across all findings
+        all_findings = [f for r in results for f in r.findings]
+        compliance_results = self.compliance_evaluator.evaluate(
+            all_findings,
+            collectors_data,
+        )
+        for cr in compliance_results:
+            results.append(cr)
+        if verbose and compliance_results:
+            total_compliance_findings = sum(len(r.findings) for r in compliance_results)
+            print(f"  -> Compliance evaluation: {len(compliance_results)} framework(s) evaluated, "
+                  f"{total_compliance_findings} finding(s)")
 
         # Phase 4: Build result
         metadata.end_time = datetime.now(UTC)
@@ -385,6 +447,53 @@ class ScanRunner:
             findings=[f for f in correlated],
         )
         results.append(corr_result)
+
+    @staticmethod
+    def _inject_scenario_results(
+        results: list[CheckResult], scenarios: list[ScenarioResult]
+    ) -> None:
+        """Inject scenario results as synthetic check results."""
+        from usaf.models.severity import CheckCategory
+
+        for scenario in scenarios:
+            if not scenario.triggered:
+                continue
+
+            scenario_result = CheckResult(
+                check_id=f"SCENARIO-{scenario.scenario_id}",
+                name=f"Scenario: {scenario.scenario_name}",
+                category=CheckCategory.COMPROMISE,
+                passed=False,
+                findings=[
+                    CorrelatedFinding(
+                        id=f"{scenario.scenario_id}-001",
+                        check_id=f"SCENARIO-{scenario.scenario_id}",
+                        category=CheckCategory.COMPROMISE,
+                        severity=scenario.severity,
+                        risk_score=scenario.severity.score,
+                        title=f"Attack Scenario Triggered: {scenario.scenario_name}",
+                        description=scenario.description,
+                        rationale=(
+                            f"The {scenario.scenario_name} attack scenario was triggered "
+                            f"with {scenario.rules_triggered}/{scenario.total_rules} constituent "
+                            f"correlation rules firing. Confidence: {scenario.confidence:.0%}. "
+                            "This represents a real-world attack pattern that requires investigation."
+                        ),
+                        remediation=(
+                            "1. Review all correlated findings for this scenario\n"
+                            "2. Follow remediation steps for each individual finding\n"
+                            "3. Escalate to security team for incident response\n"
+                            "4. Harden systems against the detected attack pattern"
+                        ),
+                        source="ScenarioEngine",
+                        source_findings=scenario.source_finding_ids,
+                        correlation_rule=f"SCENARIO-{scenario.scenario_id}",
+                        tags=[str(p.value) for p in scenario.kill_chain_phases],
+                        mitre_attack_ids=[],
+                    )
+                ],
+            )
+            results.append(scenario_result)
 
     @staticmethod
     def _get_os_info() -> str:

@@ -96,25 +96,18 @@ def scan(
     runner = ScanRunner(config_path=config)
     result = runner.run(check_ids=checks, verbose=verbose)
 
-    # Baseline diff (P2-2)
-    if baseline_diff:
-        baseline_mgr = BaselineManager()
-        try:
-            baseline = baseline_mgr.load("default-baseline")
-            snapshot = baseline_mgr.build_snapshot(result)
-            diff_result = baseline_mgr.diff(baseline, snapshot)
-            if diff_result.has_changes:
-                result.metadata.errors.append(
-                    f"Baseline drift detected: {diff_result.total_changes} change(s) "
-                    f"(added: {sum(len(v) for v in diff_result.added.values())}, "
-                    f"removed: {sum(len(v) for v in diff_result.removed.values())}, "
-                    f"modified: {sum(len(v) for v in diff_result.modified.values())})"
+    # Baseline diff (P2-2) — triggered by --baseline-diff flag or config.baseline.compare
+    should_compare = baseline_diff or runner.config.baseline.compare
+    if should_compare:
+        baseline_result = runner.compare_baseline(result, verbose=verbose)
+        if runner.config.baseline.fail_on_drift:
+            diff = baseline_result.get("diff")
+            if diff and diff.has_changes:
+                print(
+                    "  [!] Drift detected and fail_on_drift is enabled. Exiting.",
+                    file=sys.stderr,
                 )
-                if verbose:
-                    print(f"  -> Baseline drift: {diff_result.total_changes} change(s)")
-        except Exception as e:
-            if verbose:
-                print(f"  [!] Baseline diff skipped: {e}")
+                raise typer.Exit(1)
 
     # Compliance evaluation (P2-4)
     if compliance_framework:

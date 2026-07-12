@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from pathlib import Path
 
 from usaf.checks.authentication.password_policy import PasswordPolicyCheck
@@ -104,7 +105,20 @@ _REALISTIC_COLLECTORS: dict[str, dict] = {
         "nftables": {"active": False, "installed": False},
         "iptables": {"active": False, "installed": False},
     },
-    "_usaf_config": {"suid_allowlist": []},
+    "ssh_config": {
+        "sshd_config": {
+            "directives": {
+                "protocol": "2",
+                "permitrootlogin": "no",
+                "kexalgorithms": "curve25519-sha256,diffie-hellman-group-exchange-sha256",
+                "maxauthtries": "6",
+                "permitemptypasswords": "no",
+                "clientaliveinterval": "300",
+                "clientalivecountmax": "3",
+            },
+            "path": "/etc/ssh/sshd_config",
+        },
+    },
 }
 
 
@@ -384,40 +398,34 @@ class TestFilesystemCheckIntegration:
         result = KernelModuleLoadingCheck().evaluate(_REALISTIC_COLLECTORS)
         assert result.passed
 
-    def test_ssh001_passes_with_protocol_2(self, monkeypatch):
-        monkeypatch.setattr(Path, "exists", lambda _: True)
-        monkeypatch.setattr(Path, "read_text", lambda _: "Protocol 2\nPort 22\n")
+    def test_ssh001_passes_with_protocol_2(self):
         result = SSHProtocolCheck().evaluate(_REALISTIC_COLLECTORS)
         assert result.passed
 
-    def test_ssh001_fails_with_protocol_1(self, monkeypatch):
-        monkeypatch.setattr(Path, "exists", lambda _: True)
-        monkeypatch.setattr(Path, "read_text", lambda _: "Protocol 1\n")
-        result = SSHProtocolCheck().evaluate(_REALISTIC_COLLECTORS)
+    def test_ssh001_fails_with_protocol_1(self):
+        bad = deepcopy(_REALISTIC_COLLECTORS)
+        bad["ssh_config"]["sshd_config"]["directives"]["protocol"] = "1"
+        result = SSHProtocolCheck().evaluate(bad)
         assert not result.passed
 
-    def test_ssh002_passes_root_login_disabled(self, monkeypatch):
-        monkeypatch.setattr(Path, "exists", lambda _: True)
-        monkeypatch.setattr(Path, "read_text", lambda _: "PermitRootLogin no\n")
+    def test_ssh002_passes_root_login_disabled(self):
         result = SSHRootLoginCheck().evaluate(_REALISTIC_COLLECTORS)
         assert result.passed
 
-    def test_ssh002_fails_root_login_yes(self, monkeypatch):
-        monkeypatch.setattr(Path, "exists", lambda _: True)
-        monkeypatch.setattr(Path, "read_text", lambda _: "PermitRootLogin yes\n")
-        result = SSHRootLoginCheck().evaluate(_REALISTIC_COLLECTORS)
+    def test_ssh002_fails_root_login_yes(self):
+        bad = deepcopy(_REALISTIC_COLLECTORS)
+        bad["ssh_config"]["sshd_config"]["directives"]["permitrootlogin"] = "yes"
+        result = SSHRootLoginCheck().evaluate(bad)
         assert not result.passed
 
-    def test_ssh003_passes_secure_kex(self, monkeypatch):
-        monkeypatch.setattr(Path, "exists", lambda _: True)
-        monkeypatch.setattr(Path, "read_text", lambda _: "KexAlgorithms curve25519-sha256,diffie-hellman-group-exchange-sha256\n")
+    def test_ssh003_passes_secure_kex(self):
         result = SSHKeyExchangeCheck().evaluate(_REALISTIC_COLLECTORS)
         assert result.passed
 
-    def test_ssh003_fails_weak_kex(self, monkeypatch):
-        monkeypatch.setattr(Path, "exists", lambda _: True)
-        monkeypatch.setattr(Path, "read_text", lambda _: "KexAlgorithms diffie-hellman-group1-sha1,diffie-hellman-group14-sha1\n")
-        result = SSHKeyExchangeCheck().evaluate(_REALISTIC_COLLECTORS)
+    def test_ssh003_fails_weak_kex(self):
+        bad = deepcopy(_REALISTIC_COLLECTORS)
+        bad["ssh_config"]["sshd_config"]["directives"]["kexalgorithms"] = "diffie-hellman-group1-sha1,diffie-hellman-group14-sha1"
+        result = SSHKeyExchangeCheck().evaluate(bad)
         assert not result.passed
         assert any("weak" in f.title.lower() for f in result.findings)
 

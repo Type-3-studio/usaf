@@ -1,11 +1,23 @@
 from __future__ import annotations
 
-from pathlib import Path
+from typing import cast
 
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
 from usaf.models.evidence import RegistryEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
+
+
+def _get_sshd_directives(collectors: dict) -> dict[str, str]:
+    """Extract sshd_config directives from the ssh_config collector."""
+    ssh_data: dict | None = collectors.get("ssh_config")
+    if not ssh_data:
+        return {}
+    sshd: dict | None = ssh_data.get("sshd_config")
+    if not sshd:
+        return {}
+    directives: dict[str, str] = sshd.get("directives") or {}
+    return directives
 
 
 @register_check
@@ -17,23 +29,23 @@ class SSHProtocolCheck(AuditCheck):
     category = CheckCategory.SYSTEM
     severity = Severity.HIGH
     description = "Checks that SSH is configured to only accept protocol version 2 connections"
-    depends = []
+    depends = ["ssh_config"]
     tags = ["ssh", "authentication", "cryptography"]
 
     def _run_check(self, collectors: dict) -> list:
         findings: list = []
-        config = self._parse_ssh_config()
+        directives = _get_sshd_directives(collectors)
 
-        if not config:
+        if not directives:
             return findings
 
-        protocol_line = config.get("Protocol")
-        if protocol_line and protocol_line.strip() != "2":
+        protocol_val = directives.get("protocol", "")
+        if protocol_val and protocol_val != "2":
             findings.append(
                 self.finding(
                     finding_id="001",
                     title="SSH allows protocol version 1",
-                    description=f"SSH Protocol is set to {protocol_line!r}, expected '2'",
+                    description=f"SSH Protocol is set to {protocol_val!r}, expected '2'",
                     rationale=(
                         "SSH protocol version 1 has known cryptographic weaknesses including "
                         "insertion attacks, CRC compensation attacks, and lack of strong integrity "
@@ -46,11 +58,11 @@ class SSHProtocolCheck(AuditCheck):
                     ),
                     evidence=RegistryEvidence(
                         key="Protocol",
-                        value=protocol_line.strip(),
+                        value=protocol_val,
                         expected="2",
                         source="/etc/ssh/sshd_config",
                     ),
-                    detected_value=protocol_line.strip(),
+                    detected_value=protocol_val,
                     expected_value="2",
                     affected_component="/etc/ssh/sshd_config",
                     reference="https://www.openssh.com/txt/release-2.1",
@@ -64,28 +76,6 @@ class SSHProtocolCheck(AuditCheck):
 
         return findings
 
-    def _parse_ssh_config(self) -> dict[str, str]:
-        config_paths = [
-            "/etc/ssh/sshd_config",
-            "/etc/ssh/ssh_config",
-        ]
-        config: dict[str, str] = {}
-        for path_str in config_paths:
-            path = Path(path_str)
-            if not path.exists():
-                continue
-            try:
-                for line in path.read_text().splitlines():
-                    line = line.strip()
-                    if not line or line.startswith("#"):
-                        continue
-                    if " " in line:
-                        key, _, value = line.partition(" ")
-                        config[key] = value
-            except OSError:
-                continue
-        return config
-
 
 @register_check
 class SSHRootLoginCheck(AuditCheck):
@@ -96,16 +86,16 @@ class SSHRootLoginCheck(AuditCheck):
     category = CheckCategory.SYSTEM
     severity = Severity.HIGH
     description = "Checks that SSH root login is disabled or restricted to key-only"
-    depends = []
+    depends = ["ssh_config"]
     tags = ["ssh", "authentication", "privilege-escalation"]
 
     def _run_check(self, collectors: dict) -> list:
         findings: list = []
-        config = self._parse_ssh_config()
-        if not config:
+        directives = _get_sshd_directives(collectors)
+        if not directives:
             return findings
 
-        permit_root = config.get("PermitRootLogin", "").strip().lower()
+        permit_root = directives.get("permitrootlogin", "").strip().lower()
 
         dangerous_values = {"yes", "without-password", "prohibit-password"}
         if permit_root in dangerous_values:
@@ -145,23 +135,6 @@ class SSHRootLoginCheck(AuditCheck):
 
         return findings
 
-    def _parse_ssh_config(self) -> dict[str, str]:
-        path = Path("/etc/ssh/sshd_config")
-        config: dict[str, str] = {}
-        if not path.exists():
-            return config
-        try:
-            for line in path.read_text().splitlines():
-                line = line.strip()
-                if not line or line.startswith("#"):
-                    continue
-                if " " in line:
-                    key, _, value = line.partition(" ")
-                    config[key] = value
-        except OSError:
-            pass
-        return config
-
 
 @register_check
 class SSHKeyExchangeCheck(AuditCheck):
@@ -172,16 +145,16 @@ class SSHKeyExchangeCheck(AuditCheck):
     category = CheckCategory.SYSTEM
     severity = Severity.MEDIUM
     description = "Checks that SSH uses modern, secure key exchange algorithms"
-    depends = []
+    depends = ["ssh_config"]
     tags = ["ssh", "cryptography", "tls"]
 
     def _run_check(self, collectors: dict) -> list:
         findings: list = []
-        config = self._parse_ssh_config()
-        if not config:
+        directives = _get_sshd_directives(collectors)
+        if not directives:
             return findings
 
-        kex_line = config.get("KexAlgorithms", "")
+        kex_line = directives.get("kexalgorithms", "")
         weak_kex = [
             "diffie-hellman-group1-sha1",
             "diffie-hellman-group-exchange-sha1",
@@ -225,20 +198,3 @@ class SSHKeyExchangeCheck(AuditCheck):
                 )
 
         return findings
-
-    def _parse_ssh_config(self) -> dict[str, str]:
-        path = Path("/etc/ssh/sshd_config")
-        config: dict[str, str] = {}
-        if not path.exists():
-            return config
-        try:
-            for line in path.read_text().splitlines():
-                line = line.strip()
-                if not line or line.startswith("#"):
-                    continue
-                if " " in line:
-                    key, _, value = line.partition(" ")
-                    config[key] = value
-        except OSError:
-            pass
-        return config

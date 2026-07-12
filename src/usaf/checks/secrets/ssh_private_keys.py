@@ -60,7 +60,7 @@ class ExposedSSHPrivateKeysCheck(AuditCheck):
                 )
 
             name = key.get("name", "").lower()
-            if key_type == "dsa" or name.endswith("dsa_key") or name.endswith("dsa_key.pub"):
+            if key_type == "dsa" or name.endswith("_dsa_key") or name.endswith("_dsa_key.pub"):
                 findings.append(
                     self.finding(
                         finding_id="002",

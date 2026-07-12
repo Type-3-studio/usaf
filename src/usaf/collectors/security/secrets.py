@@ -37,6 +37,35 @@ _COMMON_SECRET_PATTERNS: dict[str, list[re.Pattern[str]]] = {
     "private_keys": [
         re.compile(r"-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----"),
     ],
+    "gitlab_tokens": [
+        re.compile(r"\bglpat-[a-zA-Z0-9\-_]{20,}\b"),
+        re.compile(r"\bGR1348941[a-zA-Z0-9\-_]{15,}\b"),
+    ],
+    "slack_tokens": [
+        re.compile(r"\bxox[baprs]-[a-zA-Z0-9\-]{10,}\b"),
+        re.compile(r"\bxapp-[0-9]{10,}-[a-zA-Z0-9]{20,}\b"),
+    ],
+    "npm_tokens": [
+        re.compile(r"\bnpm_[a-zA-Z0-9]{36}\b"),
+    ],
+    "azure_devops": [
+        re.compile(r"(?i)azure_devops_token\s*[=:]\s*(\S+)"),
+        re.compile(r"(?i)azure_[a-z_]*pat\s*[=:]\s*(\S+)"),
+        re.compile(r"\bAZDO[a-zA-Z0-9_-]{40,}\b"),
+    ],
+    "docker_creds": [
+        re.compile(r"(?i)docker[_-]?(hub|user|pass|password|token)\s*[=:]\s*(\S+)"),
+        re.compile(r"\"auths\"\s*:"),
+    ],
+    "stripe_keys": [
+        re.compile(r"\bsk_live_[a-zA-Z0-9]{20,}\b"),
+        re.compile(r"\brk_live_[a-zA-Z0-9]{20,}\b"),
+        re.compile(r"\bwhsec_[a-zA-Z0-9]{20,}\b"),
+    ],
+    "twilio_keys": [
+        re.compile(r"(?i)twilio_account_sid\s*[=:]\s*AC[a-zA-Z0-9]{32}\b"),
+        re.compile(r"(?i)twilio_auth_token\s*[=:]\s*(\S+)"),
+    ],
 }
 
 _SECRET_FILE_GLOBS: list[str] = [

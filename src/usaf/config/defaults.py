@@ -26,7 +26,7 @@ ignore: []
 
 baseline:
   path: null
-  compare: false
+  compare: true
   fail_on_drift: false
   auto_baseline: false
 

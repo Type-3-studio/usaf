@@ -124,12 +124,13 @@ class ProcessToPortMappingCheck(AuditCheck):
                     all_listeners.append(sock)
 
         for sock in all_listeners:
-            inode = sock.get("inode")
+            raw_inode = sock.get("inode")
             port = sock.get("local_port", 0)
             addr = sock.get("local_address", "")
             protocol = sock.get("protocol", "?")
 
-            proc_info = inode_map.get(inode)
+            inode_val: int | None = int(raw_inode) if raw_inode is not None else None
+            proc_info = inode_map.get(inode_val) if inode_val is not None else None
             proc_name = proc_info["name"] if proc_info else "unknown"
             proc_pid = proc_info["pid"] if proc_info else 0
 
@@ -162,7 +163,7 @@ class ProcessToPortMappingCheck(AuditCheck):
                         state=sock.get("state") or "LISTEN",
                         pid=proc_pid,
                         process_name=proc_name,
-                        inode=inode,
+                        inode=inode_val,
                     ),
                     detected_value=f"Port {port}: process '{proc_name}' (PID {proc_pid})",
                     expected_value="Attributable to known authorized process",

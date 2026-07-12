@@ -1,3 +1,29 @@
+# USAF default configuration
+#
+# This file is loaded automatically when running from this directory.
+# For system-wide configuration, place overrides in:
+#   ~/.config/usaf/config.yaml  or  ~/.usaf.yaml
+
+# Limit high-volume checks to keep reports manageable
+plugins:
+  overrides:
+    PRM-201:
+      max_findings: 100
+    FS-601:
+      max_findings: 100
+    FS-101:
+      max_findings: 100
+    FS-102:
+      max_findings: 100
+    PKG-101:
+      max_findings: 50
+    PER-101:
+      max_findings: 50
+    NET-101:
+      max_findings: 50
+    SVC-102:
+      max_findings: 50
+
 suid_allowlist:
   # ntfs-3g - NTFS filesystem mount helper (needs root for mounting)
   - /bin/ntfs-3g

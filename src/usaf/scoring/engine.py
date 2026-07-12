@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import math
+from typing import ClassVar
 
+from usaf.config.model import SeverityConfig
 from usaf.core.interfaces import ScoringEngineInterface
 from usaf.models.finding import Finding
 from usaf.models.result import ScanResult
@@ -23,7 +25,7 @@ class ScoringEngine(ScoringEngineInterface):
     """
 
     # Severity weights: critical findings penalise more per-unit than low
-    SEVERITY_WEIGHTS: dict[Severity, float] = {
+    SEVERITY_WEIGHTS: ClassVar[dict[Severity, float]] = {
         Severity.CRITICAL: 1.0,
         Severity.HIGH: 0.8,
         Severity.MEDIUM: 0.6,
@@ -32,7 +34,7 @@ class ScoringEngine(ScoringEngineInterface):
     }
 
     # Category weights: compromise and critical infrastructure weighted higher
-    CATEGORY_WEIGHTS: dict[CheckCategory, float] = {
+    CATEGORY_WEIGHTS: ClassVar[dict[CheckCategory, float]] = {
         CheckCategory.COMPROMISE: 3.0,
         CheckCategory.COMPLIANCE: 1.5,
         CheckCategory.KERNEL: 1.5,
@@ -55,8 +57,20 @@ class ScoringEngine(ScoringEngineInterface):
         CheckCategory.GENERAL: 0.5,
     }
 
-    def __init__(self, use_trust_scoring: bool = True) -> None:
+    def __init__(
+        self,
+        use_trust_scoring: bool = True,
+        severity_config: SeverityConfig | None = None,
+    ) -> None:
         self.trust_scorer = TrustScorer() if use_trust_scoring else None
+        cfg = severity_config or SeverityConfig()
+        self._severity_score: dict[Severity, float] = {
+            Severity.CRITICAL: cfg.CRITICAL,
+            Severity.HIGH: cfg.HIGH,
+            Severity.MEDIUM: cfg.MEDIUM,
+            Severity.LOW: cfg.LOW,
+            Severity.INFO: cfg.INFO,
+        }
 
     def calculate(self, result: ScanResult) -> ScanScore:
         all_findings = result.findings
@@ -96,7 +110,7 @@ class ScoringEngine(ScoringEngineInterface):
 
             for f in cat_findings:
                 sev_weight = self.SEVERITY_WEIGHTS.get(f.severity, 0.5)
-                base_penalty = f.severity.score * sev_weight
+                base_penalty = self._severity_score[f.severity] * sev_weight
 
                 # Apply trust scoring (P3-3) if enabled — uses evidence quality
                 if self.trust_scorer:

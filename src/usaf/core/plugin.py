@@ -4,6 +4,7 @@ import abc
 import time
 from typing import Any, ClassVar
 
+from usaf.config.model import USAFConfig
 from usaf.core.exceptions import PluginError, PluginRegistrationError
 from usaf.core.interfaces import AuditCheckInterface
 from usaf.models.evidence import Evidence
@@ -23,6 +24,7 @@ class AuditCheck(AuditCheckInterface):
     depends: ClassVar[list[str]] = []
     tags: ClassVar[list[str]] = []
     timeout: int = 60
+    max_findings: int = 0
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)
@@ -33,7 +35,12 @@ class AuditCheck(AuditCheckInterface):
                 f"Check {cls.__name__} missing required attributes: {', '.join(missing)}"
             )
 
-    def evaluate(self, collectors: dict[str, dict[str, Any]]) -> CheckResult:
+    def evaluate(
+        self,
+        collectors: dict[str, dict[str, Any]],
+        config: USAFConfig | None = None,
+    ) -> CheckResult:
+        self._config = config
         start = time.perf_counter()
         result = CheckResult(
             check_id=self.id,

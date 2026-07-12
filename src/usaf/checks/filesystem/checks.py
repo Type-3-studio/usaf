@@ -78,6 +78,7 @@ class UnexpectedFilesInEtcCheck(AuditCheck):
         "postgresql-common",
         "subuid", "subgid",
         "login.defs",
+        ".pwd.lock", ".resolv.conf.systemd-resolved.bak",
         "locale.conf", "locale.gen", "locale.alias",
         "nftables.conf",
         "iproute2",
@@ -670,6 +671,8 @@ class WorldWritableDirectoriesCheck(AuditCheck):
 
         for entry in ww_entries:
             if not entry.get("is_dir"):
+                continue
+            if entry.get("is_symlink"):
                 continue
 
             path = entry.get("path", "")

@@ -1375,3 +1375,86 @@ class ExposedAttackSurface(CorrelationRule):
                 mitre_attack_ids=["T1040", "T1046", "T1588.003", "T1562"],
             )
         ]
+
+
+class SudoPrivilegeAbusePath(CorrelationRule):
+    """Detects sudo configurations that enable unconstrained privilege escalation.
+
+    Combines findings about weak sudo configuration — no password required,
+    infinite timestamp timeout, missing logging — into a single high-severity
+    correlation that indicates a clear privilege escalation path.
+    """
+
+    id = "CORR-405"
+    name = "Sudo Privilege Escalation Path"
+    description = "Detects sudo configurations that enable unconstrained privilege escalation"
+    severity = Severity.CRITICAL
+
+    def evaluate(self, findings: list[Finding]) -> list[CorrelatedFinding]:
+        no_password = [f for f in findings if f.check_id == "USR-402"]
+        no_timeout = [f for f in findings if f.check_id == "USR-403"]
+        no_logging = [f for f in findings if f.check_id == "USR-404"]
+        broad_sudo = [f for f in findings if f.check_id == "USR-401"]
+
+        signals: list[str] = []
+        source_findings: list[Finding] = []
+        total = 0
+
+        if no_password:
+            signals.append("sudo password authentication disabled globally")
+            source_findings.append(no_password[0])
+            total += 2
+
+        if no_timeout and any("never" in (f.title or "") for f in no_timeout):
+            signals.append("sudo timestamp never expires")
+            source_findings.append(no_timeout[0])
+            total += 1
+        elif no_timeout:
+            signals.append("sudo timestamp timeout excessive")
+            source_findings.append(no_timeout[0])
+            total += 1
+
+        if no_logging:
+            signals.append("sudo command logging not configured")
+            source_findings.append(no_logging[0])
+            total += 2
+
+        if broad_sudo:
+            has_all = any("ALL" in (f.detected_value or "") for f in broad_sudo)
+            if has_all:
+                signals.append("users have unrestricted ALL sudo access")
+                source_findings.append(broad_sudo[0])
+                total += 1
+
+        if total < 2:
+            return []
+
+        return [
+            self._make_finding(
+                finding_id="001",
+                title="Sudo Privilege Escalation Path Detected",
+                description=(
+                    f"Sudo is misconfigured in {len(signals)} way(s): "
+                    f"{'; '.join(signals)}. An attacker who compromises any sudo "
+                    "user gains unrestricted root access with no audit trail."
+                ),
+                rationale=(
+                    "Sudo is the primary mechanism for privilege escalation on Linux. "
+                    "When password authentication is disabled, timestamp never expires, "
+                    "logging is off, and users have broad ALL access, any compromised "
+                    "sudo user immediately yields full root access with no forensic trail. "
+                    "This combination of misconfigurations represents a critical security gap."
+                ),
+                remediation=(
+                    "1. Require sudo password: remove '!authenticate' from sudoers\n"
+                    "2. Set reasonable timestamp_timeout (5-15 minutes)\n"
+                    "3. Enable sudo logging: 'Defaults log_input, log_output'\n"
+                    "4. Restrict sudo commands: replace ALL with specific needed commands\n"
+                    "Use 'visudo' to edit /etc/sudoers."
+                ),
+                source_findings=source_findings,
+                severity=Severity.CRITICAL,
+                tags=["sudo", "privilege-escalation", "defense-in-depth", "critical"],
+                mitre_attack_ids=["T1548.003"],
+            )
+        ]

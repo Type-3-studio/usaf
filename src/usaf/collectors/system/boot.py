@@ -84,6 +84,7 @@ class BootCollector(BaseCollector):
             "installed": False,
             "password_protected": None,
             "cfg_path": None,
+            "cfg_readable": False,
         }
         grub_cfg = Path("/boot/grub/grub.cfg")
         grub_cfg2 = Path("/boot/grub2/grub.cfg")
@@ -93,7 +94,10 @@ class BootCollector(BaseCollector):
             result["installed"] = True
             try:
                 content = cfg.read_text()
+                result["cfg_readable"] = True
                 result["password_protected"] = "password" in content.lower() or "superusers" in content.lower()
+            except PermissionError:
+                result["cfg_readable"] = True
             except OSError:
                 pass
         return result

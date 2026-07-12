@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import datetime
+from pathlib import Path
 from typing import Any
 
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
-from usaf.models.evidence import NetworkEvidence, RegistryEvidence
+from usaf.models.evidence import FileEvidence, NetworkEvidence, RegistryEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
 
@@ -505,13 +506,14 @@ class DockerDaemonSecurityCheck(AuditCheck):
         return findings
 
     @staticmethod
-    def _read_daemon_config() -> dict | None:
+    def _read_daemon_config() -> dict[str, Any] | None:
         import json
         daemon_json = Path("/etc/docker/daemon.json")
         if not daemon_json.exists():
             return None
         try:
-            return json.loads(daemon_json.read_text())
+            result: dict[str, Any] | None = json.loads(daemon_json.read_text())
+            return result
         except (json.JSONDecodeError, OSError):
             return {}
 

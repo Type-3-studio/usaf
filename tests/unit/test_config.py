@@ -22,7 +22,7 @@ class TestUSAFConfigModel:
         assert config.plugins.disabled == []
         assert config.severity.CRITICAL == 10.0
         assert config.severity.HIGH == 7.5
-        assert config.baseline.compare is False
+        assert config.baseline.compare is True
         assert config.reporting.format == "terminal"
         assert config.reporting.color is True
         assert config.suid_allowlist == []

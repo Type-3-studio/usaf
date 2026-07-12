@@ -355,24 +355,40 @@ class GRUBPasswordCheck(AuditCheck):
                 )
             )
         elif password_protected is None:
+            cfg_path = grub.get("cfg_path")
+            cfg_readable = grub.get("cfg_readable", False)
+            if cfg_path and not cfg_readable:
+                desc = (
+                    f"GRUB configuration '{cfg_path}' exists but is not readable "
+                    f"by the current user (permission denied). Unable to determine "
+                    f"if GRUB is password-protected."
+                )
+                remediation = (
+                    f"Check permissions: 'ls -la {cfg_path}'. "
+                    f"Run scan as root or ensure the file is readable."
+                )
+            else:
+                desc = (
+                    "GRUB configuration file was not found or could not be read. "
+                    "Unable to determine if GRUB is password-protected."
+                )
+                remediation = (
+                    "Check bootloader: 'ls /boot/grub' or 'ls /boot/grub2'. "
+                    "If GRUB is the bootloader, ensure /boot/grub/grub.cfg exists "
+                    "and is readable."
+                )
+
             findings.append(
                 self.finding(
                     finding_id="002",
                     title="GRUB password status unknown",
-                    description=(
-                        "GRUB configuration file was not found or could not be read. "
-                        "Unable to determine if GRUB is password-protected."
-                    ),
+                    description=desc,
                     rationale=(
                         "If GRUB is installed but the configuration is inaccessible, "
                         "it may indicate missing bootloader configuration or a system "
                         "that doesn't use GRUB. Verify the bootloader in use."
                     ),
-                    remediation=(
-                        "Check bootloader: 'ls /boot/grub' or 'ls /boot/grub2'. "
-                        "If GRUB is the bootloader, ensure /boot/grub/grub.cfg exists "
-                        "and is readable."
-                    ),
+                    remediation=remediation,
                     evidence=RegistryEvidence(
                         key="grub.cfg",
                         value="not found or unreadable",

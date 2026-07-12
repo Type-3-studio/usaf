@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+from usaf.models.severity import Severity
+
 
 class SeverityConfig(BaseModel):
     CRITICAL: float = 10.0
@@ -12,7 +14,7 @@ class SeverityConfig(BaseModel):
 
 
 class PluginOverride(BaseModel):
-    severity: str | None = None
+    severity: Severity | None = None
     enabled: bool | None = None
     timeout: int | None = None
     max_findings: int | None = None
@@ -36,7 +38,7 @@ class GeneralConfig(BaseModel):
 
 class BaselineConfig(BaseModel):
     path: str | None = None
-    compare: bool = False
+    compare: bool = True
     fail_on_drift: bool = False
     auto_baseline: bool = False
 
@@ -81,8 +83,9 @@ class USAFConfig(BaseModel):
     plugins: PluginConfig = Field(default_factory=PluginConfig)
     severity: SeverityConfig = Field(default_factory=SeverityConfig)
     ignore: list[str] = Field(default_factory=list)
-    ignore_paths: list[str] = Field(default_factory=list,
-        description="Glob patterns for paths to ignore (e.g., /var/log/**)")
+    ignore_paths: list[str] = Field(
+        default_factory=list, description="Glob patterns for paths to ignore (e.g., /var/log/**)"
+    )
     baseline: BaselineConfig = Field(default_factory=BaselineConfig)
     reporting: ReportingConfig = Field(default_factory=ReportingConfig)
     policies: list[PolicyConfig] = Field(default_factory=list)
@@ -90,5 +93,6 @@ class USAFConfig(BaseModel):
     severity_context: SeverityContextConfig = Field(default_factory=SeverityContextConfig)
     compliance: ComplianceConfig = Field(default_factory=ComplianceConfig)
     profile: ProfileConfig = Field(default_factory=ProfileConfig)
-    suid_allowlist: list[str] = Field(default_factory=list,
-        description="Additional SUID binary paths to consider expected")
+    suid_allowlist: list[str] = Field(
+        default_factory=list, description="Additional SUID binary paths to consider expected"
+    )

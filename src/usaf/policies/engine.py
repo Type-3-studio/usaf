@@ -57,11 +57,20 @@ class PolicyEngine:
             if hasattr(config, "severity_overrides"):
                 config.severity_overrides.update(policy.severity_overrides)
             elif hasattr(config, "plugins") and hasattr(config.plugins, "overrides"):
+                from usaf.models.severity import Severity as SevEnum
+
                 for check_id, severity in policy.severity_overrides.items():
                     if check_id not in config.plugins.overrides:
                         from usaf.config.model import PluginOverride
+
+                        parsed_sev: SevEnum | None = None
+                        if isinstance(severity, str):
+                            try:
+                                parsed_sev = SevEnum(severity.upper())
+                            except ValueError:
+                                parsed_sev = None
                         config.plugins.overrides[check_id] = PluginOverride(
-                            severity=severity, enabled=None
+                            severity=parsed_sev, enabled=None
                         )
         if policy.ignore_patterns:
             if hasattr(config, "ignore"):

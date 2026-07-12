@@ -128,7 +128,6 @@ _FAKE_COLLECTORS: dict[str, dict] = {
         "nftables": {"active": False, "installed": False},
         "iptables": {"active": False, "installed": False},
     },
-    "_usaf_config": {"suid_allowlist": []},
 }
 
 
@@ -152,7 +151,10 @@ class TestSeverityContextPipeline:
     def test_permission_temp_dir_deescalates(self):
         findings = [
             _make_finding(
-                "PRM-201", "001", Severity.HIGH, CheckCategory.PERMISSIONS,
+                "PRM-201",
+                "001",
+                Severity.HIGH,
+                CheckCategory.PERMISSIONS,
                 evidence=FileEvidence(path="/tmp/world_writable", permission="0o777"),
             ),
         ]
@@ -177,10 +179,15 @@ class TestSeverityContextPipeline:
 
         result = ScanResult(
             metadata=ScanMetadata(hostname="test"),
-            results=[CheckResult(
-                check_id="SSH-101", name="SSH Test", category=CheckCategory.SYSTEM,
-                passed=False, findings=findings,
-            )],
+            results=[
+                CheckResult(
+                    check_id="SSH-101",
+                    name="SSH Test",
+                    category=CheckCategory.SYSTEM,
+                    passed=False,
+                    findings=findings,
+                )
+            ],
         )
         score = ScoringEngine().calculate(result)
         assert score.critical_count == 1
@@ -196,18 +203,32 @@ class TestCorrelationPipeline:
     def test_ssh_brute_force_surface_detected(self):
         findings = [
             _make_finding(
-                "SSH-102", "001", Severity.HIGH, CheckCategory.SYSTEM,
+                "SSH-102",
+                "001",
+                Severity.HIGH,
+                CheckCategory.SYSTEM,
                 title="Root login is permitted",
                 evidence=NetworkEvidence(
-                    protocol="TCP", local_address="0.0.0.0", local_port=22,
-                    state="LISTEN", pid=100, process_name="sshd",
+                    protocol="TCP",
+                    local_address="0.0.0.0",
+                    local_port=22,
+                    state="LISTEN",
+                    pid=100,
+                    process_name="sshd",
                 ),
             ),
             _make_finding(
-                "NET-101", "001", Severity.MEDIUM, CheckCategory.NETWORK,
+                "NET-101",
+                "001",
+                Severity.MEDIUM,
+                CheckCategory.NETWORK,
                 evidence=NetworkEvidence(
-                    protocol="TCP", local_address="0.0.0.0", local_port=22,
-                    state="LISTEN", pid=100, process_name="sshd",
+                    protocol="TCP",
+                    local_address="0.0.0.0",
+                    local_port=22,
+                    state="LISTEN",
+                    pid=100,
+                    process_name="sshd",
                 ),
             ),
         ]
@@ -220,14 +241,22 @@ class TestCorrelationPipeline:
     def test_persistence_pattern_detected(self):
         findings = [
             _make_finding(
-                "UNKN-SERVICE", "001", Severity.HIGH, CheckCategory.SERVICES,
+                "UNKN-SERVICE",
+                "001",
+                Severity.HIGH,
+                CheckCategory.SERVICES,
                 title="Unknown systemd service: backdoor",
                 evidence=FileEvidence(path="/etc/systemd/system/backdoor.service"),
                 affected="systemd: backdoor",
             ),
             _make_finding(
-                "USR-101", "001", Severity.CRITICAL, CheckCategory.USERS,
-                evidence=RegistryEvidence(key="passwd", value="root:0:0", expected="one root only", source="/etc/passwd"),
+                "USR-101",
+                "001",
+                Severity.CRITICAL,
+                CheckCategory.USERS,
+                evidence=RegistryEvidence(
+                    key="passwd", value="root:0:0", expected="one root only", source="/etc/passwd"
+                ),
             ),
         ]
         engine = CorrelationEngine()
@@ -238,29 +267,51 @@ class TestCorrelationPipeline:
     def test_multi_rule_correlation(self):
         findings = [
             _make_finding(
-                "SSH-102", "001", Severity.HIGH, CheckCategory.SYSTEM,
+                "SSH-102",
+                "001",
+                Severity.HIGH,
+                CheckCategory.SYSTEM,
                 title="Root login is permitted",
                 evidence=NetworkEvidence(
-                    protocol="TCP", local_address="0.0.0.0", local_port=22,
-                    state="LISTEN", pid=100, process_name="sshd",
+                    protocol="TCP",
+                    local_address="0.0.0.0",
+                    local_port=22,
+                    state="LISTEN",
+                    pid=100,
+                    process_name="sshd",
                 ),
             ),
             _make_finding(
-                "NET-101", "001", Severity.MEDIUM, CheckCategory.NETWORK,
+                "NET-101",
+                "001",
+                Severity.MEDIUM,
+                CheckCategory.NETWORK,
                 evidence=NetworkEvidence(
-                    protocol="TCP", local_address="0.0.0.0", local_port=22,
-                    state="LISTEN", pid=100, process_name="sshd",
+                    protocol="TCP",
+                    local_address="0.0.0.0",
+                    local_port=22,
+                    state="LISTEN",
+                    pid=100,
+                    process_name="sshd",
                 ),
             ),
             _make_finding(
-                "UNKN-SERVICE", "001", Severity.HIGH, CheckCategory.SERVICES,
+                "UNKN-SERVICE",
+                "001",
+                Severity.HIGH,
+                CheckCategory.SERVICES,
                 title="Unknown systemd service: backdoor",
                 evidence=FileEvidence(path="/etc/systemd/system/backdoor.service"),
                 affected="systemd: backdoor",
             ),
             _make_finding(
-                "USR-101", "001", Severity.CRITICAL, CheckCategory.USERS,
-                evidence=RegistryEvidence(key="passwd", value="root:0:0", expected="one root only", source="/etc/passwd"),
+                "USR-101",
+                "001",
+                Severity.CRITICAL,
+                CheckCategory.USERS,
+                evidence=RegistryEvidence(
+                    key="passwd", value="root:0:0", expected="one root only", source="/etc/passwd"
+                ),
             ),
         ]
         engine = CorrelationEngine()
@@ -291,14 +342,31 @@ class TestKnowledgeEnrichmentPipeline:
     def test_kb_enriches_all_known_checks(self):
         kb = KnowledgeBase()
         check_ids = {
-            "KERN-101", "KERN-201", "KERN-301",
-            "SSH-101", "SSH-102", "SSH-201",
-            "USR-101", "USR-201", "USR-102",
-            "NET-101", "NET-201",
-            "PRM-101", "PRM-201",
-            "FW-101", "USB-101", "PWD-101",
-            "KERN-401", "PKG-101", "PER-201", "SEC-101", "SVC-101",
-            "CMP-101", "COM-101", "CTN-101", "FOR-101",
+            "KERN-101",
+            "KERN-201",
+            "KERN-301",
+            "SSH-101",
+            "SSH-102",
+            "SSH-201",
+            "USR-101",
+            "USR-201",
+            "USR-102",
+            "NET-101",
+            "NET-201",
+            "PRM-101",
+            "PRM-201",
+            "FW-101",
+            "USB-101",
+            "PWD-101",
+            "KERN-401",
+            "PKG-101",
+            "PER-201",
+            "SEC-101",
+            "SVC-101",
+            "CMP-101",
+            "COM-101",
+            "CTN-101",
+            "FOR-101",
         }
         for cid in check_ids:
             entry = kb.get(cid)
@@ -312,7 +380,9 @@ class TestKnowledgeEnrichmentPipeline:
     def test_kb_confidence_evaluation(self):
         kb = KnowledgeBase()
         finding = _make_finding(
-            "KERN-101", "001", Severity.HIGH,
+            "KERN-101",
+            "001",
+            Severity.HIGH,
             evidence=RegistryEvidence(key="test", value="0", expected="2", source="/proc/test"),
         )
         confidence, effective = kb.evaluate_finding_confidence(finding)
@@ -333,16 +403,28 @@ class TestCompliancePipeline:
     def test_cis_mapping_coverage(self):
         self._ensure_discovery()
         findings = [
-            _make_finding("KERN-101", "001", Severity.HIGH, cis_benchmarks=["CIS Ubuntu 20.04: 1.6.1"]),
-            _make_finding("SSH-101", "001", Severity.HIGH, cis_benchmarks=["CIS Ubuntu 20.04: 5.2.2"]),
-            _make_finding("KERN-401", "001", Severity.MEDIUM, cis_benchmarks=["CIS Ubuntu 20.04: 3.5"]),
+            _make_finding(
+                "KERN-101", "001", Severity.HIGH, cis_benchmarks=["CIS Ubuntu 20.04: 1.6.1"]
+            ),
+            _make_finding(
+                "SSH-101", "001", Severity.HIGH, cis_benchmarks=["CIS Ubuntu 20.04: 5.2.2"]
+            ),
+            _make_finding(
+                "KERN-401", "001", Severity.MEDIUM, cis_benchmarks=["CIS Ubuntu 20.04: 3.5"]
+            ),
         ]
         result = ScanResult(
             metadata=ScanMetadata(hostname="test"),
-            results=[CheckResult(
-                check_id=f.check_id, name=f.check_id, category=f.category,
-                passed=False, findings=[f],
-            ) for f in findings],
+            results=[
+                CheckResult(
+                    check_id=f.check_id,
+                    name=f.check_id,
+                    category=f.category,
+                    passed=False,
+                    findings=[f],
+                )
+                for f in findings
+            ],
         )
         framework = ComplianceFramework()
         coverage = framework.get_coverage("cis", result)
@@ -441,19 +523,67 @@ class TestFullPipelineEndToEnd:
     def test_full_pipeline_with_fake_data(self):
         # Phase 1: Build findings from fake collector data
         findings = [
-            _make_finding("KERN-101", "001", Severity.HIGH, CheckCategory.KERNEL,
-                          evidence=RegistryEvidence(key="randomize_va_space", value="0", expected="2", source="/proc/sys")),
-            _make_finding("SSH-102", "001", Severity.HIGH, CheckCategory.SYSTEM,
-                          title="Root login is permitted",
-                          evidence=NetworkEvidence(protocol="TCP", local_address="0.0.0.0", local_port=22, state="LISTEN", pid=100, process_name="sshd")),
-            _make_finding("USR-201", "001", Severity.CRITICAL, CheckCategory.USERS,
-                          evidence=RegistryEvidence(key="root", value="", expected="x", source="/etc/shadow")),
-            _make_finding("NET-101", "001", Severity.MEDIUM, CheckCategory.NETWORK,
-                          evidence=NetworkEvidence(protocol="TCP", local_address="0.0.0.0", local_port=22, state="LISTEN", pid=100, process_name="sshd")),
-            _make_finding("USR-101", "001", Severity.CRITICAL, CheckCategory.USERS,
-                          evidence=RegistryEvidence(key="passwd", value="root:0:0", expected="one root", source="/etc/passwd")),
-            _make_finding("PRM-201", "001", Severity.HIGH, CheckCategory.PERMISSIONS,
-                          evidence=FileEvidence(path="/tmp/world_writable", permission="0o777")),
+            _make_finding(
+                "KERN-101",
+                "001",
+                Severity.HIGH,
+                CheckCategory.KERNEL,
+                evidence=RegistryEvidence(
+                    key="randomize_va_space", value="0", expected="2", source="/proc/sys"
+                ),
+            ),
+            _make_finding(
+                "SSH-102",
+                "001",
+                Severity.HIGH,
+                CheckCategory.SYSTEM,
+                title="Root login is permitted",
+                evidence=NetworkEvidence(
+                    protocol="TCP",
+                    local_address="0.0.0.0",
+                    local_port=22,
+                    state="LISTEN",
+                    pid=100,
+                    process_name="sshd",
+                ),
+            ),
+            _make_finding(
+                "USR-201",
+                "001",
+                Severity.CRITICAL,
+                CheckCategory.USERS,
+                evidence=RegistryEvidence(key="root", value="", expected="x", source="/etc/shadow"),
+            ),
+            _make_finding(
+                "NET-101",
+                "001",
+                Severity.MEDIUM,
+                CheckCategory.NETWORK,
+                evidence=NetworkEvidence(
+                    protocol="TCP",
+                    local_address="0.0.0.0",
+                    local_port=22,
+                    state="LISTEN",
+                    pid=100,
+                    process_name="sshd",
+                ),
+            ),
+            _make_finding(
+                "USR-101",
+                "001",
+                Severity.CRITICAL,
+                CheckCategory.USERS,
+                evidence=RegistryEvidence(
+                    key="passwd", value="root:0:0", expected="one root", source="/etc/passwd"
+                ),
+            ),
+            _make_finding(
+                "PRM-201",
+                "001",
+                Severity.HIGH,
+                CheckCategory.PERMISSIONS,
+                evidence=FileEvidence(path="/tmp/world_writable", permission="0o777"),
+            ),
         ]
 
         # Phase 2: Severity context adjustment
@@ -488,13 +618,22 @@ class TestFullPipelineEndToEnd:
                         existing_tags.add(tag)
 
         # Phase 5: Scoring
-        all_results = [CheckResult(
-            check_id=f.check_id, name=f.check_id, category=f.category,
-            passed=False, findings=[f],
-        ) for f in findings]
+        all_results = [
+            CheckResult(
+                check_id=f.check_id,
+                name=f.check_id,
+                category=f.category,
+                passed=False,
+                findings=[f],
+            )
+            for f in findings
+        ]
         corr_result = CheckResult(
-            check_id="CORRELATION", name="Correlation", category=CheckCategory.COMPROMISE,
-            passed=len(correlated) == 0, findings=[f for f in correlated],
+            check_id="CORRELATION",
+            name="Correlation",
+            category=CheckCategory.COMPROMISE,
+            passed=len(correlated) == 0,
+            findings=[f for f in correlated],
         )
         all_results.append(corr_result)
 
@@ -511,6 +650,7 @@ class TestFullPipelineEndToEnd:
 
         # Phase 6: Compliance
         import usaf.checks  # noqa: F401
+
         framework = ComplianceFramework()
         coverage = framework.get_coverage("cis", result)
         assert coverage.coverage_percent >= 0
@@ -518,6 +658,7 @@ class TestFullPipelineEndToEnd:
         # Phase 7: Baseline snapshot
         from usaf.baseline.manager import BaselineManager, BaselineSnapshot
         import tempfile
+
         with tempfile.TemporaryDirectory() as td:
             mgr = BaselineManager(td)
             snap = mgr.build_snapshot(result)

@@ -152,6 +152,13 @@ class ScanRunner:
         for instance in collector_registry.create_all_instances():
             self.collector_manager.add(instance)
 
+    def _collect_single(self, name: str) -> tuple[str, dict[str, Any]]:
+        try:
+            data = self.collector_manager.collect_single(name)
+            return name, data
+        except Exception as e:
+            return name, {"_error": str(e)}
+
     def run(self, check_ids: list[str] | None = None, verbose: bool = False) -> ScanResult:
         start_time = time.time()
         scan_start_dt = datetime.now(UTC)
@@ -171,23 +178,43 @@ class ScanRunner:
         if verbose:
             print("[*] Collecting system data...")
 
-        # Phase 1: Collect data
+        # Phase 1: Collect data (parallel if config.general.parallel)
         collectors_data: dict[str, dict[str, Any]] = {}
         collector_names = self._resolve_collector_dependencies()
 
-        # Inject config into collectors_data so checks can access dynamic allowlists
-        collectors_data["_usaf_config"] = {
-            "suid_allowlist": self.config.suid_allowlist,
-        }
-        for name in collector_names:
-            try:
-                data = self.collector_manager.collect_single(name)
+        if self.config.general.parallel and len(collector_names) > 1:
+            if verbose:
+                print(f"  -> Collecting from {len(collector_names)} collectors in parallel ({self.config.general.max_workers} workers)")
+            with concurrent.futures.ThreadPoolExecutor(
+                max_workers=self.config.general.max_workers
+            ) as executor:
+                coll_future_map: dict[concurrent.futures.Future[tuple[str, dict[str, Any]]], str] = {
+                    executor.submit(self._collect_single, name): name
+                    for name in collector_names
+                }
+                for coll_future in concurrent.futures.as_completed(coll_future_map):
+                    name = coll_future_map[coll_future]
+                    try:
+                        _, data = coll_future.result()
+                        collectors_data[name] = data
+                        if "_error" in data:
+                            metadata.errors.append(f"Collector '{name}': {data['_error']}")
+                            if verbose:
+                                print(f"  [!] Collector '{name}' failed: {data['_error']}")
+                    except Exception as e:
+                        collectors_data[name] = {"_error": str(e)}
+                        metadata.errors.append(f"Collector '{name}': {e}")
+                        if verbose:
+                            print(f"  [!] Collector '{name}' failed: {e}")
+        else:
+            for name in collector_names:
+                _, data = self._collect_single(name)
                 collectors_data[name] = data
-            except Exception as e:
-                collectors_data[name] = {"_error": str(e)}
-                metadata.errors.append(f"Collector '{name}': {e}")
-                if verbose:
-                    print(f"  [!] Collector '{name}' failed: {e}")
+                if "_error" in data:
+                    metadata.errors.append(f"Collector '{name}': {data['_error']}")
+                    if verbose:
+                        print(f"  [!] Collector '{name}' failed: {data['_error']}")
+
         metadata.collector_count = self.collector_manager.count
 
         if verbose:
@@ -213,7 +240,7 @@ class ScanRunner:
                 try:
                     instance = registry.get_instance(check_id)
                     _apply_overrides(instance)
-                    result = instance.evaluate(collectors_data)
+                    result = instance.evaluate(collectors_data, self.config)
                     result = self._apply_ignore_list(result)
                     return result
                 except PluginDependencyError as e:
@@ -240,14 +267,14 @@ class ScanRunner:
             with concurrent.futures.ThreadPoolExecutor(
                 max_workers=self.config.general.max_workers
             ) as executor:
-                future_map = {
+                future_to_cid: dict[concurrent.futures.Future[CheckResult], str] = {
                     executor.submit(_run_check, cid): cid for cid in execution_order
                 }
-                for future in concurrent.futures.as_completed(future_map):
-                    cid = future_map[future]
+                for future in concurrent.futures.as_completed(future_to_cid):
+                    cid = future_to_cid[future]
                     try:
-                        result = future.result()
-                        results.append(result)
+                        cr = future.result()
+                        results.append(cr)
                     except Exception as e:
                         results.append(
                             CheckResult(
@@ -268,7 +295,7 @@ class ScanRunner:
                         instance.max_findings = override.max_findings
                     if verbose:
                         print(f"  -> Running {check_id}: {instance.name}...")
-                    result = instance.evaluate(collectors_data)
+                    result = instance.evaluate(collectors_data, self.config)
                     result = self._apply_ignore_list(result)
                     results.append(result)
                 except PluginDependencyError as e:
@@ -369,6 +396,71 @@ class ScanRunner:
             results=results,
             collectors_data=collectors_data,
         )
+
+    def compare_baseline(
+        self,
+        result: ScanResult,
+        baseline_name: str = "default-baseline",
+        verbose: bool = False,
+    ) -> dict[str, Any]:
+        """Compare scan result against a stored baseline.
+
+        Returns a dict with keys: diff (BaselineDiff | None), auto_created (bool),
+        auto_created_path (str | None), error (str | None).
+        Also handles auto-creation if configured.
+        """
+        from usaf.baseline.manager import BaselineDiff, BaselineManager
+        from usaf.core.exceptions import BaselineError
+
+        baseline_mgr = BaselineManager()
+        result_data: dict[str, Any] = {
+            "diff": None,
+            "auto_created": False,
+            "auto_created_path": None,
+            "error": None,
+        }
+
+        try:
+            baseline = baseline_mgr.load(baseline_name)
+            snapshot = baseline_mgr.build_snapshot(result)
+            diff = baseline_mgr.diff(baseline, snapshot)
+            result_data["diff"] = diff
+
+            if diff.has_changes:
+                result.metadata.errors.append(
+                    f"Baseline drift detected: {diff.total_changes} change(s) "
+                    f"(added: {sum(len(v) for v in diff.added.values())}, "
+                    f"removed: {sum(len(v) for v in diff.removed.values())}, "
+                    f"modified: {sum(len(v) for v in diff.modified.values())})"
+                )
+                if verbose:
+                    print(f"  -> Baseline drift: {diff.total_changes} change(s)")
+            elif verbose:
+                print("  -> Baseline: no drift detected")
+
+        except BaselineError:
+            if self.config.baseline.auto_baseline:
+                if verbose:
+                    print("  -> No baseline found. Auto-creating...")
+                try:
+                    snapshot = baseline_mgr.build_snapshot(result)
+                    path = baseline_mgr.store(baseline_name, snapshot)
+                    result_data["auto_created"] = True
+                    result_data["auto_created_path"] = str(path)
+                    if verbose:
+                        print(f"  -> Baseline '{baseline_name}' created at {path}")
+                except Exception as e:
+                    if verbose:
+                        print(f"  [!] Auto-baseline failed: {e}")
+            elif verbose:
+                print("  -> No baseline found. Run 'usaf baseline init' to create one.")
+
+        except Exception as e:
+            result_data["error"] = str(e)
+            if verbose:
+                print(f"  [!] Baseline diff skipped: {e}")
+
+        return result_data
 
     def score(self, result: ScanResult) -> Any:
         return self.scoring_engine.calculate(result)

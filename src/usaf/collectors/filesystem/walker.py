@@ -112,6 +112,8 @@ class FilesystemCollector(BaseCollector):
                                 continue
                             checked.add(sp)
                             st = full.lstat()
+                            if full.is_symlink():
+                                continue
                             if st.st_mode & stat_module.S_IWOTH:
                                 results.append({
                                     "path": sp,
@@ -119,6 +121,7 @@ class FilesystemCollector(BaseCollector):
                                     "uid": st.st_uid,
                                     "gid": st.st_gid,
                                     "is_dir": full.is_dir(),
+                                    "is_symlink": False,
                                     "size": st.st_size if full.is_file() else None,
                                     "modified": st.st_mtime,
                                 })

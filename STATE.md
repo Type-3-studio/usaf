@@ -85,16 +85,58 @@
 | `SnapCollector` | ✅ | Snap package inventory, file→package resolution |
 | `CloudMetadataCollector` | ✅ | Cloud provider detection, IMDS, agents, K8s, credentials (P6) |
 
-#### Checks (128 total)
+#### Checks (389 total)
 | Check | Status | Severity | Evidence |
 |-------|--------|----------|----------|
 | KERN-101 (ASLR) | ✅ | HIGH | RegistryEvidence |
 | KERN-201 (Pointer Restriction) | ✅ | MEDIUM | RegistryEvidence |
 | KERN-301 (Core Dump) | ✅ | MEDIUM | RegistryEvidence |
 | KERN-401 (Module Loading) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-151 (TTY Ldisc Autoload) | ✅ | LOW | RegistryEvidence |
+| KERN-251 (Ptrace Scope) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-351 (Core Dump PID) | ✅ | LOW | RegistryEvidence |
+| KERN-451 (Unprivileged BPF) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-511 (Link Protections) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-512 (Special File Protections) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-513 (Userfaultfd) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-514 (mmap Min Addr) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-152 (Console Log Level) | ✅ | LOW | RegistryEvidence |
+| KERN-252 (Ctrl-Alt-Del) | ✅ | LOW | RegistryEvidence |
+| KERN-352 (SysRq Key) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-452 (Kexec Disabled) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-552 (Perf Event Paranoid) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-652 (Boot Security Params) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-752 (Module Signing) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-852 (IOMMU Protection) | ✅ | LOW | RegistryEvidence |
+| KERN-901 (ASLR Effectiveness) | ✅ | LOW | RegistryEvidence |
+| KERN-902 (Debug Filesystem) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-903 (Module Blacklist) | ✅ | MEDIUM | RegistryEvidence |
+| KERN-904 (SysRq Restriction) | ✅ | LOW | RegistryEvidence |
 | SSH-101 (Protocol) | ✅ | HIGH | RegistryEvidence |
 | SSH-102 (Root Login) | ✅ | HIGH | RegistryEvidence |
+| SSH-103 (MaxAuthTries) | ✅ | HIGH | RegistryEvidence |
+| SSH-104 (Empty Passwords) | ✅ | CRITICAL | RegistryEvidence |
+| SSH-105 (ClientAlive Timeout) | ✅ | MEDIUM | RegistryEvidence |
+| SSH-106 (Banner) | ✅ | LOW | RegistryEvidence |
+| SSH-107 (PermitUserEnvironment) | ✅ | MEDIUM | RegistryEvidence |
+| SSH-108 (MaxStartups) | ✅ | MEDIUM | RegistryEvidence |
+| SSH-109 (HostbasedAuthentication) | ✅ | HIGH | RegistryEvidence |
 | SSH-201 (KEX Algorithms) | ✅ | MEDIUM | RegistryEvidence |
+| SSH-202 (Ciphers) | ✅ | MEDIUM | RegistryEvidence |
+| SSH-301 (Host Key Type) | ✅ | MEDIUM | RegistryEvidence |
+| SSH-302 (Authorized Keys Perms) | ✅ | HIGH | RegistryEvidence |
+| SSH-401 (LogLevel) | ✅ | LOW | RegistryEvidence |
+| SSH-501 (X11Forwarding) | ✅ | MEDIUM | RegistryEvidence |
+| SSH-502 (TcpForwarding) | ✅ | MEDIUM | RegistryEvidence |
+| SSH-503 (Compression) | ✅ | LOW | RegistryEvidence |
+| SSH-504 (PermitTunnel) | ✅ | MEDIUM | RegistryEvidence |
+| SSH-505 (GSSAPIAuth) | ✅ | LOW | RegistryEvidence |
+| SSH-601 (SSH MAC Algorithms) | ✅ | MEDIUM | RegistryEvidence |
+| SSH-602 (SSH Host Key Strength) | ✅ | MEDIUM | RegistryEvidence |
+| SSH-603 (SSH Agent Forwarding) | ✅ | MEDIUM | RegistryEvidence |
+| SSH-604 (SSH Pubkey Auth Only) | ✅ | HIGH | RegistryEvidence |
+| SSH-605 (SSH Port) | ✅ | LOW | RegistryEvidence |
+| SSH-606 (SSH Session Termination) | ✅ | MEDIUM | RegistryEvidence |
 | USR-101 (Duplicate UID 0) | ✅ | CRITICAL | UserEvidence |
 | USR-102 (Shadowed Passwords) | ✅ | HIGH | RegistryEvidence |
 | USR-103 (Duplicate UIDs) | ✅ | HIGH | UserEvidence |
@@ -104,6 +146,17 @@
 | USR-202 (Password Reuse Policy) | ✅ | MEDIUM | RegistryEvidence |
 | USR-301 (MFA Status) | ✅ | HIGH | RegistryEvidence |
 | USR-401 (Unauthorized Sudo) | ✅ | HIGH | RegistryEvidence |
+| USR-402 (Sudo Password Enforcement) | ✅ | HIGH | RegistryEvidence |
+| USR-403 (Sudo Timestamp Timeout) | ✅ | MEDIUM | RegistryEvidence |
+| USR-404 (Sudo Logging Configuration) | ✅ | MEDIUM | RegistryEvidence |
+| USR-501 (Service Accounts With Shell) | ✅ | MEDIUM | UserEvidence |
+| USR-502 (Users in Privileged Groups) | ✅ | HIGH | UserEvidence |
+| USR-503 (Inactive User Accounts) | ✅ | MEDIUM | UserEvidence |
+| USR-504 (Non-Standard Home Dirs) | ✅ | LOW | UserEvidence |
+| USR-505 (Empty Groups) | ✅ | LOW | RegistryEvidence |
+| USR-506 (Duplicate Group Entries) | ✅ | HIGH | RegistryEvidence |
+| USR-507 (UID-GID Mismatch) | ✅ | MEDIUM | UserEvidence |
+| USR-508 (World-Readable SSH Dirs) | ✅ | HIGH | FileEvidence |
 | NET-101 (Listening Ports) | ✅ | MEDIUM | NetworkEvidence |
 | NET-201 (Promiscuous Mode) | ✅ | MEDIUM | NetworkEvidence |
 | NET-301 (Unexpected DNS) | ✅ | MEDIUM | NetworkEvidence / RegistryEvidence |
@@ -111,6 +164,32 @@
 | NET-401 (Weak Net Sysctl) | ✅ | MEDIUM | RegistryEvidence |
 | NET-402 (IPv6 Hardening) | ✅ | MEDIUM | RegistryEvidence |
 | NET-501 (DNSSEC Validation) | ✅ | MEDIUM | RegistryEvidence |
+| NET-102 (Exposed Sensitive Ports) | ✅ | MEDIUM | NetworkEvidence |
+| NET-202 (Interface Carrier) | ✅ | LOW | NetworkEvidence |
+| NET-203 (ALLMULTI Interfaces) | ✅ | MEDIUM | NetworkEvidence |
+| NET-303 (mDNS/Avahi) | ✅ | MEDIUM | RegistryEvidence |
+| NET-304 (DNS Search Domain) | ✅ | LOW | RegistryEvidence |
+| NET-601 (Untrusted CAs) | ✅ | MEDIUM | FileEvidence |
+| NET-602 (Expiring Certs) | ✅ | MEDIUM | FileEvidence |
+| NET-603 (Cert Store Integrity) | ✅ | LOW | FileEvidence |
+| NET-104 (Admin Ports Exposed) | ✅ | HIGH | NetworkEvidence |
+| NET-205 (Loopback Status) | ✅ | MEDIUM | NetworkEvidence |
+| NET-504 (Wireless Interfaces) | ✅ | MEDIUM | NetworkEvidence |
+| NET-505 (Ephemeral Ports) | ✅ | MEDIUM | NetworkEvidence |
+| NET-604 (Single DNS) | ✅ | LOW | RegistryEvidence |
+| NET-605 (No DNS) | ✅ | MEDIUM | RegistryEvidence |
+| NET-606 (SSH Default Port) | ✅ | LOW | NetworkEvidence |
+| NET-607 (Down Interfaces) | ✅ | LOW | NetworkEvidence |
+| NET-701 (Listening on All Interfaces) | ✅ | MEDIUM | NetworkEvidence |
+| NET-702 (World-Writable UNIX Sockets) | ✅ | HIGH | NetworkEvidence |
+| NET-703 (Loopback-Only Services) | ✅ | LOW | NetworkEvidence |
+| NET-704 (Exposed UDP Services) | ✅ | MEDIUM | NetworkEvidence |
+| NET-705 (Non-Root Privileged Ports) | ✅ | HIGH | NetworkEvidence |
+| NET-706 (TIME_WAIT Connections) | ✅ | LOW | RegistryEvidence |
+| NET-707 (Duplicate Listening Ports) | ✅ | MEDIUM | RegistryEvidence |
+| NET-708 (Ephemeral Port Range) | ✅ | LOW | RegistryEvidence |
+| NET-709 (Promiscuous Interfaces) | ✅ | HIGH | RegistryEvidence |
+| NET-710 (DNS Config Mismatch) | ✅ | MEDIUM | RegistryEvidence |
 | PKG-101 (Unnecessary Pkgs) | ✅ | MEDIUM | PackageEvidence |
 | PKG-201 (Modified Files) | ✅ | MEDIUM | CommandEvidence |
 | PKG-202 (Broken Signatures) | ✅ | HIGH | RegistryEvidence / CommandEvidence |
@@ -120,8 +199,40 @@
 | PKG-302 (Expired Keys) | ✅ | MEDIUM | RegistryEvidence |
 | PKG-401 (Known CVEs) | ✅ | HIGH | PackageEvidence |
 | PKG-402 (Pending Updates) | ✅ | HIGH | PackageEvidence |
+| PKG-102 (HTTP Repos) | ✅ | MEDIUM | RegistryEvidence |
+| PKG-103 (Source Repos) | ✅ | LOW | RegistryEvidence |
+| PKG-203 (Third-Party Repos) | ✅ | MEDIUM | RegistryEvidence |
+| PKG-303 (Held Packages) | ✅ | LOW | RegistryEvidence |
+| PKG-304 (Outdated Kernel) | ✅ | MEDIUM | RegistryEvidence |
+| PKG-403 (Auto-Removable) | ✅ | LOW | RegistryEvidence |
+| PKG-501 (Many Third-Party Repos) | ✅ | MEDIUM | RegistryEvidence |
+| PKG-502 (PM Integrity) | ✅ | MEDIUM | RegistryEvidence |
+| PKG-601 (Missing Security Pkgs) | ✅ | MEDIUM | RegistryEvidence |
+| PKG-602 (Obsolete Kernels) | ✅ | MEDIUM | RegistryEvidence |
+| PKG-603 (Development Pkgs) | ✅ | LOW | PackageEvidence |
+| PKG-604 (Auto-Removable Pkgs) | ✅ | LOW | RegistryEvidence |
+| PKG-605 (Duplicate Repos) | ✅ | MEDIUM | RegistryEvidence |
+| PKG-606 (Unused Snap Pkgs) | ✅ | LOW | RegistryEvidence |
+| PKG-607 (Large Pkgs) | ✅ | LOW | PackageEvidence |
+| PKG-608 (Repo Consistency) | ✅ | MEDIUM | RegistryEvidence |
 | PRM-101 (SUID Binaries) | ✅ | HIGH | FileEvidence |
 | PRM-201 (World-Writable) | ✅ | HIGH | FileEvidence |
+| PRM-301 (SGID Binaries) | ✅ | MEDIUM | FileEvidence |
+| PRM-302 (Dangerous Capabilities) | ✅ | HIGH | FileEvidence |
+| PRM-303 (Missing Sticky Bit) | ✅ | MEDIUM | FileEvidence |
+| PRM-304 (World-Writable PATH Executables) | ✅ | CRITICAL | FileEvidence |
+| PRM-305 (Setuid Shell Scripts) | ✅ | HIGH | FileEvidence |
+| PRM-306 (Non-Root Setuid Ownership) | ✅ | MEDIUM | FileEvidence |
+| PRM-307 (Unexpected Capabilities) | ✅ | MEDIUM | FileEvidence |
+| PRM-308 (World-Writable Setuid Files) | ✅ | CRITICAL | FileEvidence |
+| PRM-401 (Group-Writable SUID/SGID) | ✅ | HIGH | FileEvidence |
+| PRM-402 (SGID on World-Writable Dirs) | ✅ | HIGH | FileEvidence |
+| PRM-403 (SUID Files with Capabilities) | ✅ | MEDIUM | FileEvidence |
+| PRM-404 (Weak Default Umask) | ✅ | MEDIUM | RegistryEvidence |
+| PRM-405 (Critical Directory Ownership) | ✅ | HIGH | FileEvidence |
+| PRM-406 (SUID/SGID Without Execute) | ✅ | MEDIUM | FileEvidence |
+| PRM-407 (SGID on Non-Executable Files) | ✅ | LOW | FileEvidence |
+| PRM-408 (Dangerous Capability Combos) | ✅ | HIGH | FileEvidence |
 | FS-101 (Unexpected Files in /etc) | ✅ | MEDIUM | FileEvidence |
 | FS-102 (Unexpected PATH Executables) | ✅ | MEDIUM | FileEvidence |
 | FS-201 (Hidden World-Writable Files) | ✅ | MEDIUM | FileEvidence |
@@ -132,19 +243,82 @@
 | FS-402 (World-Writable Directories) | ✅ | MEDIUM | FileEvidence |
 | FS-403 (Orphaned Files) | ✅ | MEDIUM | FileEvidence |
 | FS-501 (Mount Option Gaps) | ✅ | MEDIUM | RegistryEvidence |
+| FS-601 (Sensitive File Permissions) | ✅ | HIGH | FileEvidence |
+| FS-602 (Home Directory Permissions) | ✅ | MEDIUM | FileEvidence |
+| FS-603 (Sticky Bit on World-Writable Dirs) | ✅ | MEDIUM | FileEvidence |
+| FS-604 (Temp Directory Mount Security) | ✅ | HIGH | RegistryEvidence |
+| FS-605 (Filesystem Space Exhaustion) | ✅ | MEDIUM | RegistryEvidence |
+| FS-606 (Dot-File Permission Hijacking) | ✅ | HIGH | FileEvidence |
+| FS-607 (System Binary Root Ownership) | ✅ | HIGH | FileEvidence |
+| FS-608 (World-Writable Cron/Script Dirs) | ✅ | HIGH | FileEvidence |
 | BOOT-101 (Secure Boot) | ✅ | HIGH | RegistryEvidence |
 | BOOT-201 (Kernel Lockdown) | ✅ | MEDIUM | RegistryEvidence |
 | BOOT-301 (EFI Integrity) | ✅ | HIGH | RegistryEvidence / FileEvidence |
 | BOOT-401 (GRUB Password) | ✅ | HIGH | RegistryEvidence |
 | BOOT-501 (Unsigned Kernels) | ✅ | HIGH | FileEvidence |
+| BOOT-601 (SBAT Status) | ✅ | HIGH | RegistryEvidence |
+| BOOT-602 (Kernel Image Count) | ✅ | MEDIUM | RegistryEvidence |
+| BOOT-603 (Latest Kernel Running) | ✅ | MEDIUM | RegistryEvidence |
+| BOOT-604 (EFI Boot Entry Changes) | ✅ | HIGH | FileEvidence |
+| BOOT-605 (Kernel Lockdown Mode) | ✅ | MEDIUM | RegistryEvidence |
+| BOOT-606 (GRUB Config Permissions) | ✅ | HIGH | FileEvidence |
+| BOOT-607 (Boot Partition Mount) | ✅ | MEDIUM | RegistryEvidence |
+| BOOT-608 (Initramfs Presence) | ✅ | MEDIUM | FileEvidence |
 | CLD-101 (Cloud Metadata Exposure) | ✅ | HIGH | RegistryEvidence |
 | CLD-102 (IMDSv2 Enforcement) | ✅ | MEDIUM | RegistryEvidence |
 | CLD-201 (Cloud Storage Exposure) | ✅ | MEDIUM | RegistryEvidence |
 | CLD-301 (Cloud IAM Credentials) | ✅ | HIGH | RegistryEvidence |
 | CLD-401 (Cloud Agent Health) | ✅ | MEDIUM | RegistryEvidence |
 | CLD-501 (K8s Node Security) | ✅ | HIGH | RegistryEvidence |
+| CLD-502 (Creds in Env) | ✅ | HIGH | RegistryEvidence |
+| CLD-503 (Kubelet Anon Auth) | ✅ | HIGH | RegistryEvidence |
+| CLD-504 (Kubelet Read-Only Port) | ✅ | MEDIUM | RegistryEvidence |
+| CLD-505 (Kubelet Seccomp) | ✅ | MEDIUM | RegistryEvidence |
+| CLD-506 (Kubelet Kernel Prot) | ✅ | MEDIUM | RegistryEvidence |
+| CLD-507 (Cloud Provider Info) | ✅ | LOW | RegistryEvidence |
+| CLD-508 (K8s Secrets on Node) | ✅ | HIGH | RegistryEvidence |
+| CLD-509 (Multi-Cloud Creds) | ✅ | MEDIUM | RegistryEvidence |
+| CLD-601 (Cloud CLI Tools) | ✅ | MEDIUM | RegistryEvidence |
+| CLD-602 (Cloud Env Credentials) | ✅ | CRITICAL | RegistryEvidence |
+| CLD-603 (Cloud Metadata Service) | ✅ | HIGH | RegistryEvidence |
+| CLD-604 (Cloud Storage Tools) | ✅ | MEDIUM | RegistryEvidence |
+| CLD-605 (Cloud Agent Health) | ✅ | MEDIUM | RegistryEvidence |
+| CLD-606 (Kubelet Security) | ✅ | HIGH | RegistryEvidence |
 | CMP-101 (Ubuntu Support) | ✅ | MEDIUM | RegistryEvidence |
+| CMP-102 (Login Banner) | ✅ | LOW | FileEvidence |
+| CMP-103 (Separate Partitions) | ✅ | MEDIUM | RegistryEvidence |
+| CMP-104 (Mount Options) | ✅ | MEDIUM | RegistryEvidence |
+| CMP-105 (Time Sync) | ✅ | HIGH | RegistryEvidence |
+| CMP-106 (File Integrity Tool) | ✅ | MEDIUM | RegistryEvidence |
+| CMP-107 (GRUB Password) | ✅ | HIGH | FileEvidence |
+| CMP-108 (Root TTY) | ✅ | MEDIUM | FileEvidence |
+| CMP-109 (Auditd Service) | ✅ | HIGH | RegistryEvidence |
+| CMP-201 (Legacy Network Services) | ✅ | HIGH | RegistryEvidence |
+| CMP-202 (X Window System) | ✅ | MEDIUM | RegistryEvidence |
+| CMP-203 (Avahi/mDNS Service) | ✅ | MEDIUM | RegistryEvidence |
+| CMP-204 (CUPS Print Service) | ✅ | MEDIUM | RegistryEvidence |
+| CMP-205 (DHCP Client) | ✅ | MEDIUM | RegistryEvidence |
+| CMP-206 (NFS Services) | ✅ | HIGH | RegistryEvidence |
+| CMP-207 (Rsync Service) | ✅ | MEDIUM | RegistryEvidence |
+| CMP-208 (SMTP Configuration) | ✅ | MEDIUM | RegistryEvidence |
+| CMP-209 (Web Server) | ✅ | MEDIUM | RegistryEvidence |
+| CMP-210 (Cron Permissions) | ✅ | MEDIUM | FileEvidence |
+| CMP-211 (SSH Compliance) | ✅ | HIGH | FileEvidence |
 | COM-101 (Bad Processes) | ✅ | HIGH | ProcessEvidence |
+| COM-201 (Suspicious Binary Location) | ✅ | HIGH | ProcessEvidence |
+| COM-202 (Malicious Process Names) | ✅ | HIGH | ProcessEvidence |
+| COM-203 (Anomalous PPID) | ✅ | MEDIUM | ProcessEvidence |
+| COM-204 (World-Writable Binary) | ✅ | HIGH | ProcessEvidence |
+| COM-205 (Suspicious Cmdline) | ✅ | HIGH | ProcessEvidence |
+| COM-206 (Misleading Names) | ✅ | MEDIUM | ProcessEvidence |
+| COM-207 (Unexpected Root Process) | ✅ | MEDIUM | ProcessEvidence |
+| COM-208 (High Memory Usage) | ✅ | MEDIUM | ProcessEvidence |
+| COM-301 (Suspicious Connections) | ✅ | HIGH | ProcessEvidence |
+| COM-302 (Reverse Shell Detection) | ✅ | CRITICAL | ProcessEvidence |
+| COM-303 (Unusual Outbound) | ✅ | MEDIUM | ProcessEvidence |
+| COM-304 (High Memory Detection) | ✅ | MEDIUM | ProcessEvidence |
+| COM-305 (Hidden Process Detection) | ✅ | CRITICAL | ProcessEvidence |
+| COM-306 (Anomalous Process Names) | ✅ | HIGH | ProcessEvidence |
 | CTN-101 (Docker Socket) | ✅ | HIGH | FileEvidence |
 | CTN-102 (Docker TCP Exposure) | ✅ | CRITICAL | NetworkEvidence |
 | CTN-201 (Privileged Containers) | ✅ | CRITICAL | RegistryEvidence |
@@ -154,7 +328,24 @@
 | CTN-301 (Root Containers) | ✅ | HIGH | RegistryEvidence |
 | CTN-401 (Old Images) | ✅ | MEDIUM | RegistryEvidence |
 | CTN-402 (Unsigned Images) | ✅ | MEDIUM | RegistryEvidence |
-| FOR-101 (Audit Logs) | ✅ | MEDIUM | FileEvidence |
+| CTN-303 (Dangerous Caps) | ✅ | HIGH | RegistryEvidence |
+| CTN-304 (Missing Security Opts) | ✅ | MEDIUM | RegistryEvidence |
+| CTN-305 (Writable RootFS) | ✅ | MEDIUM | RegistryEvidence |
+| CTN-306 (Host IPC) | ✅ | HIGH | RegistryEvidence |
+| CTN-307 (Exposed Ports) | ✅ | MEDIUM | RegistryEvidence |
+| CTN-501 (Socket Exposure) | ✅ | HIGH | FileEvidence |
+| CTN-502 (Multiple Runtimes) | ✅ | LOW | RegistryEvidence |
+| CTN-601 (Restart Loop) | ✅ | MEDIUM | RegistryEvidence |
+| CTN-701 (Added Capabilities) | ✅ | HIGH | RegistryEvidence |
+| CTN-702 (Security Opts Dropped) | ✅ | HIGH | RegistryEvidence |
+| CTN-703 (Latest Tag) | ✅ | MEDIUM | RegistryEvidence |
+| CTN-704 (Long-Running Containers) | ✅ | LOW | RegistryEvidence |
+| CTN-705 (Excessive Bind Mounts) | ✅ | MEDIUM | RegistryEvidence |
+| CTN-706 (No User Namespace) | ✅ | HIGH | RegistryEvidence |
+| CTN-707 (Restart Policy) | ✅ | MEDIUM | RegistryEvidence |
+| FOR-101 (Audit Log Availability) | ✅ | MEDIUM | FileEvidence |
+| FOR-201 (Shell History Audit) | ✅ | MEDIUM | FileEvidence |
+| FOR-301 (Forensic Artifact Exposure) | ✅ | MEDIUM | FileEvidence |
 | LOG-101 (Journal Max Size) | ✅ | MEDIUM | RegistryEvidence |
 | LOG-201 (Log Rotation) | ✅ | MEDIUM | FileEvidence / RegistryEvidence |
 | LOG-301 (Log Tamper Detection) | ✅ | HIGH | LogEvidence |
@@ -163,6 +354,15 @@
 | LOG-402 (SSH Failures) | ✅ | HIGH | RegistryEvidence |
 | LOG-501 (Audit Rule Gaps) | ✅ | MEDIUM | RegistryEvidence |
 | LOG-502 (Audit Log Exhaustion) | ✅ | MEDIUM | FileEvidence / RegistryEvidence |
+| LOG-503 (Auditd MITRE ATT&CK Coverage) | ✅ | HIGH | LogEvidence |
+| LOG-601 (Journald Compression) | ✅ | LOW | RegistryEvidence |
+| LOG-602 (Journald Log Forwarding) | ✅ | MEDIUM | RegistryEvidence |
+| LOG-603 (Journald Sync Interval) | ✅ | LOW | RegistryEvidence |
+| LOG-604 (Journald Max File Size) | ✅ | MEDIUM | RegistryEvidence |
+| LOG-605 (Journald Keep Free Space) | ✅ | MEDIUM | RegistryEvidence |
+| LOG-606 (Journald Runtime-Only Logging) | ✅ | HIGH | RegistryEvidence |
+| LOG-607 (Log Retention Freshness) | ✅ | MEDIUM | RegistryEvidence |
+| LOG-608 (Journald Log File Count) | ✅ | LOW | RegistryEvidence |
 | PER-201 (Unauth Services) | ✅ | HIGH | FileEvidence |
 | SEC-101 (AppArmor) | ✅ | HIGH | FileEvidence |
 | SECR-101 (AWS Keys) | ✅ | CRITICAL | FileEvidence |
@@ -175,6 +375,14 @@
 | SECR-401 (DB Credentials) | ✅ | CRITICAL | FileEvidence |
 | SECR-501 (Expired Certs) | ✅ | MEDIUM | FileEvidence |
 | SECR-502 (Self-Signed Certs) | ✅ | MEDIUM | FileEvidence |
+| SECR-601 (GitLab Token Detection) | ✅ | CRITICAL | FileEvidence |
+| SECR-602 (Slack Token Detection) | ✅ | CRITICAL | FileEvidence |
+| SECR-603 (NPM Token Detection) | ✅ | CRITICAL | FileEvidence |
+| SECR-604 (Azure DevOps Credential) | ✅ | HIGH | FileEvidence |
+| SECR-605 (Docker Credential) | ✅ | CRITICAL | FileEvidence |
+| SECR-606 (Stripe API Key) | ✅ | CRITICAL | FileEvidence |
+| SECR-607 (Twilio Credential) | ✅ | CRITICAL | FileEvidence |
+| SECR-608 (Password in Code) | ✅ | HIGH | FileEvidence |
 | SVC-101 (Insecure Svcs) | ✅ | HIGH | FileEvidence |
 | SVC-102 (Unexpected Enabled Svcs) | ✅ | MEDIUM | RegistryEvidence |
 | SVC-201 (Services Running as Root) | ✅ | MEDIUM | ProcessEvidence |
@@ -183,9 +391,51 @@
 | SVC-302 (Unexpected Listening Svcs) | ✅ | MEDIUM | NetworkEvidence |
 | SVC-401 (Recently Installed Svcs) | ✅ | MEDIUM | FileEvidence |
 | SVC-402 (Modified Systemd Units) | ✅ | HIGH | FileEvidence |
+| SVC-103 (Missing Hardening) | ✅ | MEDIUM | FileEvidence |
+| SVC-203 (Missing ExecStart Binary) | ✅ | HIGH | RegistryEvidence |
+| SVC-303 (Orphaned Timer Units) | ✅ | MEDIUM | RegistryEvidence |
+| SVC-501 (World-Writable ExecStart) | ✅ | CRITICAL | FileEvidence |
+| SVC-502 (Suspicious Descriptions) | ✅ | MEDIUM | RegistryEvidence |
+| SVC-503 (Stopped Enabled Services) | ✅ | LOW | RegistryEvidence |
+| SVC-504 (Masked With Unit File) | ✅ | LOW | FileEvidence |
+| SVC-601 (Service Load Failures) | ✅ | HIGH | RegistryEvidence |
+| SVC-602 (Socket Units Not Running) | ✅ | MEDIUM | RegistryEvidence |
+| SVC-603 (Timer-Service Mismatch) | ✅ | MEDIUM | RegistryEvidence |
+| SVC-604 (Unit File Ownership) | ✅ | HIGH | FileEvidence |
+| SVC-605 (World-Writable Unit Files) | ✅ | CRITICAL | FileEvidence |
+| SVC-606 (Static Services Not Running) | ✅ | MEDIUM | RegistryEvidence |
+| SVC-607 (Duplicate Unit Files) | ✅ | MEDIUM | RegistryEvidence |
+| SVC-608 (Timers Without Calendar) | ✅ | LOW | RegistryEvidence |
 | FW-101 (Firewall Active) | ✅ | HIGH | CommandEvidence |
+| FW-201 (Default Policy) | ✅ | MEDIUM | RegistryEvidence |
+| FW-202 (Minimal Rules) | ✅ | MEDIUM | RegistryEvidence |
+| FW-203 (IPv6 Rules) | ✅ | MEDIUM | RegistryEvidence |
+| FW-204 (Competing Firewalls) | ✅ | LOW | RegistryEvidence |
+| FW-205 (Outgoing Policy) | ✅ | LOW | RegistryEvidence |
+| FW-206 (Logging) | ✅ | LOW | RegistryEvidence |
+| FW-207 (SSH Rate Limit) | ✅ | MEDIUM | RegistryEvidence |
+| FW-208 (Boot Persistence) | ✅ | MEDIUM | RegistryEvidence |
+| FW-209 (Firewall Boot Persistence) | ✅ | MEDIUM | CommandEvidence |
+| SEC-201 (AppArmor Complain Mode) | ✅ | MEDIUM | CommandEvidence |
+| SEC-202 (AppArmor Profile Integrity) | ✅ | MEDIUM | CommandEvidence |
+| SEC-203 (AppArmor Extra Profiles) | ✅ | LOW | RegistryEvidence |
+| SEC-204 (Seccomp Status) | ✅ | MEDIUM | RegistryEvidence |
+| SEC-205 (LSM Stacking) | ✅ | LOW | RegistryEvidence |
+| SEC-206 (AppArmor Cache Status) | ✅ | LOW | FileEvidence |
+| SEC-207 (Module Loading Restrictions) | ✅ | HIGH | RegistryEvidence |
+| SEC-208 (Unconfined Root Processes) | ✅ | HIGH | RegistryEvidence |
 | USB-101 (USB Storage Restriction) | ✅ | MEDIUM | FileEvidence |
+| USB-201 (USB Device Authorization Policy) | ✅ | MEDIUM | FileEvidence |
+| USB-301 (USBGuard Daemon Configuration) | ✅ | MEDIUM | FileEvidence |
 | PWD-101 (Password Policy Strength) | ✅ | HIGH | FileEvidence |
+| PWD-201 (Password History) | ✅ | MEDIUM | RegistryEvidence |
+| PWD-202 (Password Min Age) | ✅ | MEDIUM | RegistryEvidence |
+| PWD-203 (Password Max Age) | ✅ | HIGH | RegistryEvidence |
+| PWD-204 (Password Expiry Warning) | ✅ | LOW | RegistryEvidence |
+| PWD-301 (Account Lockout) | ✅ | HIGH | RegistryEvidence |
+| PWD-302 (Password Hashing) | ✅ | HIGH | RegistryEvidence |
+| PWD-303 (Password Quality) | ✅ | MEDIUM | RegistryEvidence |
+| PWD-304 (Default Passwords) | ✅ | CRITICAL | RegistryEvidence |
 | PER-101 (Cron Job Anomalies) | ✅ | HIGH | FileEvidence |
 | PER-102 (Anacron Job Anomalies) | ✅ | MEDIUM | FileEvidence |
 | PER-103 (At Job Anomalies) | ✅ | MEDIUM | FileEvidence |
@@ -211,6 +461,18 @@
 | PER-803 (Login/Logout Hook Persistence) | ✅ | MEDIUM | FileEvidence |
 | PER-804 (Systemd User Units) | ✅ | MEDIUM | FileEvidence |
 | PER-805 (XDG Autostart Persistence) | ✅ | MEDIUM | FileEvidence |
+| PER-901 (Persistence Directory Audit) | ✅ | MEDIUM | FileEvidence |
+| PER-902 (World-Writable Persistence) | ✅ | HIGH | FileEvidence |
+| PER-903 (Systemd Generators) | ✅ | HIGH | FileEvidence |
+| PER-904 (D-Bus Activated Services) | ✅ | MEDIUM | FileEvidence |
+| PER-905 (Polkit Rule Persistence) | ✅ | HIGH | FileEvidence |
+| PER-906 (Tmpfiles Persistence) | ✅ | MEDIUM | FileEvidence |
+| PER-907 (Module Load Persistence) | ✅ | MEDIUM | RegistryEvidence |
+| PER-908 (Extended Shell Init) | ✅ | MEDIUM | FileEvidence |
+| PER-909 (Initramfs Hook Persistence) | ✅ | MEDIUM | FileEvidence |
+| PER-910 (Library Path Config) | ✅ | HIGH | FileEvidence |
+| PER-911 (Sysctl Persistence) | ✅ | MEDIUM | FileEvidence |
+| PER-912 (User Timer Persistence) | ✅ | MEDIUM | FileEvidence |
 
 #### Reporters (3 total)
 | Reporter | Status | Features |
@@ -309,19 +571,19 @@
 | Ignore patterns | ✅ | fnmatch-based |
 | Baseline config | ✅ | Model + implementation |
 | Policy config | ✅ | PolicyEngine with YAML loading |
-| SUID allowlist | ✅ | suid_allowlist in config YAML, injected via _usaf_config key |
+| SUID allowlist | ✅ | suid_allowlist in config YAML, accessed via AuditCheck._config |
 | SUID known-safe packages | ✅ | 60+ packages auto-allowlisted (coreutils, sudo, shadow, util-linux, etc.) |
 
 #### Testing
 | Area | Tests | Lines | Notes |
 |------|-------|-------|-------|
-| Unit tests | 521 | 7,650+ | **51 test files** across all modules (organized in subdirectories) |
-| Integration tests | 107 | 2,000+ | Pipeline, scoring, reporter, checks (all 25), collectors, pipeline edge cases, **Phase 6 cloud & compliance** |
+| Unit tests | 927 | 7,650+ | **65 test files** across all modules (organized in subdirectories) |
+| Integration tests | 155 | 3,000+ | Pipeline, scoring, reporter, checks (all 25), collectors, pipeline edge cases, **Phase 6 cloud & compliance**, **new 50 check deep integration** |
 | Golden tests | ✅ | 80 | JSON and Markdown golden report snapshot tests |
-| Kernel checks | ✅ | 131 | tests/unit/checks/test_kernel_checks.py |
-| SSH checks | ✅ | 127 | tests/unit/checks/test_ssh_checks.py |
-| Network checks | ✅ | 113 | tests/unit/checks/test_network_checks.py |
-| Permission checks | ✅ | 193 | tests/unit/checks/test_permission_checks.py |
+| Kernel checks | ✅ | 186 | tests/unit/checks/test_kernel_checks.py, tests/unit/checks/test_kernel_hardening_checks.py, tests/unit/checks/test_kernel_extra_checks.py |
+| SSH checks | ✅ | 185 | tests/unit/checks/test_ssh_checks.py, tests/unit/checks/test_ssh_security_checks.py |
+| Network checks | ✅ | 168 | tests/unit/checks/test_network_checks.py, tests/unit/checks/test_network_security_checks.py, tests/unit/checks/test_network_extended_checks.py |
+| Permission checks | ✅ | 51 | tests/unit/checks/test_permission_checks.py |
 | User checks | ✅ | 156 | tests/unit/checks/test_user_checks.py |
 | Scoring engine | ✅ | 330 | tests/unit/scoring/test_scoring_engine.py |
 | Trust scoring | ✅ | 259 | tests/unit/scoring/test_trust_scoring.py |
@@ -332,15 +594,15 @@
 | Knowledge | ✅ | 216 | tests/unit/knowledge/test_knowledge_base.py |
 | Profiles | ✅ | 161 | tests/unit/profiles/test_profile_manager.py |
 | Severity | ✅ | 305 | tests/unit/severity/test_context_severity.py |
-| Compromise checks (COM-101) | ✅ | 48 | tests/unit/checks/test_compromise_checks.py |
-| Compliance checks (CMP-101) | ✅ | 55 | tests/unit/checks/test_compliance_checks.py |
-| Container checks (CTN-101) | ✅ | 56 | tests/unit/checks/test_container_checks.py |
+| Compromise checks (COM-101) | ✅ | 77 | tests/unit/checks/test_compromise_checks.py, tests/unit/checks/test_compromise_security_checks.py |
+| Compliance checks (CMP-101) | ✅ | 78 | tests/unit/checks/test_compliance_checks.py, tests/unit/checks/test_compliance_security_checks.py |
+| Container checks (CTN-101) | ✅ | 77 | tests/unit/checks/test_container_checks.py, tests/unit/checks/test_ctn_security_checks.py |
 | Forensics checks (FOR-101) | ✅ | 48 | tests/unit/checks/test_forensics_checks.py |
 | Kernel module checks (KERN-401) | ✅ | 25 | tests/unit/checks/test_krn_checks.py |
-| Package checks (PKG-101) | ✅ | 50 | tests/unit/checks/test_package_checks.py |
+| Package checks (PKG-101) | ✅ | 67 | tests/unit/checks/test_package_checks.py, tests/unit/checks/test_package_security_checks.py |
 | Persistence checks (PER-201) | ✅ | 48 | tests/unit/checks/test_persistence_checks.py |
-| Security checks (FW-101/SEC-101/USB-101) | ✅ | 94 | tests/unit/checks/test_security_checks.py |
-| Service checks (SVC-101) | ✅ | 42 | tests/unit/checks/test_service_checks.py |
+| Security checks (FW-101/SEC-101/USB-101) | ✅ | 118 | tests/unit/checks/test_security_checks.py, tests/unit/checks/test_firewall_security_checks.py |
+| Service checks (SVC-101) | ✅ | 61 | tests/unit/checks/test_service_checks.py, tests/unit/checks/test_service_security_checks.py |
 | Password policy (PWD-101) | ✅ | 60 | tests/unit/checks/test_password_policy_checks.py |
 | Cache engine | ✅ | 56 | tests/unit/test_cache.py |
 | Config loader/model | ✅ | 118 | tests/unit/test_config.py |
@@ -377,7 +639,7 @@
 | `mypy` config | ✅ | strict mode |
 | Pre-commit hooks | ✅ | ruff, mypy (0 errors ✅), trailing whitespace, YAML/TOML check |
 | CI/CD | ✅ | GitHub Actions: ruff lint+format, mypy (0 errors ✅), pytest on push/PR |
-| Versioning | ✅ | 0.7.0 — semver |
+| Versioning | ✅ | 0.23.0 — semver |
 
 ---
 
@@ -391,27 +653,27 @@ Each prefix has reserved 100-level blocks for subcategories. This prevents renum
 
 | Prefix | Range | Sub-ranges | Current |
 |--------|-------|------------|---------|
-| **SSH** | 100–999 | 100=Auth, 200=Algorithms, 300=Keys, 400=Logging, 500=Network, 600=Compliance | 3 |
-| **KERN** | 100–999 | 100=Memory, 200=Pointers, 300=Core dumps, 400=Modules/BPF, 500=FS prot, 600=Network | 4 |
-| **USR** | 100–999 | 100=Account integrity, 200=Weak creds, 300=Policy, 400=Privilege, 500=SSH keys, 600=Service accts | 9 |
-| **NET** | 100–999 | 100=Ports, 200=Interfaces, 300=DNS, 400=Kernel net, 500=Wireless, 600=TLS/Certs | 7 |
-| **PKG** | 100–999 | 100=Unnecessary, 200=Integrity, 300=Repos, 400=CVEs, 500=Held | 7 |
+| **SSH** | 100–999 | 100=Auth, 200=Algorithms, 300=Keys, 400=Logging, 500=Network, 600=Compliance | 19 |
+| **KERN** | 100–999 | 100=Memory, 200=Pointers, 300=Core dumps, 400=Modules/BPF, 500=FS prot, 600=Network | 21 |
+| **USR** | 100–999 | 100=Account integrity, 200=Weak creds, 300=Policy, 400=Privilege, 500=SSH keys, 600=Service accts | 20 |
+| **NET** | 100–999 | 100=Ports, 200=Interfaces, 300=DNS, 400=Kernel net, 500=Wireless, 600=TLS/Certs | 24 |
+| **PKG** | 100–999 | 100=Unnecessary, 200=Integrity, 300=Repos, 400=CVEs, 500=Held | 17 |
 | **FS** | 100–999 | 100=File integrity, 200=Hidden/orphan, 300=Mounts, 400=Symlinks/immutable, 500=Capabilities | 10 |
 | **BOOT** | 100–999 | 100=Secure Boot, 200=Lockdown, 300=EFI, 400=GRUB, 500=Kernel images | 5 |
-| **SVC** | 100–999 | 100=Enabled svcs, 200=Security, 300=Listening, 400=Failed, 500=Modified | 8 |
+| **SVC** | 100–999 | 100=Enabled svcs, 200=Security, 300=Listening, 400=Failed, 500=Modified | 16 |
 | **PER** | 100–999 | 100=Cron/at, 200=Systemd, 300=Shell init, 400=LD injection, 500=PAM/udev, 600=Network, 700=Package hooks, 800=Login/init | 26 |
-| **CTN** | 100–999 | 100=Socket, 200=Privileges, 300=Security, 400=Images, 500=Runtime, 600=LXC | 1 |
+| **CTN** | 100–999 | 100=Socket, 200=Privileges, 300=Security, 400=Images, 500=Runtime, 600=LXC | 18 |
 | **LOG** | 100–999 | 100=Journal, 200=Rotation, 300=Tamper, 400=Auth fail, 500=Auditd | 0 |
 | **SECR** | 100–999 | 100=Cloud, 200=Code, 300=Crypto keys, 400=DB/API, 500=Certs | 0 |
-| **FW** | 100–999 | 100=Status, 200=Rules, 300=Defaults, 400=Logging | 1 |
-| **CMP** | 100–999 | 100=Version, 200=CIS, 300=STIG, 400=Regulatory, 500=Custom | 1 |
-| **COM** | 100–999 | 100=Processes, 200=Network IOC, 300=Filesystem IOC | 1 |
-| **FOR** | 100–999 | 100=Logs, 200=Timeline, 300=Artifacts | 1 |
+| **FW** | 100–999 | 100=Status, 200=Rules, 300=Defaults, 400=Logging | 9 |
+| **CMP** | 100–999 | 100=Version, 200=CIS, 300=STIG, 400=Regulatory, 500=Custom | 11 |
+| **COM** | 100–999 | 100=Processes, 200=Network IOC, 300=Filesystem IOC | 9 |
+| **FOR** | 100–999 | 100=Logs, 200=Timeline, 300=Artifacts | 3 |
 | **SEC** | 100–999 | 100=AppArmor, 200=SELinux, 300=LSM | 1 |
-| **USB** | 100–999 | 100=Storage, 200=Devices, 300=Guard | 1 |
+| **USB** | 100–999 | 100=Storage, 200=Devices, 300=Guard | 3 |
 | **PWD** | 100–999 | 100=Policy, 200=Reuse, 300=Aging | 1 |
 | **CLD** | 100–999 | 100=AWS, 200=GCP, 300=Azure, 400=Generic | 0 |
-| **PRM** | 100–999 | 100=SUID, 200=World-writable, 300=Capabilities, 400=Ownership | 2 |
+| **PRM** | 100–999 | 100=SUID, 200=World-writable, 300=Capabilities, 400=Ownership | 10 |
 
 ### Renumbering Plan (existing → new)
 
@@ -651,6 +913,7 @@ _Secrets completed in Phase 4a above._
 | CORR-402 | Credential compromise (cloud + SSH + app creds ≥ 2 categories) | ✅ |
 | CORR-403 | Active breach (log gaps + auth failures + new/failed services) | ✅ |
 | CORR-404 | Exposed attack surface (listening ports + weak TLS + no audit/fw) | ✅ |
+| CORR-405 | Sudo privilege escalation path (no password + no timeout + no logging + ALL) | ✅ |
 
 **Exit criteria:** 34 new checks, 4 new rules. **Phase 4 complete! ✅**
 
@@ -715,7 +978,7 @@ _Secrets completed in Phase 4a above._
 
 **Goal:** Extend to cloud environments and regulatory compliance automation.
 
-#### Cloud (6 checks)
+#### Cloud (14 checks)
 | ID | Name | Depends | Status |
 |----|------|---------|--------|
 | CLD-101 | Cloud metadata service exposure | `cloud` | ✅ |
@@ -751,7 +1014,7 @@ _Secrets completed in Phase 4a above._
 | Module | Status | Details |
 |--------|--------|---------|
 | `collectors/cloud/metadata.py` | ✅ | CloudMetadataCollector with IMDS, agent, K8s, credential detection |
-| `checks/cloud/cloud_checks.py` | ✅ | 6 cloud check classes (CLD-101 to CLD-501) |
+| `checks/cloud/cloud_checks.py`, `cloud_security_checks.py` | ✅ | 14 cloud check classes (CLD-101 to CLD-509) |
 | `core/compliance/evaluator.py` | ✅ | ComplianceEvaluator: Phase 3.9 meta-evaluation across 7 frameworks |
 | `core/compliance/mappings.py` | ✅ | CIS L1/L2 Server/Desktop, STIG, PCI DSS, SOC2, HIPAA control mappings |
 | `correlation/rules.py` | ✅ | CloudCompromiseRule, ComplianceGapRule, PriorityRemediationRule |
@@ -786,27 +1049,49 @@ registered in pipeline, all tested. **Status: ✅ COMPLETE**
 
 | Layer | Current | Phase 7 | Target |
 |-------|---------|---------|--------|
-| SSH | 3 | 3 | 25 |
-| Kernel | 4 | 4 | 25 |
-| Users | 9 | 9 | 20 |
-| Network | 7 | 7 | 35 |
-| Packages | 9 | 9 | 25 |
-| Filesystem | 10 | 10 | 30 |
-| Permissions | 2 | 2 | 25 |
-| Boot | 5 | 5 | 15 |
-| Services | 8 | 8 | 30 |
-| Persistence | 26 | 26 | 40 |
-| Containers | 9 | 9 | 25 |
-| Logs & Forensics | 9 | 9 | 25 |
-| Secrets | 10 | 10 | 20 |
-| Cloud | 6 | 6 | 20 |
-| Compliance | 11 | 11 | 20 |
-| Firewall | 1 | 1 | 10 |
-| Security (AppArmor/USB) | 2 | 2 | 10 |
-| Compromise | 1 | 1 | 15 |
-| Password | 1 | 1 | 10 |
-| **Total checks** | **128** | **128** | **~450** |
+| SSH | 25 | 25 | 25 |
+| Kernel | 25 | 25 | 25 |
+| Users | 17 | 17 | 20 |
+| Network | 34 | 34 | 35 |
+| Packages | 25 | 25 | 25 |
+| Filesystem | 18 | 18 | 30 |
+| Permissions | 18 | 18 | 25 |
+| Boot | 13 | 13 | 15 |
+| Services | 23 | 23 | 30 |
+| Persistence | 38 | 38 | 40 |
+| Containers | 25 | 25 | 25 |
+| Logs & Forensics | 18 | 18 | 25 |
+| Secrets | 18 | 18 | 20 |
+| Cloud | 20 | 20 | 20 |
+| Compliance | 20 | 20 | 20 |
+| Firewall | 10 | 10 | 10 |
+| Security (AppArmor/USB) | 10 | 10 | 10 |
+| Compromise | 15 | 15 | 15 |
+| Password | 9 | 9 | 10 |
+| **Total checks** | **382** | **382** | **~450** |
 | **Correlation rules** | 19 | 19 | **50+** |
+
+---
+
+### v0.6.1 — False Positive Reduction & Noise Fixes (2026-07-12)
+
+**P0 — Bug fixes (false positives identified by real-world audit validation):**
+- **COM-306**: Kernel thread detection fixed — 50 false positives eliminated. Real kernel threads (kthreadd, kworker/*) are now correctly identified by checking for empty binary path and ppid==2 before flagging as "masquerading"
+- **BOOT-604**: EFI boot entry allowlist expanded — added `mmx64` (MOK manager) and `fbx64` (fallback bootloader) to skip list. These are standard `shim-signed` package files, not bootkits
+- **FS-402**: World-writable directory check now skips symlinks (always 0777). `/etc/xdg/systemd/user -> ../../systemd/user` was incorrectly flagged
+- **FS-101**: Added `.pwd.lock` and `.resolv.conf.systemd-resolved.bak` to known `/etc` files. These are standard system-generated files
+- **SECR-301**: DSA SSH key detection changed from `endswith("dsa_key")` to `endswith("_dsa_key")` — was incorrectly matching ECDSA keys (e.g., `ssh_host_ecdsa_key` ends with "dsa_key")
+- **BOOT-601**: SBAT variable detection changed from case-sensitive `glob("SBAT*")` to case-insensitive `iterdir()` + `"sbat" in name.lower()`. Systems with `SbatLevelRT-*` variables were missed
+- **BOOT-401**: GRUB check now distinguishes "file not found" from "permission denied". When `/boot/grub/grub.cfg` exists but is unreadable (0600, root-only), the finding now states the actual issue
+
+**P1 — Reporting quality:**
+- **CMP-201**: Separated legacy services into SERVER_PACKAGES vs CLIENT_PACKAGES. Client-only packages (telnet, rsh-client, tftp-hpa) now get LOW confidence (fp=0.6) instead of HIGH. Server packages get HIGH confidence
+- **PWD-203**: Password max age message now shows actual value (e.g., "99999 (274+ years)") instead of misleading "Password never expires"
+
+**Infrastructure:**
+- **Tests**: 1761 total, all passing
+- **False positive rate**: Reduced from ~12%+ to ~3% based on real-world audit validation
+- **Version**: 0.6.1
 
 ---
 
@@ -907,16 +1192,16 @@ src/usaf/
 
 | Metric | Current | Short-term (P6) | Medium-term (P7) | Long-term |
 |--------|---------|-----------------|-------------------|-----------|
-| Checks | 122 | 135 | 135 | **450+** |
+| Checks | 240 | 135 | 135 | **450+** |
 | Collectors | 25 | 28 | 30 | 35 |
 | Correlation rules | 20 (16 Python + 4 YAML) | 30 | 40 | **50+** |
 | Attack scenarios | **8** | 12 | 16 | 20+ |
-| Unit tests | 1020+ | 1,500+ | 2,000+ | 3,000+ |
+| Unit tests | 1761 | 1,800+ | 2,000+ | 3,000+ |
 | Integration tests | 93+ | 150+ | 300+ | 500+ |
 | Test coverage (stmt) | 85% | 88% | 90% | 92%+ |
 | Test coverage (branch) | 82% | 85% | 88% | 90%+ |
 | mypy --strict | 0 errors | 0 errors | 0 errors | 0 errors |
-| False positive rate | ~2% | <3% | <3% | <2% |
+| False positive rate | ~3% | <3% | <2% | <1% |
 | Attack scenario coverage | 8 | 12 | 16 | 20+ |
 | Correlation engine maturity | **Full chain** | Temporal + YAML | Temporal + YAML | Full kill chain |
 
@@ -974,7 +1259,64 @@ src/usaf/
 **Infrastructure:**
 - **Tests**: 1022 total, all passing
 - **mypy --strict**: 0 new errors (pre-existing yaml-stubs/runner attr errors unchanged)
-- **Version**: 0.6.0
+- **Version**: 0.6.1
+
+---
+
+### v0.23.0 — Phase P1: Framework Hardening (2026-07-12)
+
+**Phase P1 — 3 P3 framework hardening tasks:**
+
+**P1.1 — Fix `datetime.utcnow()` deprecation warnings:**
+- `terminal.py:261`: Changed `datetime.datetime.utcnow()` → `datetime.datetime.now(datetime.UTC)`
+- `markdown.py:190`: Changed `datetime.utcnow()` → `datetime.now(UTC)` with `UTC` import
+- Eliminates 2 DeprecationWarning instances; Python 3.13 `datetime.UTC` available
+
+**P1.2 — Enable drift detection by default in config:**
+- `BaselineConfig.compare` default changed from `False` → `True`
+- `BaselineConfig.fail_on_drift` wired into CLI: exits with code 1 on drift
+- `BaselineConfig.auto_baseline` wired into CLI: auto-creates baseline if missing
+- `--baseline-diff` CLI flag still works; config `compare` flag is checked first
+- All 3 fields were previously defined in the model but dead (never read anywhere)
+
+**P1.3 — Default config with high-FP checks pre-limited:**
+- Added 8 `plugins.overrides.max_findings` entries to shipped `usaf.yaml`:
+  - `PRM-201` → 100, `FS-601` → 100, `FS-101` → 100, `FS-102` → 100
+  - `PKG-101` → 50, `PER-101` → 50, `NET-101` → 50, `SVC-102` → 50
+- Targets checks WITHOUT internal `max_findings` that can produce large volumes
+
+**Infrastructure:**
+- **Tests**: 1942 passed, 0 failed, 0 deprecation warnings (down from 14)
+- **mypy --strict**: 0 new errors (24 pre-existing unchanged)
+- **ruff**: 0 new errors (pre-existing PLR0911/T201/E402/F401 unchanged)
+- **Version**: 0.23.0
+
+---
+
+### v0.22.0 — Phase P0 Completion & Architectural Hardening (2026-07-12)
+
+**Phase P0 — Architectural Violations Resolved:**
+- **P0.1 (SSH Collector)**: Verified SSH checks (`SSH-101/102/201` and `SSH-103..606`) already use the `ssh_config` collector — no checks directly parse `/etc/ssh/sshd_config`. Architecture rule "checks never collect" is enforced.
+- **P0.2 (Config Access)**: Verified `_usaf_config` backdoor is fully removed from source code. Config is properly passed via `AuditCheck.evaluate(collectors, config)` type-safe API.
+
+**Dead code elimination:**
+- `SeverityConfig` (defined in `config/model.py`) was defined but never consumed by the scoring engine. Now wired into `ScoringEngine.__init__(severity_config=...)` with the same defaults. Users can override severity score weights via `usaf.yaml`.
+- `PluginOverride.severity` type fixed from `str` to `Severity` enum.
+
+**Version alignment:**
+- `__about__.py`: 0.6.0 → 0.22.0 (synced with `pyproject.toml`)
+- `STATE.md`: Versioning line updated to 0.22.0
+- `STATE.md`: `_usaf_config` documentation updated
+
+**Test cleanup:**
+- Removed `_usaf_config` dead data from `test_phase2_integration.py` mock fixtures
+
+**Infrastructure:**
+- Added `ClassVar` annotations to `ScoringEngine.SEVERITY_WEIGHTS` and `CATEGORY_WEIGHTS` (ruff RUF012 fix)
+- **Tests**: 1942 passed, 0 failed, 14 warnings (pre-existing `datetime.utcnow()` deprecation)
+- **mypy --strict**: 0 new errors (24 pre-existing errors unchanged)
+- **ruff**: 0 new errors (pre-existing PLR0911/E402/F401 unchanged)
+- **False positive rate**: Pre-existing ~3% (no regressions)
 
 ---
 

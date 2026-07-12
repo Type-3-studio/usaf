@@ -245,13 +245,11 @@ class UnexpectedSUIDCheck(AuditCheck):
 
         return findings
 
-    def _load_config_allowlist(self, collectors: dict[str, Any]) -> set[str]:
+    def _load_config_allowlist(self, collectors: dict[str, Any] | None = None) -> set[str]:
         """Load user-defined SUID allowlist from configuration."""
-        config_data = collectors.get("_usaf_config", {})
-        raw_list = config_data.get("suid_allowlist", [])
-        if isinstance(raw_list, list):
-            return {str(p) for p in raw_list if p}
-        return set()
+        if self._config is None:
+            return set()
+        return {str(p) for p in self._config.suid_allowlist if p}
 
     def _build_description(self, path_str: str, owning_package: str | None) -> str:
         if owning_package and owning_package in self._known_suid_packages:

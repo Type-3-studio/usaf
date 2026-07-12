@@ -99,4 +99,5 @@ class CheckCategory(str, Enum):
     PROCESSES = "PROCESSES"
     FILESYSTEM = "FILESYSTEM"
     CRYPTOGRAPHY = "CRYPTOGRAPHY"
+    CLOUD = "CLOUD"
     GENERAL = "GENERAL"

@@ -1,0 +1,33 @@
+id: CLD-301
+title: Cloud IAM Credential Audit
+threat: Long-lived cloud IAM credentials stored on the filesystem that can be stolen by an attacker with local access
+exploit: An attacker who gains local access can read ~/.aws/credentials, GCP service account JSON keys, or Azure profile files and extract cloud API credentials. These long-lived credentials can be used from any network to access cloud resources
+impact: Persistent cloud account compromise that persists even after instance remediation
+fix: "1. Remove long-lived credentials: 'rm ~/.aws/credentials'. 2. Use IAM roles for EC2/GCE/Azure VMs. 3. Rotate all exposed credentials immediately"
+breakage: Removal of credentials breaks CLI tools and scripts that depend on static credentials
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H (8.8)"
+affected_versions:
+  - "All cloud environments with static credentials"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Development and CI/CD environments where static credentials are required"
+  - "Service accounts with restricted permissions"
+related_findings:
+  - "CLD-101"
+  - "CLD-102"
+  - "SECR-101"
+  - "SECR-102"
+  - "SECR-401"
+  - "CORR-601"
+severity_override: null
+tags:
+  - "cloud"
+  - "iam"
+  - "credentials"
+  - "aws"
+  - "gcp"
+  - "azure"
+  - "audit"
+mitre_mappings:
+  - "T1552.005"
+  - "T1525"

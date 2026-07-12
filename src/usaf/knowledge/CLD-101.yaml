@@ -1,0 +1,27 @@
+id: CLD-101
+title: Cloud Metadata Service Exposure
+threat: The cloud instance metadata service (IMDS) is accessible, enabling SSRF-based credential theft
+exploit: An attacker with local access or SSRF capability can query http://169.254.169.254/latest/meta-data/ to retrieve IAM credentials, instance identity documents, and user-data
+impact: Complete cloud account compromise. Stolen IAM credentials can be used from any network to access cloud resources, exfiltrate data, and launch further attacks
+fix: "On AWS: 'aws ec2 modify-instance-metadata-options --instance-id <id> --http-tokens required'. On GCP: 'gcloud compute instances add-metadata <name> --metadata google-compute-enable-virtio-rng=0'. On Azure: enable managed identities and disable IMDS"
+breakage: IMDSv2 enforcement may break tools that use IMDSv1 for credential retrieval
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H (8.8)"
+affected_versions:
+  - "All cloud environments"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Instances using IMDSv1 intentionally for legacy tooling"
+related_findings:
+  - "CLD-102"
+  - "CLD-301"
+  - "CORR-601"
+severity_override: null
+tags:
+  - "cloud"
+  - "metadata"
+  - "imds"
+  - "ssrf"
+  - "credential-theft"
+mitre_mappings:
+  - "T1552.005"
+  - "T1613"

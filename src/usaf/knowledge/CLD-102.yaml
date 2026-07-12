@@ -1,0 +1,25 @@
+id: CLD-102
+title: IMDSv1 vs IMDSv2 Enforcement
+threat: IMDSv2 (session-oriented) is not enforced, leaving the metadata service vulnerable to SSRF-based credential theft
+exploit: An attacker with local access or SSRF capability can bypass the IMDSv2 PUT requirement by falling back to IMDSv1, which does not require session tokens. This is a well-known AWS security hardening gap
+impact: Critical cloud credential theft via unauthenticated metadata service access
+fix: "aws ec2 modify-instance-metadata-options --instance-id <id> --http-tokens required --http-put-response-hop-limit 2"
+breakage: Tools using IMDSv1 directly may need updates to support IMDSv2
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H (8.8)"
+affected_versions:
+  - "AWS EC2 instances"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Instances that require IMDSv1 for legacy software compatibility"
+related_findings:
+  - "CLD-101"
+  - "CLD-301"
+severity_override: null
+tags:
+  - "cloud"
+  - "aws"
+  - "imds"
+  - "imdsv2"
+  - "hardening"
+mitre_mappings:
+  - "T1552.005"

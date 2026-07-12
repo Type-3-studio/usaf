@@ -1,0 +1,29 @@
+id: CLD-201
+title: Public Cloud Storage Exposure
+threat: Cloud storage CLI tools present on the system enable unauthorized access to cloud storage buckets
+exploit: An attacker with local access can use aws s3, gcloud storage, or az storage commands to list, read, and exfiltrate data from misconfigured cloud storage buckets with overly permissive IAM policies
+impact: Data exfiltration from S3, GCS, or Azure Blob Storage. Potential public exposure of sensitive data
+fix: "1. Remove unnecessary CLI tools: 'apt purge awscli'. 2. Audit IAM policies. 3. Enable S3 Block Public Access"
+breakage: Removal of CLI tools may affect legitimate cloud operations scripts
+cvss: "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N (6.5)"
+affected_versions:
+  - "Systems with cloud CLI tools installed"
+false_positive_rate: 0.3
+known_exceptions:
+  - "DevOps/admin workstations requiring cloud CLI access"
+  - "CI/CD runners that deploy cloud infrastructure"
+related_findings:
+  - "CLD-301"
+  - "SECR-101"
+  - "SECR-102"
+severity_override: null
+tags:
+  - "cloud"
+  - "storage"
+  - "s3"
+  - "gcs"
+  - "blob-storage"
+  - "data-exposure"
+mitre_mappings:
+  - "T1530"
+  - "T1525"

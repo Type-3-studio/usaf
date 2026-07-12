@@ -1,0 +1,26 @@
+id: CMP-401
+title: PCI DSS 4.0 Compliance
+threat: Non-compliance with PCI DSS 4.0 (Payment Card Industry Data Security Standard)
+exploit: PCI DSS controls protect cardholder data. Failure indicates systems processing payment data are not adequately secured
+impact: Inability to process credit card payments. Fines, penalties, and increased audit scrutiny. Risk of cardholder data breach
+fix: "Address all failing PCI DSS 4.0 controls. Focus on firewall, encryption, access control, and audit logging requirements"
+breakage: PCI DSS requirements may restrict system configurations
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Systems processing payment card data"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Systems not in PCI DSS scope"
+related_findings:
+  - "CMP-201"
+  - "CMP-402"
+  - "CMP-403"
+severity_override: null
+tags:
+  - "compliance"
+  - "pci-dss"
+  - "payment"
+  - "cardholder-data"
+  - "benchmark"
+mitre_mappings:
+  - "T1078"

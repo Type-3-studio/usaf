@@ -1,0 +1,25 @@
+id: CMP-301
+title: STIG Ubuntu 22.04 Compliance
+threat: Non-compliance with STIG (Security Technical Implementation Guide) for Ubuntu 22.04
+exploit: STIG controls represent DoD-mandated security requirements. Failure indicates non-compliance with military-grade security standards
+impact: Inability to deploy in DoD environments. Reduced security posture against advanced persistent threats
+fix: "Address all failing STIG controls. STIG compliance requires strict configuration management"
+breakage: STIG compliance may significantly restrict system functionality
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 22.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Systems not subject to DoD security requirements"
+related_findings:
+  - "CMP-201"
+  - "CMP-202"
+severity_override: null
+tags:
+  - "compliance"
+  - "stig"
+  - "dod"
+  - "hardening"
+  - "benchmark"
+mitre_mappings:
+  - "T1078"

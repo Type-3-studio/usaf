@@ -1,0 +1,28 @@
+id: CLD-401
+title: Cloud Agent Health
+threat: Cloud management agents (SSM Agent, GCP Guest Agent, Azure waagent) are not running, reducing operational security and management capabilities
+exploit: Without cloud agents, automated patch management, vulnerability scanning, and configuration compliance monitoring are unavailable. Attackers may disable agents to avoid detection
+impact: Reduced visibility and management capability. Missing security patches and compliance drift
+fix: "AWS: 'sudo systemctl enable --now amazon-ssm-agent'. GCP: 'sudo systemctl enable --now google-guest-agent'. Azure: 'sudo systemctl enable --now waagent'"
+breakage: Agent configuration may conflict with existing management tools
+cvss: "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L (3.8)"
+affected_versions:
+  - "AWS EC2"
+  - "GCP Compute Engine"
+  - "Azure VMs"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Systems using alternative management tools (Ansible, Salt, etc.)"
+  - "Immutable infrastructure where agents are not needed"
+related_findings:
+  - "COM-101"
+  - "SVC-301"
+severity_override: null
+tags:
+  - "cloud"
+  - "agent"
+  - "ssm"
+  - "monitoring"
+  - "management"
+mitre_mappings:
+  - "T1562.001"

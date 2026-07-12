@@ -1,0 +1,22 @@
+id: CMP-501
+title: Custom Policy Evaluation
+threat: Custom security policies define organization-specific requirements that go beyond standard benchmarks
+exploit: Without custom policy evaluation, organization-specific security requirements may not be enforced
+impact: Gaps in organization-specific security controls that are not covered by standard benchmarks
+fix: "Create YAML policies under policies/ directory and run 'usaf scan' to evaluate"
+breakage: None — informational check
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "All Ubuntu versions"
+false_positive_rate: 0.0
+known_exceptions: []
+related_findings:
+  - "CMP-201"
+  - "CMP-202"
+severity_override: null
+tags:
+  - "compliance"
+  - "custom-policy"
+  - "organization"
+mitre_mappings:
+  - "T1078"

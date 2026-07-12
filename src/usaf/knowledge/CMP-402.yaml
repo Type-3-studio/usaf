@@ -1,0 +1,25 @@
+id: CMP-402
+title: SOC2 Compliance
+threat: Non-compliance with SOC2 (Service Organization Control 2) security criteria
+exploit: SOC2 controls address security, availability, processing integrity, confidentiality, and privacy. Failure indicates gaps in service organization security controls
+impact: Inability to obtain or maintain SOC2 certification. Loss of customer trust and business opportunities
+fix: "Address all failing SOC2 controls. Focus on access controls, monitoring, risk assessment, and change management"
+breakage: SOC2 compliance may require additional monitoring and documentation
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Service organizations"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Organizations not requiring SOC2 certification"
+related_findings:
+  - "CMP-201"
+  - "CMP-401"
+  - "CMP-403"
+severity_override: null
+tags:
+  - "compliance"
+  - "soc2"
+  - "trust-services"
+  - "benchmark"
+mitre_mappings:
+  - "T1078"

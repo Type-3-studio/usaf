@@ -1,0 +1,25 @@
+id: CMP-203
+title: CIS Level 1 — Desktop Compliance
+threat: Non-compliance with CIS Level 1 Desktop benchmarks indicates weak desktop security posture
+exploit: CIS Level 1 Desktop controls address display manager security, wireless configuration, and desktop-specific hardening
+impact: Desktop-specific security gaps including unauthorized access via display manager and wireless exposure
+fix: "Address all failing CIS Level 1 Desktop controls including display manager and wireless configuration"
+breakage: Some desktop controls may affect GUI usability
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 22.04 Desktop"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Server systems without graphical environment"
+related_findings:
+  - "CMP-201"
+  - "CMP-202"
+severity_override: null
+tags:
+  - "compliance"
+  - "cis"
+  - "level-1"
+  - "desktop"
+  - "benchmark"
+mitre_mappings:
+  - "T1204"

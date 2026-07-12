@@ -1,0 +1,25 @@
+id: CMP-202
+title: CIS Level 2 — Server Compliance
+threat: Non-compliance with CIS Level 2 Server benchmarks indicates advanced security hardening gaps
+exploit: CIS Level 2 controls provide defense-in-depth. Failure against these benchmarks means the system lacks advanced security protections
+impact: Reduced security posture against sophisticated attacks. Compliance audit failure for Level 2 requirements
+fix: "Address all failing CIS Level 2 Server controls in addition to Level 1"
+breakage: Level 2 controls may restrict functionality more than Level 1
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 22.04"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Systems in high-security environments already meeting Level 2"
+related_findings:
+  - "CMP-201"
+  - "CMP-203"
+severity_override: null
+tags:
+  - "compliance"
+  - "cis"
+  - "level-2"
+  - "server"
+  - "benchmark"
+mitre_mappings:
+  - "T1190"

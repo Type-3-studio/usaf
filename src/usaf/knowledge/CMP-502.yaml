@@ -1,0 +1,24 @@
+id: CMP-502
+title: Baseline Drift Analysis
+threat: Configuration drift from the established security baseline may indicate unauthorized changes or security degradation
+exploit: Drift from baseline can indicate unauthorized configuration changes, missing security patches, or compromised system state
+impact: Reduced security posture over time as the system deviates from the hardened baseline
+fix: "1. Run 'usaf baseline init' to establish a baseline. 2. Run 'usaf scan --baseline-diff' periodically to detect drift"
+breakage: None — informational check
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "All Ubuntu versions"
+false_positive_rate: 0.1
+known_exceptions:
+  - "Systems undergoing authorized maintenance or updates"
+related_findings:
+  - "CMP-503"
+  - "FS-302"
+severity_override: null
+tags:
+  - "compliance"
+  - "baseline"
+  - "drift"
+  - "monitoring"
+mitre_mappings:
+  - "T1562"

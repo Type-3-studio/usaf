@@ -1,0 +1,26 @@
+id: CMP-201
+title: CIS Level 1 — Server Compliance
+threat: Non-compliance with CIS Level 1 Server benchmarks indicates weak security posture
+exploit: CIS Level 1 controls represent fundamental security hardening. Failure against these benchmarks means the system lacks basic security protections
+impact: Systematic security weakness across multiple domains. Increased attack surface and compliance risk
+fix: "Address all failing CIS Level 1 Server controls. Run 'usaf scan --compliance cis' for detailed gap analysis"
+breakage: Some CIS controls may impact usability on non-production systems
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Ubuntu 22.04"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Systems requiring legacy compatibility"
+related_findings:
+  - "CMP-101"
+  - "CMP-202"
+  - "CMP-203"
+severity_override: null
+tags:
+  - "compliance"
+  - "cis"
+  - "level-1"
+  - "server"
+  - "benchmark"
+mitre_mappings:
+  - "T1190"

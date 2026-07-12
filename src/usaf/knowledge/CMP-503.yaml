@@ -1,0 +1,25 @@
+id: CMP-503
+title: Remediation Verification
+threat: High and critical severity findings remain unaddressed, posing active security risks
+exploit: Unremediated vulnerabilities can be exploited by attackers to gain access, escalate privileges, or exfiltrate data
+impact: Active security risks that increase over time as new vulnerabilities are discovered
+fix: "1. Review all HIGH/CRITICAL findings. 2. Apply remediation steps. 3. Run 'usaf scan' to verify fixes"
+breakage: None — informational check
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "All Ubuntu versions"
+false_positive_rate: 0.0
+known_exceptions:
+  - "Findings with accepted risk or compensating controls"
+related_findings:
+  - "CMP-502"
+  - "PKG-401"
+  - "PKG-402"
+severity_override: null
+tags:
+  - "compliance"
+  - "remediation"
+  - "verification"
+  - "tracking"
+mitre_mappings:
+  - "T1098"

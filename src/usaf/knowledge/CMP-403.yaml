@@ -1,0 +1,26 @@
+id: CMP-403
+title: HIPAA Compliance
+threat: Non-compliance with HIPAA (Health Insurance Portability and Accountability Act) Security Rule
+exploit: HIPAA controls protect electronic protected health information (ePHI). Failure indicates gaps in healthcare data protection
+impact: HIPAA violations carry significant fines (up to $1.5M/year per violation category). Risk of ePHI exposure and breach notification requirements
+fix: "Address all failing HIPAA controls. Focus on access controls, audit controls, integrity controls, and transmission security"
+breakage: HIPAA compliance may require additional administrative and technical controls
+cvss: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N (0.0)"
+affected_versions:
+  - "Healthcare organizations"
+false_positive_rate: 0.05
+known_exceptions:
+  - "Organizations not handling ePHI"
+related_findings:
+  - "CMP-201"
+  - "CMP-401"
+  - "CMP-402"
+severity_override: null
+tags:
+  - "compliance"
+  - "hipaa"
+  - "healthcare"
+  - "ephI"
+  - "benchmark"
+mitre_mappings:
+  - "T1078"

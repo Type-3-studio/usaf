@@ -1,0 +1,28 @@
+id: CLD-501
+title: Kubernetes Node Security Assessment
+threat: Kubernetes node is misconfigured, exposing the cluster to node-level attacks
+exploit: An attacker who compromises a pod can exploit kubelet misconfigurations (read-only port, anonymous auth) to enumerate pods, steal secrets, or escape to the host node
+impact: Cluster-wide compromise through a single misconfigured node. Container escape, secret theft, and lateral movement within the cluster
+fix: "1. Disable kubelet read-only port: set readOnlyPort: 0. 2. Enable NodeRestriction admission controller. 3. Use CIS Kubernetes Benchmark"
+breakage: Strict kubelet configuration may break monitoring tools that depend on the read-only API
+cvss: "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H (9.0)"
+affected_versions:
+  - "Kubernetes nodes (kubelet)"
+false_positive_rate: 0.15
+known_exceptions:
+  - "Development clusters with relaxed security requirements"
+related_findings:
+  - "CTN-101"
+  - "CTN-201"
+  - "CTN-202"
+  - "CTN-203"
+severity_override: null
+tags:
+  - "cloud"
+  - "kubernetes"
+  - "kubelet"
+  - "node-security"
+  - "container"
+mitre_mappings:
+  - "T1610"
+  - "T1046"

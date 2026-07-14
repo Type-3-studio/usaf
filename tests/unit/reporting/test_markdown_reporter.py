@@ -2,9 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from usaf.models.finding import Finding
-from usaf.models.result import CheckResult, ScanResult
-from usaf.models.severity import CheckCategory, Severity
+from usaf.models.result import ScanResult
 from usaf.reporting.markdown import MarkdownReporter
 
 

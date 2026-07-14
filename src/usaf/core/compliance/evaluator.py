@@ -3,7 +3,12 @@ from __future__ import annotations
 import logging
 from typing import Any, ClassVar
 
-from usaf.compliance.framework import CIS_MAPPINGS, ComplianceControl, ComplianceFramework, ComplianceResult
+from usaf.compliance.framework import (
+    CIS_MAPPINGS,
+    ComplianceControl,
+    ComplianceFramework,
+    ComplianceResult,
+)
 from usaf.core.registry import registry
 from usaf.models.finding import Finding
 from usaf.models.result import CheckResult

@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import os
 
-import pytest
-
 from usaf.checks.persistence import cron_persistence as cron_mod
 from usaf.checks.persistence.cron_persistence import (
     AnacronJobCheck,

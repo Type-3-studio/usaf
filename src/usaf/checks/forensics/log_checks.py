@@ -210,7 +210,6 @@ class LogTamperCheck(AuditCheck):
             return findings
 
         import datetime
-        import re
 
         def _parse_journal_date(s: str) -> datetime.datetime | None:
             s = s.strip()
@@ -229,11 +228,11 @@ class LogTamperCheck(AuditCheck):
             span = newest_dt - oldest_dt
             total_hours = span.total_seconds() / 3600
             if oldest_dt.tzinfo is None:
-                oldest_dt = oldest_dt.replace(tzinfo=datetime.timezone.utc)
+                oldest_dt = oldest_dt.replace(tzinfo=datetime.UTC)
             if newest_dt.tzinfo is None:
-                newest_dt = newest_dt.replace(tzinfo=datetime.timezone.utc)
+                newest_dt = newest_dt.replace(tzinfo=datetime.UTC)
 
-            now = datetime.datetime.now(datetime.timezone.utc)
+            now = datetime.datetime.now(datetime.UTC)
             age_hours = (now - newest_dt).total_seconds() / 3600
 
             if total_hours < 1:
@@ -281,7 +280,7 @@ class LogTamperCheck(AuditCheck):
                             log_path="systemd-journal",
                             match_count=0,
                             pattern="recent_entries_gap",
-                            time_range=(newest_dt, datetime.datetime.now(datetime.timezone.utc)),
+                            time_range=(newest_dt, datetime.datetime.now(datetime.UTC)),
                         ),
                         detected_value=f"Last entry {age_hours:.1f} hours ago",
                         expected_value="Journal entries within last 24 hours",
@@ -402,7 +401,6 @@ class LogFilePermissionsCheck(AuditCheck):
 
     def _run_check(self, collectors: dict[str, Any]) -> list:
         findings: list = []
-        import os
 
         for log_dir in self._LOG_DIRS:
             dp = Path(log_dir)

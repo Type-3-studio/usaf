@@ -6,7 +6,6 @@ from usaf.core.registry import register_check
 from usaf.models.evidence import FileEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
-
 KNOWN_SYSTEMD_TIMERS = {
     "apt-daily.timer",
     "apt-daily-upgrade.timer",

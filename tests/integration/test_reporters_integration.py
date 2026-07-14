@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from usaf.models.finding import Finding
-from usaf.models.result import CheckResult, ScanResult, ScanMetadata
+from usaf.models.result import CheckResult, ScanMetadata, ScanResult
 from usaf.models.score import ScanScore
 from usaf.models.severity import CheckCategory, Severity
 from usaf.reporting.json import JSONReporter

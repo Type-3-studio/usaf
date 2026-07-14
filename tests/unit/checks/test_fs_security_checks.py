@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import os
-import stat
-from pathlib import Path
 from unittest.mock import MagicMock, PropertyMock, patch
 
 from usaf.checks.filesystem.fs_security_checks import (

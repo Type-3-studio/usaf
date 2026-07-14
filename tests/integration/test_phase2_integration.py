@@ -7,13 +7,10 @@ baseline, and profile modules integrate correctly with realistic data
 flowing through the pipeline.
 """
 
-from pathlib import Path
 
-import pytest
 
 from usaf.baseline.manager import BaselineManager
 from usaf.compliance.framework import ComplianceFramework
-from usaf.core.registry import registry
 from usaf.correlation.engine import CorrelationEngine
 from usaf.correlation.rules import (
     SSHBruteForceSurface,
@@ -24,18 +21,15 @@ from usaf.knowledge.base import KnowledgeBase
 from usaf.models.evidence import (
     FileEvidence,
     NetworkEvidence,
-    ProcessEvidence,
     RegistryEvidence,
 )
 from usaf.models.finding import Finding
-from usaf.models.result import CheckResult, ScanResult, ScanMetadata
+from usaf.models.result import CheckResult, ScanMetadata, ScanResult
 from usaf.models.score import ScanScore
 from usaf.models.severity import CheckCategory, Confidence, Severity
 from usaf.profiles.manager import ProfileManager
 from usaf.scoring.engine import ScoringEngine
-from usaf.scoring.trust import TrustScorer
 from usaf.severity.engine import SeverityContextEngine
-
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -656,8 +650,9 @@ class TestFullPipelineEndToEnd:
         assert coverage.coverage_percent >= 0
 
         # Phase 7: Baseline snapshot
-        from usaf.baseline.manager import BaselineManager, BaselineSnapshot
         import tempfile
+
+        from usaf.baseline.manager import BaselineManager, BaselineSnapshot
 
         with tempfile.TemporaryDirectory() as td:
             mgr = BaselineManager(td)

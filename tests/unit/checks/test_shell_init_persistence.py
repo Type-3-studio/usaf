@@ -5,7 +5,6 @@ from usaf.checks.persistence.shell_init_persistence import (
     ModifiedZshInitCheck,
     UnexpectedProfileScriptsCheck,
 )
-from usaf.models.severity import Severity
 
 
 class TestUnexpectedProfileScriptsCheck:

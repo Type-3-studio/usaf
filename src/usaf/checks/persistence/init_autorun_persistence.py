@@ -1,12 +1,10 @@
 import os
 from datetime import datetime
-import stat
 
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
 from usaf.models.evidence import FileEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
-
 
 RC_LOCAL = "/etc/rc.local"
 INIT_D_DIR = "/etc/init.d"

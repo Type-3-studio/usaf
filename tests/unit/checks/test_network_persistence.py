@@ -5,7 +5,6 @@ from usaf.checks.persistence.network_persistence import (
     SshAuthorizedKeysFileTamperCheck,
     SshForcedCommandsCheck,
 )
-from usaf.models.severity import Severity
 
 
 class TestNetworkHookScriptsCheck:

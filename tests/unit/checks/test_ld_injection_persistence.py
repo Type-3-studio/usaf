@@ -5,7 +5,6 @@ from usaf.checks.persistence.ld_injection_persistence import (
     LdPreloadEnvironmentCheck,
     LdSoPreloadCheck,
 )
-from usaf.models.severity import Severity
 
 
 class TestLdPreloadEnvironmentCheck:

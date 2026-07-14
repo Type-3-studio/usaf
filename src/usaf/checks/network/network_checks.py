@@ -6,7 +6,7 @@ from typing import Any
 
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
-from usaf.models.evidence import NetworkEvidence, RegistryEvidence, FileEvidence
+from usaf.models.evidence import FileEvidence, NetworkEvidence, RegistryEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
 SENSITIVE_PORTS: dict[int, str] = {
@@ -279,7 +279,7 @@ class DNSSearchDomainCheck(AuditCheck):
         search_domains.extend(rc.get("search_domains", []))
 
         rs: dict[str, Any] = dns_data.get("resolved_status", {})
-        mode: str | None = rs.get("mode", None)
+        mode: str | None = rs.get("mode")
 
         internal_domains = [
             sd for sd in search_domains
@@ -411,7 +411,7 @@ class ExpiringCertificatesCheck(AuditCheck):
     def _run_check(self, collectors: dict[str, Any]) -> list:
         cert_data = self._get_data(collectors, "certificates")
         findings: list = []
-        now = datetime.datetime.now(datetime.timezone.utc)
+        now = datetime.datetime.now(datetime.UTC)
         threshold = now + datetime.timedelta(days=60)
 
         ca_bundles: list[dict[str, Any]] = cert_data.get("ca_bundles", [])
@@ -506,7 +506,7 @@ class ExpiringCertificatesCheck(AuditCheck):
                     date_str = line[len("notAfter="):]
                     return datetime.datetime.strptime(
                         date_str, "%b %d %H:%M:%S %Y %Z"
-                    ).replace(tzinfo=datetime.timezone.utc)
+                    ).replace(tzinfo=datetime.UTC)
         except (OSError, subprocess.SubprocessError, ValueError):
             return None
         return None

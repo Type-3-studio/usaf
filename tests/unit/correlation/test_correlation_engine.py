@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from usaf.correlation.engine import CorrelatedFinding, CorrelationEngine, CorrelationRule
-from usaf.models.evidence import FileEvidence, NetworkEvidence
+from usaf.models.evidence import NetworkEvidence
 from usaf.models.finding import Finding
 from usaf.models.severity import CheckCategory, Severity
 

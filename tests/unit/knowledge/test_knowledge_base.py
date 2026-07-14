@@ -3,10 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-import yaml
 
 from usaf.knowledge.base import KnowledgeBase, KnowledgeEntry
-from usaf.models.evidence import FileEvidence, NetworkEvidence
+from usaf.models.evidence import FileEvidence
 from usaf.models.finding import Finding
 from usaf.models.severity import CheckCategory, Confidence, Severity
 

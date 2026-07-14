@@ -6,7 +6,6 @@ from usaf.core.registry import register_check
 from usaf.models.evidence import FileEvidence, RegistryEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
-
 NETWORK_HOOK_DIRS = [
     "/etc/network/if-up.d",
     "/etc/network/if-down.d",

@@ -30,7 +30,7 @@ class KnowledgeEntry:
         self.false_positive_rate: float = data.get("false_positive_rate", 0.0)
         self.known_exceptions: list[str] = data.get("known_exceptions", [])
         self.related_findings: list[str] = data.get("related_findings", [])
-        self.severity_override: str | None = data.get("severity_override", None)
+        self.severity_override: str | None = data.get("severity_override")
         self.tags: list[str] = data.get("tags", [])
         self.mitre_mappings: list[str] = data.get("mitre_mappings", [])
         self._data = data

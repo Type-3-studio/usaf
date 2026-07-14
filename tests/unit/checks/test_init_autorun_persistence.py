@@ -7,7 +7,6 @@ from usaf.checks.persistence.init_autorun_persistence import (
     SystemdUserUnitsCheck,
     XdgAutostartCheck,
 )
-from usaf.models.severity import Severity
 
 
 class TestRcLocalScriptCheck:

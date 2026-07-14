@@ -307,7 +307,7 @@ class KernelLockdownConfidentialityCheck(AuditCheck):
         findings.append(
             self.finding(
                 finding_id="001",
-                title=f"Kernel lockdown not at confidentiality mode",
+                title="Kernel lockdown not at confidentiality mode",
                 description=(
                     f"Kernel lockdown is at '{mode}' level, not 'confidentiality'. "
                     f"The lockdown feature restricts user-space access to kernel features."

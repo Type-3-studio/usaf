@@ -1,12 +1,11 @@
 import os
-from datetime import datetime
 import stat
+from datetime import datetime
 
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
 from usaf.models.evidence import FileEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
-
 
 SUSPICIOUS_INIT_PATTERNS = [
     "wget",
@@ -146,7 +145,7 @@ class UnexpectedProfileScriptsCheck(AuditCheck):
                             size=ps["size"],
                             modified=ps["modified"],
                         ),
-                        detected_value=f"Unknown profile script with suspicious content",
+                        detected_value="Unknown profile script with suspicious content",
                         expected_value="Known scripts only",
                         affected_component=ps["name"],
                         confidence=Confidence.MEDIUM,

@@ -1,11 +1,9 @@
 import os
-import stat
 
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
 from usaf.models.evidence import FileEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
-
 
 SUSPICIOUS_CRON_PATTERNS = [
     r"wget",

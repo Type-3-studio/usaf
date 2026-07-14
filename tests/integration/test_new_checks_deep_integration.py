@@ -4,66 +4,73 @@ from pathlib import Path
 from unittest.mock import patch
 
 from usaf.checks.boot.boot_security_checks import (
-    KernelImageCountCheck,
     BootPartitionMountCheck,
-    GrubConfigPermissionsCheck,
+    KernelImageCountCheck,
 )
 from usaf.checks.cloud.cld_security_checks import CloudCliToolsCheck, CloudEnvCredentialsCheck
-from usaf.checks.compliance.cmp_security_checks import LegacyServicesCheck, AvahiServiceCheck
-from usaf.checks.compromise.com_extended_checks import ReverseShellDetectionCheck, HiddenProcessCheck
-from usaf.checks.containers.ctn_security_checks import ContainerAddedCapabilitiesCheck, ContainerLatestTagCheck
+from usaf.checks.compliance.cmp_security_checks import AvahiServiceCheck, LegacyServicesCheck
+from usaf.checks.compromise.com_extended_checks import (
+    HiddenProcessCheck,
+    ReverseShellDetectionCheck,
+)
+from usaf.checks.containers.ctn_security_checks import (
+    ContainerAddedCapabilitiesCheck,
+    ContainerLatestTagCheck,
+)
 from usaf.checks.filesystem.fs_security_checks import (
     SensitiveFilePermissionsCheck,
     TempDirMountSecurityCheck,
-    HomeDirectoryPermissionsCheck,
 )
 from usaf.checks.forensics.log_security_checks import (
-    JournaldRuntimeOnlyCheck,
     JournaldCompressionCheck,
     JournaldForwardingCheck,
+    JournaldRuntimeOnlyCheck,
 )
 from usaf.checks.kernel.krn_security_checks import DebugFsCheck, KernelAslrCheck, SysRqKeyCheck
 from usaf.checks.network.net_security_checks import (
-    ListeningAllInterfacesCheck,
-    ExposedUdpServicesCheck,
-    NonRootPrivilegedPortsCheck,
-    InterfacePromiscuousCheck,
     DnsResolverConfigCheck,
     EphemeralPortExhaustionCheck,
+    ExposedUdpServicesCheck,
+    InterfacePromiscuousCheck,
+    ListeningAllInterfacesCheck,
+    NonRootPrivilegedPortsCheck,
 )
 from usaf.checks.packages.pkg_security_checks import (
+    DevPackagesInstalledCheck,
     MissingRecommendedPackagesCheck,
     ObsoleteKernelPackagesCheck,
-    DevPackagesInstalledCheck,
 )
 from usaf.checks.permissions.prm_security_checks import (
     GroupWritableSetuidCheck,
-    SGIDOnWorldWritableDirsCheck,
     SetuidWithCapabilitiesCheck,
-    CriticalDirectoryOwnershipCheck,
+    SGIDOnWorldWritableDirsCheck,
+)
+from usaf.checks.secrets.secr_extended_checks import (
+    GitlabTokensCheck,
+    SlackTokensCheck,
+    StripeKeysCheck,
 )
 from usaf.checks.security.fw_boot_check import FirewallServiceBootCheck
 from usaf.checks.security.sec_security_checks import (
-    SeccompStatusCheck,
-    AppArmorComplainModeCheck,
     LsmStackingCheck,
+    SeccompStatusCheck,
 )
-from usaf.checks.secrets.secr_extended_checks import GitlabTokensCheck, SlackTokensCheck, StripeKeysCheck
 from usaf.checks.services.svc_security_checks import (
     ServiceLoadFailuresCheck,
     TimerServiceMismatchCheck,
-    UnitFileOwnershipCheck,
 )
-from usaf.checks.system.ssh_security_extended import SshAgentForwardingCheck, SshPubkeyAuthOnlyCheck, SshMacAlgorithmsCheck
+from usaf.checks.system.ssh_security_extended import (
+    SshAgentForwardingCheck,
+    SshMacAlgorithmsCheck,
+    SshPubkeyAuthOnlyCheck,
+)
 from usaf.checks.users.usr_security_checks import (
-    ServiceAccountsWithShellCheck,
-    UsersInPrivilegedGroupsCheck,
-    InactiveUserAccountsCheck,
     EmptyGroupsCheck,
+    InactiveUserAccountsCheck,
+    ServiceAccountsWithShellCheck,
     UidGidMismatchCheck,
+    UsersInPrivilegedGroupsCheck,
 )
-from usaf.models.severity import Severity
-
 
 BASE_COLLECTORS: dict = {
     "kernel_params": {

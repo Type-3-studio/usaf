@@ -1,11 +1,9 @@
 import os
-import re
 
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
 from usaf.models.evidence import FileEvidence, ProcessEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
-
 
 SYSTEM_LD_PATHS = {
     "/etc/ld.so.preload",

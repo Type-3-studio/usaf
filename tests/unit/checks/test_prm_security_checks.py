@@ -7,9 +7,9 @@ from usaf.checks.permissions.prm_security_checks import (
     CriticalDirectoryOwnershipCheck,
     DangerousCapabilityCombinationsCheck,
     GroupWritableSetuidCheck,
-    SGIDOnWorldWritableDirsCheck,
     SetuidWithCapabilitiesCheck,
     SetuidWithoutExecuteCheck,
+    SGIDOnWorldWritableDirsCheck,
     UnexpectedSGIDOnFilesCheck,
     WeakDefaultUmaskCheck,
 )

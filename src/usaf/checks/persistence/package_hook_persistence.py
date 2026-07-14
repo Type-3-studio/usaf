@@ -6,7 +6,6 @@ from usaf.core.registry import register_check
 from usaf.models.evidence import FileEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
-
 APT_HOOK_DIRS = [
     "/etc/apt/apt.conf.d",
     "/usr/lib/apt/apt.conf.d",

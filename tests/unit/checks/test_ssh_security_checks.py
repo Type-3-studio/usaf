@@ -5,14 +5,14 @@ from pathlib import Path
 from usaf.checks.system.ssh_security_checks import (
     SSHBannerCheck,
     SSHCiphersCheck,
+    SSHClientAliveCheck,
     SSHEmptyPasswordsCheck,
     SSHHostbasedAuthCheck,
     SSHMaxAuthTriesCheck,
     SSHMaxStartupsCheck,
-    SSHClientAliveCheck,
     SSHPermitUserEnvironmentCheck,
 )
-from usaf.models.severity import Confidence, Severity
+from usaf.models.severity import Severity
 
 
 def _make_collectors(directives: dict | None = None) -> dict:
@@ -323,14 +323,14 @@ class TestSSHCiphersCheck:
 
 
 from usaf.checks.system.ssh_security_checks import (
-    SSHHostKeyTypeCheck,
     SSHAuthorizedKeysPermsCheck,
-    SSHLogLevelCheck,
-    SSHX11ForwardingCheck,
-    SSHTcpForwardingCheck,
     SSHCompressionCheck,
-    SSHPermitTunnelCheck,
     SSHGSSAPICheck,
+    SSHHostKeyTypeCheck,
+    SSHLogLevelCheck,
+    SSHPermitTunnelCheck,
+    SSHTcpForwardingCheck,
+    SSHX11ForwardingCheck,
 )
 
 

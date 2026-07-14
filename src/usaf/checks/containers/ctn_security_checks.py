@@ -4,9 +4,8 @@ from typing import Any
 
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
-from usaf.models.evidence import FileEvidence, RegistryEvidence
+from usaf.models.evidence import RegistryEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
-
 
 DEFAULT_CONTAINER_CAPS: set[str] = {
     "cap_chown", "cap_dac_override", "cap_fowner", "cap_fsetid",
@@ -191,7 +190,7 @@ class ContainerLongRunningCheck(AuditCheck):
                 try:
                     import datetime
                     created = datetime.datetime.fromisoformat(created_raw.replace("Z", "+00:00"))
-                    uptime = datetime.datetime.now(datetime.timezone.utc) - created
+                    uptime = datetime.datetime.now(datetime.UTC) - created
                     hours = uptime.total_seconds() / 3600
                 except (ValueError, TypeError, AttributeError):
                     continue

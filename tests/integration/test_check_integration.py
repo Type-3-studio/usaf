@@ -2,9 +2,7 @@ from __future__ import annotations
 
 """Integration tests for individual checks with realistic mock data."""
 
-from usaf.checks.authentication.password_policy import PasswordPolicyCheck
 from usaf.checks.compromise.known_bad_processes import KnownBadProcessCheck
-from usaf.checks.containers.docker_socket_check import DockerSocketCheck
 from usaf.checks.kernel.module_loading_check import KernelModuleLoadingCheck
 from usaf.checks.packages.unnecessary_packages import UnnecessaryPackagesCheck
 from usaf.checks.security.firewall_check import FirewallActiveCheck
@@ -29,7 +27,6 @@ class TestCheckIntegration:
         assert len(result.findings) == 0
 
     def test_risky_packages_list(self):
-        from usaf.checks.packages.unnecessary_packages import UnnecessaryPackagesCheck
 
         check = UnnecessaryPackagesCheck()
         assert "telnetd" in check.RISKY_PACKAGES

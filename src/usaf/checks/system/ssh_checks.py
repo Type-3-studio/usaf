@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import cast
-
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
 from usaf.models.evidence import RegistryEvidence

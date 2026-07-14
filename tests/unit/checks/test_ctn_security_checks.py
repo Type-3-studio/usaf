@@ -11,7 +11,6 @@ from usaf.checks.containers.ctn_security_checks import (
 )
 from usaf.models.severity import Confidence, Severity
 
-
 BASE_CTR = {"id": "abc123", "names": "web-app", "image": "nginx:1.25", "state": "running", "privileged": False, "user": "", "cap_add": [], "cap_drop": [], "security_opt": [], "bind_mounts": [], "readonly_rootfs": False, "created": "2026-07-01T00:00:00Z"}
 
 
@@ -88,7 +87,7 @@ class TestContainerLongRunningCheck:
     def test_passes_with_recent_container(self):
         check = ContainerLongRunningCheck()
         import datetime
-        recent = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=24)).isoformat()
+        recent = (datetime.datetime.now(datetime.UTC) - datetime.timedelta(hours=24)).isoformat()
         result = check.evaluate({"containers": {"docker": {"detailed": [dict(BASE_CTR, created=recent)]}}})
         assert result.passed
 

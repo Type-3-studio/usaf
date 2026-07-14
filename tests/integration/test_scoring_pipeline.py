@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from usaf.models.evidence import ProcessEvidence
 from usaf.models.finding import Finding
-from usaf.models.result import CheckResult, ScanResult, ScanMetadata
+from usaf.models.result import CheckResult, ScanMetadata, ScanResult
 from usaf.models.severity import CheckCategory, Confidence, Severity
 from usaf.scoring.engine import ScoringEngine
 from usaf.scoring.trust import TrustScorer

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
-from usaf.models.evidence import RegistryEvidence, FileEvidence
+from usaf.models.evidence import RegistryEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
 

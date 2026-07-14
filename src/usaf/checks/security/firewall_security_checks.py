@@ -4,7 +4,7 @@ from typing import Any
 
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
-from usaf.models.evidence import CommandEvidence, RegistryEvidence
+from usaf.models.evidence import RegistryEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
 
@@ -327,8 +327,8 @@ class FirewallOutgoingPolicyCheck(AuditCheck):
                     finding_id="001",
                     title="UFW default outgoing policy is allow",
                     description=(
-                        f"UFW outgoing policy is set to allow. All outgoing traffic "
-                        f"is permitted by default."
+                        "UFW outgoing policy is set to allow. All outgoing traffic "
+                        "is permitted by default."
                     ),
                     rationale=(
                         "Default allow outgoing means any application can send traffic "

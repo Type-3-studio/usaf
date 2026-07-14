@@ -6,7 +6,6 @@ from usaf.core.registry import register_check
 from usaf.models.evidence import FileEvidence, RegistryEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
-
 KNOWN_PAM_MODULES = {
     "pam_unix.so": "Unix authentication",
     "pam_unix2.so": "Unix authentication (alt)",
@@ -147,7 +146,7 @@ class UnexpectedPamModulesCheck(AuditCheck):
                     findings.append(
                         self.finding(
                             finding_id="002",
-                            title=f"Suspicious PAM module reference in config",
+                            title="Suspicious PAM module reference in config",
                             description=(
                                 f"Config file {cf.get('file', '')} references "
                                 f"suspicious PAM module '{suspicious_mod}'"

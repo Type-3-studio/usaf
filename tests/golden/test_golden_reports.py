@@ -8,7 +8,7 @@ import pytest
 
 from usaf.models.evidence import RegistryEvidence
 from usaf.models.finding import Finding
-from usaf.models.result import CheckResult, ScanResult, ScanMetadata
+from usaf.models.result import CheckResult, ScanMetadata, ScanResult
 from usaf.models.severity import CheckCategory, Severity
 from usaf.reporting.json import JSONReporter
 from usaf.reporting.markdown import MarkdownReporter

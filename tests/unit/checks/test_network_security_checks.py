@@ -11,7 +11,6 @@ from usaf.checks.network.network_checks import (
     ExpiringCertificatesCheck,
     ExposedSensitivePortsCheck,
     InterfaceCarrierCheck,
-    UntrustedCACheck,
 )
 from usaf.models.severity import Severity
 
@@ -182,7 +181,7 @@ class TestExpiringCertificatesCheck:
 
     @patch("usaf.checks.network.network_checks.ExpiringCertificatesCheck._get_expiry")
     def test_passes_when_cert_valid(self, mock_expiry):
-        mock_expiry.return_value = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=365)
+        mock_expiry.return_value = datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=365)
         check = ExpiringCertificatesCheck()
         result = check.evaluate({
             "certificates": {"ca_bundles": [{"path": "/etc/ssl/certs/valid.pem"}]}
@@ -191,7 +190,7 @@ class TestExpiringCertificatesCheck:
 
     @patch("usaf.checks.network.network_checks.ExpiringCertificatesCheck._get_expiry")
     def test_fails_when_expired(self, mock_expiry):
-        mock_expiry.return_value = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=10)
+        mock_expiry.return_value = datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=10)
         check = ExpiringCertificatesCheck()
         result = check.evaluate({
             "certificates": {"ca_bundles": [{"path": "/etc/ssl/certs/expired.pem"}]}
@@ -201,7 +200,7 @@ class TestExpiringCertificatesCheck:
 
     @patch("usaf.checks.network.network_checks.ExpiringCertificatesCheck._get_expiry")
     def test_fails_when_expiring_soon(self, mock_expiry):
-        mock_expiry.return_value = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=30)
+        mock_expiry.return_value = datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=30)
         check = ExpiringCertificatesCheck()
         result = check.evaluate({
             "certificates": {"ca_bundles": [{"path": "/etc/ssl/certs/expiring.pem"}]}

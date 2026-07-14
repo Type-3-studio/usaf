@@ -14,7 +14,6 @@ from usaf.checks.network.net_security_checks import (
 )
 from usaf.models.severity import Confidence, Severity
 
-
 LISTEN_TCP_OK = {"protocol": "TCP", "local_address": "192.168.1.1", "local_port": 22, "state": "LISTEN", "uid": 0}
 LISTEN_TCP_ALL = {"protocol": "TCP", "local_address": "0.0.0.0", "local_port": 8080, "state": "LISTEN", "uid": 0}
 LISTEN_TCP_LOCAL = {"protocol": "TCP", "local_address": "127.0.0.1", "local_port": 5432, "state": "LISTEN", "uid": 100}

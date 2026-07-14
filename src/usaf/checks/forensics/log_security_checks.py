@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import re
 from typing import Any
 
 from usaf.core.plugin import AuditCheck

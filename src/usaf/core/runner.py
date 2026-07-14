@@ -15,6 +15,7 @@ from usaf.cache.engine import CacheEngine
 from usaf.collectors.manager import CollectorManager
 from usaf.collectors.registry import collector_registry
 from usaf.config.loader import load_config
+from usaf.core.compliance.evaluator import ComplianceEvaluator
 from usaf.core.exceptions import PluginDependencyError
 from usaf.core.progress import ScanProgress
 from usaf.core.registry import registry
@@ -47,7 +48,6 @@ from usaf.correlation.rules import (
 )
 from usaf.correlation.scenarios import CORE_SCENARIOS
 from usaf.correlation.yaml_loader import YamlRuleLoader
-from usaf.core.compliance.evaluator import ComplianceEvaluator
 from usaf.knowledge.base import KnowledgeBase
 from usaf.models.result import CheckResult, ScanMetadata, ScanResult
 from usaf.models.scenario import ScenarioResult
@@ -441,7 +441,7 @@ class ScanRunner:
         auto_created_path (str | None), error (str | None).
         Also handles auto-creation if configured.
         """
-        from usaf.baseline.manager import BaselineDiff, BaselineManager
+        from usaf.baseline.manager import BaselineManager
         from usaf.core.exceptions import BaselineError
 
         baseline_mgr = BaselineManager()

@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-import os
 import subprocess
 from typing import Any
 
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
-from usaf.models.evidence import PackageEvidence, RegistryEvidence
+from usaf.models.evidence import RegistryEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
 UBUNTU_ARCHIVE_PATTERNS: tuple[str, ...] = (

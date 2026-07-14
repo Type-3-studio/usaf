@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-import os
-from pathlib import Path
 from typing import Any
 
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
-from usaf.models.evidence import ProcessEvidence, RegistryEvidence
+from usaf.models.evidence import ProcessEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
-
 
 SUSPICIOUS_CONNECTIONS: list[str] = [
     "pastebin.com", "ssh", "443", "1337",

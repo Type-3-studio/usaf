@@ -40,7 +40,7 @@ class CloudCliToolsCheck(AuditCheck):
                 title="Cloud CLI tools installed",
                 description=f"Cloud CLI tools found: {', '.join(found)}. These tools may provide access to cloud credentials.",
                 rationale="CLI tools may contain cached credentials and API keys. On shared or CI systems, these can be harvested by malicious processes.",
-                remediation=f"Review installed CLI tools. Ensure credentials are not cached: 'aws configure list', 'gcloud auth list'. Use IAM roles instead of keys where possible.",
+                remediation="Review installed CLI tools. Ensure credentials are not cached: 'aws configure list', 'gcloud auth list'. Use IAM roles instead of keys where possible.",
                 evidence=RegistryEvidence(key="packages.cloud_cli", value=", ".join(found), expected="not installed on shared systems", source="dpkg"),
                 detected_value=f"CLI tools: {', '.join(found)}",
                 expected_value="No cloud CLI tools on shared systems",

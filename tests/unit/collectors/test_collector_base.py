@@ -5,7 +5,7 @@ from typing import Any
 import pytest
 
 from usaf.collectors.base import BaseCollector
-from usaf.core.exceptions import CollectorError, CollectorTimeoutError
+from usaf.core.exceptions import CollectorError
 
 
 class TestBaseCollector:

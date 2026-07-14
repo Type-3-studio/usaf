@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
 from unittest.mock import patch
 
 from usaf.checks.persistence.per_security_checks import (
@@ -18,7 +17,6 @@ from usaf.checks.persistence.per_security_checks import (
     WorldWritablePersistenceCheck,
 )
 from usaf.models.severity import Severity
-
 
 BASE_USERS = [
     {"username": "alice", "uid": 1001, "gid": 1001, "home": "/home/alice", "shell": "/bin/bash"},

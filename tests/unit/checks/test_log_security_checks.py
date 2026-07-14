@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from unittest.mock import patch
-
 from usaf.checks.forensics.log_security_checks import (
     JournaldCompressionCheck,
     JournaldForwardingCheck,

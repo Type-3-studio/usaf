@@ -68,7 +68,7 @@ class TestContainerCollector:
                 class MockResult:
                     returncode = 0
                     stdout = ""
-                if "podman info" in str(cmd) or "podman" in str(cmd) and "json" in str(cmd):
+                if "podman info" in str(cmd) or ("podman" in str(cmd) and "json" in str(cmd)):
                     MockResult.stdout = '{"Version": {"Version": "4.8.0"}}\n'
                 return MockResult()
             mock_run.side_effect = side_effect

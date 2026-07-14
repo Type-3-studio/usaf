@@ -8,7 +8,6 @@ from usaf.core.registry import register_check
 from usaf.models.evidence import RegistryEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
-
 COMMON_PASSWORD = Path("/etc/pam.d/common-password")
 LOGIN_DEFS = Path("/etc/login.defs")
 COMMON_AUTH = Path("/etc/pam.d/common-auth")

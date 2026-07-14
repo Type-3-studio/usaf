@@ -12,7 +12,6 @@ from usaf.checks.packages.package_security_checks import (
     SourceReposEnabledCheck,
     ThirdPartyPackageCountCheck,
 )
-from usaf.models.severity import Severity
 
 
 class TestInsecureRepoURLCheck:

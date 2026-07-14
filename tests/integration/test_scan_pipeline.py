@@ -11,7 +11,6 @@ from usaf.core.runner import ScanRunner
 from usaf.models.result import ScanResult
 from usaf.models.score import ScanScore
 
-
 SKIP_LINUX = pytest.mark.skipif(
     not os.path.exists("/proc"),
     reason="Requires /proc filesystem (Linux)",

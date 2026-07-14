@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import pytest
-
 from usaf.checks.secrets.aws_keys import AWSKeysCheck
 from usaf.models.severity import CheckCategory
 

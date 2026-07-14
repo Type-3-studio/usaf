@@ -5,7 +5,7 @@ from pathlib import Path
 
 from usaf.core.plugin import AuditCheck
 from usaf.core.registry import register_check
-from usaf.models.evidence import NetworkEvidence, ProcessEvidence
+from usaf.models.evidence import NetworkEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
 KNOWN_SAFE_PORTS: dict[int, str] = {

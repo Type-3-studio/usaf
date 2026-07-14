@@ -10,7 +10,6 @@ from usaf.checks.security.firewall_security_checks import (
     FirewallOutgoingPolicyCheck,
     FirewallRateLimitCheck,
 )
-from usaf.models.severity import Severity
 
 
 def _fw(ufw=None, nft=None, ipt=None) -> dict:

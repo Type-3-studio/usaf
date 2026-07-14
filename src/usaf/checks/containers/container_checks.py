@@ -361,7 +361,7 @@ class OldImagesCheck(AuditCheck):
             created_dt = self._parse_created(created_str)
             if created_dt is None:
                 continue
-            age = (datetime.datetime.now(datetime.timezone.utc) - created_dt).days
+            age = (datetime.datetime.now(datetime.UTC) - created_dt).days
             if age > self._MAX_AGE_DAYS:
                 findings.append(
                     self.finding(
@@ -404,7 +404,7 @@ class OldImagesCheck(AuditCheck):
             try:
                 dt = datetime.datetime.strptime(created_str, fmt)
                 if dt.tzinfo is None:
-                    dt = dt.replace(tzinfo=datetime.timezone.utc)
+                    dt = dt.replace(tzinfo=datetime.UTC)
                 return dt
             except ValueError:
                 continue

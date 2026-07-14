@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
 from unittest.mock import patch
 
 from usaf.checks.users.usr_security_checks import (
@@ -14,7 +13,6 @@ from usaf.checks.users.usr_security_checks import (
     UsersInPrivilegedGroupsCheck,
 )
 from usaf.models.severity import Confidence, Severity
-
 
 BASE_USERS = [
     {"username": "root", "uid": 0, "gid": 0, "home": "/root", "shell": "/bin/bash"},

@@ -103,8 +103,8 @@ class ExpiredCertificatesCheck(AuditCheck):
                 try:
                     not_after = datetime.datetime.strptime(not_after_str.strip(), fmt)
                     if not_after.tzinfo is None:
-                        not_after = not_after.replace(tzinfo=datetime.timezone.utc)
-                    if not_after < datetime.datetime.now(datetime.timezone.utc):
+                        not_after = not_after.replace(tzinfo=datetime.UTC)
+                    if not_after < datetime.datetime.now(datetime.UTC):
                         return {
                             "subject": subject,
                             "issuer": issuer,

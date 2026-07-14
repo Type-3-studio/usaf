@@ -5,7 +5,6 @@ from usaf.checks.persistence.pam_udev_persistence import (
     UdevRulesPersistenceCheck,
     UnexpectedPamModulesCheck,
 )
-from usaf.models.severity import Severity
 
 
 class TestUnexpectedPamModulesCheck:

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from test_lab.scenarios.base import BaseScenario, ExpectedFinding, ExpectedFindings
 from test_lab.scenarios.registry import ScenarioRegistry
 

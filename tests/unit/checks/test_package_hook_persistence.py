@@ -4,7 +4,6 @@ from usaf.checks.persistence.package_hook_persistence import (
     AptHookPersistenceCheck,
     DpkgHookPersistenceCheck,
 )
-from usaf.models.severity import Severity
 
 
 class TestAptHookPersistenceCheck:

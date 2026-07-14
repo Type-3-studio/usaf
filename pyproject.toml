@@ -85,25 +85,55 @@ line-length = 100
 
 [tool.ruff.lint]
 select = [
-    "E", "F", "W",   # pycodestyle, pyflakes, pycodestyle warnings
-    "I",             # isort
-    "N",             # naming
-    "UP",            # pyupgrade
-    "B",             # flake8-bugbear
-    "SIM",           # flake8-simplify
-    "ARG",           # flake8-unused-arguments
-    "RUF",           # ruff-specific
-    "PL",            # pylint
-    "T20",           # flake8-print (ban print statements)
+    # === Core correctness ===
+    "E",    # pycodestyle errors
+    "F",    # Pyflakes — logic errors, undefined names
+    "W",    # pycodestyle warnings
+    "I",    # isort — import ordering
+    "N",    # pep8-naming — naming conventions
+    "UP",   # pyupgrade — modern Python syntax
+    "B",    # flake8-bugbear — bug detection
+    "SIM",  # flake8-simplify — simpler expressions
+    "RUF",  # Ruff-specific rules
+    "PL",   # Pylint — opinionated style and logic
+
+    # === Unused code detection ===
+    "ARG",  # flake8-unused-arguments
+
+    # === Security & correctness ===
+    "T10",  # flake8-debugger — no debugger breakpoints in committed code
+    "T20",  # flake8-print — no print() outside CLI entry points
+
+    # === Modernization ===
+    "FA",   # flake8-future-annotations — from __future__ import annotations
+    "C4",   # flake8-comprehensions — idiomatic dict/list/set comprehensions
 ]
 ignore = [
-    "PLR2004",  # Magic value used in comparison
-    "PLR0913",  # Too many arguments
-    "E501",     # Line length (handled by formatter)
+    "PLR2004",  # Magic-value-in-comparison — acceptable for security thresholds & limits
+    "PLR0913",  # Too-many-arguments — framework APIs (plugins, models) need flexibility
+    "E501",     # Line-length — handled by ruff formatter
+    "RUF012",   # Mutable-class-default — intentionally used across 389 check plugin classes
+                # as design-time configuration constants (e.g., _WEAK_TYPES = {"dsa"}).
+                # This is the architectural pattern for the plugin system, not a bug.
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# CLI entry point — uses print() for interactive user output
+"src/usaf/cli/app.py" = ["T201"]
+# Scan runner — uses print() for progress/status output
+"src/usaf/core/runner.py" = ["T201"]
+# Tests — local imports and path manipulation are common test patterns
+"tests/**" = ["PLC0415", "E402"]
+# Test-lab utility scripts — CLI tools, not part of the library API
+"test_lab/**" = ["T201", "PLC0415", "E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["usaf"]
 
 [tool.ruff.format]
 quote-style = "double"
+# docstring-code-format deliberately omitted for now:
+# would reformat ~182 files' docstring examples. Enable in a dedicated formatting pass.
 
 [tool.mypy]
 strict = true

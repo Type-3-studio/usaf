@@ -4,7 +4,7 @@ from typing import Any
 
 from usaf.models.evidence import NetworkEvidence
 from usaf.models.finding import Finding
-from usaf.models.severity import CheckCategory, Severity
+from usaf.models.severity import Severity
 
 
 class ContextAwareSeverity:
@@ -173,7 +173,7 @@ class SeverityContextEngine:
             if not is_service and finding.severity == Severity.MEDIUM:
                 return Severity.HIGH, f"human user account ({username}) — higher risk"
             if username == "root" and finding.severity >= Severity.HIGH:
-                return Severity.CRITICAL, f"root account finding — maximum severity warranted"
+                return Severity.CRITICAL, "root account finding — maximum severity warranted"
 
         return finding.severity, f"user context for {username}"
 

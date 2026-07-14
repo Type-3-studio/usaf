@@ -7,7 +7,6 @@ from usaf.core.registry import register_check
 from usaf.models.evidence import FileEvidence, RegistryEvidence
 from usaf.models.severity import CheckCategory, Confidence, Severity
 
-
 DANGEROUS_MODULES: dict[str, str] = {
     "bluetooth": "Bluetooth stack — attack surface for wireless exploits",
     "btusb": "Bluetooth USB driver — enables Bluetooth attacks",
@@ -129,7 +128,7 @@ class DangerousKernelModulesCheck(AuditCheck):
                             f"Review all modules: 'lsmod | sort'"
                         ),
                         evidence=FileEvidence(
-                            path=f"/proc/modules",
+                            path="/proc/modules",
                             content=f"{mod_name}: {mod_info}",
                         ),
                         detected_value=f"Module '{mod_name}' loaded: {mod_info}",

@@ -8,7 +8,7 @@ from usaf.checks.system.ssh_security_extended import (
     SshPortCheck,
     SshPubkeyAuthOnlyCheck,
 )
-from usaf.models.severity import Confidence, Severity
+from usaf.models.severity import Severity
 
 
 def _collectors(directives: dict | None = None) -> dict:

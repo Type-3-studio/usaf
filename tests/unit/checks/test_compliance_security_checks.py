@@ -8,7 +8,6 @@ from usaf.checks.compliance.compliance_checks import (
     GrubPasswordCheck,
     LoginBannerCheck,
     MountOptionsCheck,
-    RestrictedRootLoginCheck,
     SeparatePartitionCheck,
     TimeSyncCheck,
 )

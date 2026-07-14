@@ -199,7 +199,7 @@ class EphemeralPortListeningCheck(AuditCheck):
                         title=f"Service listening on ephemeral port {port}",
                         description=f"{proto_label} service on {addr}:{port} is in the ephemeral port range",
                         rationale="Services should not listen on ephemeral port ranges (49152-65535). Ephemeral ports are for outbound connections. A listening service here may bypass firewall rules.",
-                        remediation=f"Configure the service to use a static port below 49152.",
+                        remediation="Configure the service to use a static port below 49152.",
                         evidence=NetworkEvidence(
                             protocol=proto_label, local_address=addr,
                             local_port=port, state=sock.get("state"),

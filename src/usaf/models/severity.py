@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class Severity(str, Enum):
+class Severity(StrEnum):
     CRITICAL = "CRITICAL"
     HIGH = "HIGH"
     MEDIUM = "MEDIUM"
@@ -55,7 +55,7 @@ class Severity(str, Enum):
         return self.level >= other.level
 
 
-class Confidence(str, Enum):
+class Confidence(StrEnum):
     HIGH = "HIGH"
     MEDIUM = "MEDIUM"
     LOW = "LOW"
@@ -79,7 +79,7 @@ class Confidence(str, Enum):
         return mapping[self]
 
 
-class CheckCategory(str, Enum):
+class CheckCategory(StrEnum):
     SYSTEM = "SYSTEM"
     NETWORK = "NETWORK"
     USERS = "USERS"

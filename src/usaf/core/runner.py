@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import concurrent.futures
+import fnmatch
 import logging
 import platform
 import sys
@@ -167,7 +168,6 @@ class ScanRunner:
         show_progress: bool = True,
     ) -> ScanResult:
         start_time = time.time()
-        scan_start_dt = datetime.now(UTC)
         scan_id = str(uuid.uuid4())
 
         metadata = ScanMetadata(
@@ -506,7 +506,6 @@ class ScanRunner:
     def _filter_checks(self, all_ids: list[str]) -> list[str]:
         """Apply enabled/disabled/ignore filters from config."""
         plugin_cfg = self.config.plugins
-        ignore_patterns = self.config.ignore
 
         if plugin_cfg.enabled and plugin_cfg.enabled != ["*"]:
             enabled_set = set(plugin_cfg.enabled)
@@ -533,8 +532,6 @@ class ScanRunner:
 
     def _apply_ignore_list(self, result: CheckResult) -> CheckResult:
         """Remove findings matching ignore patterns (by ID or path)."""
-        import fnmatch
-
         ignore_patterns = self.config.ignore
         ignore_paths = self.config.ignore_paths
 
@@ -561,14 +558,13 @@ class ScanRunner:
         """Inject correlated findings as a synthetic check result."""
         if not correlated:
             return
-        from usaf.models.severity import CheckCategory
 
         corr_result = CheckResult(
             check_id="CORRELATION",
             name="Cross-Check Correlation Analysis",
             category=CheckCategory.COMPROMISE,
             passed=len(correlated) == 0,
-            findings=[f for f in correlated],
+            findings=list(correlated),
         )
         results.append(corr_result)
 
@@ -577,8 +573,6 @@ class ScanRunner:
         results: list[CheckResult], scenarios: list[ScenarioResult]
     ) -> None:
         """Inject scenario results as synthetic check results."""
-        from usaf.models.severity import CheckCategory
-
         for scenario in scenarios:
             if not scenario.triggered:
                 continue

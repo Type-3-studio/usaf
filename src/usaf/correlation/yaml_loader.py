@@ -53,9 +53,6 @@ class CorrelationRuleYAML(CorrelationRule):
         if len(unique_signals) < self._min_signal_count:
             return []
 
-        temporal_boost = self._compute_temporal_boost(unique_signals)
-        risk_accumulation = 1.0 - (0.5 ** len(unique_signals))
-
         details: list[str] = []
         seen_check_ids: set[str] = set()
         for f in unique_signals:
@@ -149,8 +146,7 @@ class CorrelationRuleYAML(CorrelationRule):
                 if isinstance(pattern, str):
                     if not any(fnmatch.fnmatch(v, pattern) for v in str_value):
                         return False
-                elif isinstance(pattern, list):
-                    if not any(fnmatch.fnmatch(v, p) for v in str_value for p in pattern):
+                elif isinstance(pattern, list) and not any(fnmatch.fnmatch(v, p) for v in str_value for p in pattern):
                         return False
         return True
 

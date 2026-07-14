@@ -31,10 +31,8 @@ class DBCredentialsCheck(AuditCheck):
             seen_paths.add(p)
             perm = m.get("permission", "")
             if perm and perm.endswith(("666", "644", "777", "755")):
-                severity = Severity.CRITICAL
                 fp_prob = 0.1
             else:
-                severity = Severity.HIGH
                 fp_prob = 0.15
 
             findings.append(

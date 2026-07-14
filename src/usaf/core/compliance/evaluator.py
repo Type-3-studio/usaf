@@ -174,8 +174,6 @@ class ComplianceEvaluator:
                 )
             )
 
-        total = len(controls)
-        applicable = total - not_checked_controls
         overall_passed = failed_controls == 0 and not_checked_controls == 0
 
         return CheckResult(

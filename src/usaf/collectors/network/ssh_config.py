@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import contextlib
+import pwd
 import subprocess
 from pathlib import Path
 
@@ -23,7 +25,6 @@ class SSHConfigCollector(BaseCollector):
 
     def _parse_sshd_config(self) -> dict:
         result: dict = {"lines": [], "directives": {}, "includes": [], "path": None}
-        paths = ["/etc/ssh/sshd_config", "/etc/ssh/sshd_config.d"]
         main = Path("/etc/ssh/sshd_config")
         if main.exists():
             result["path"] = str(main)
@@ -117,22 +118,19 @@ class SSHConfigCollector(BaseCollector):
     def _scan_authorized_keys(self) -> list[dict]:
         result: list[dict] = []
         try:
-            import pwd
             for user in pwd.getpwall():
                 if user.pw_dir and Path(user.pw_dir).exists():
                     ak = Path(user.pw_dir) / ".ssh" / "authorized_keys"
                     if ak.exists():
-                        try:
+                        with contextlib.suppress(OSError):
                             result.append({
                                 "user": user.pw_name,
                                 "path": str(ak),
-                                "key_count": len([l for l in ak.read_text().splitlines()
-                                                  if l.strip() and not l.strip().startswith("#")]),
+                                "key_count": len([entry for entry in ak.read_text().splitlines()
+                                                  if entry.strip() and not entry.strip().startswith("#")]),
                                 "modified": ak.stat().st_mtime,
                                 "permissions": oct(ak.stat().st_mode),
                             })
-                        except OSError:
-                            pass
         except ImportError:
             pass
         return result

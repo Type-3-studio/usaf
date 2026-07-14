@@ -81,18 +81,14 @@ class EmptyPasswordCheck(AuditCheck):
     def _run_check(self, collectors: dict) -> list:
         users_data = self._get_data(collectors, "users")
         shadow_data = users_data.get("shadow", [])
-        passwd_data = users_data.get("users", [])
         findings = []
 
         empty_password_users = [
             s for s in shadow_data if s.get("password_hash") in ("", None, "NP")
         ]
 
-        passwd_map = {u["username"]: u for u in passwd_data if u.get("username")}
-
         for account in empty_password_users:
             username = account["username"]
-            user_info = passwd_map.get(username, {})
 
             findings.append(
                 self.finding(

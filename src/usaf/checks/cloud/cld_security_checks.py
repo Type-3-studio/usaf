@@ -128,7 +128,6 @@ class CloudMetadataCheck(AuditCheck):
         if not cloud_data.get("on_cloud", False):
             return findings
 
-        imds_reachable = metadata.get("imds_reachable", False)
         imds_v1 = metadata.get("imds_v1_accessible", False)
 
         if imds_v1:
@@ -165,9 +164,7 @@ class CloudStorageToolsCheck(AuditCheck):
 
     def _run_check(self, collectors: dict[str, Any]) -> list:
         findings: list = []
-        apt_data = self._get_data(collectors, "apt")
         cloud_data = self._get_data(collectors, "cloud")
-        installed = {p.get("name", "") for p in apt_data.get("packages", [])}
 
         if not cloud_data.get("on_cloud", False):
             return findings

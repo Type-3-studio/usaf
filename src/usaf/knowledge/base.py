@@ -75,7 +75,6 @@ class KnowledgeEntry:
         bonus = 0.0
         ev_type = type(ev).__name__
 
-        file_evidence_types = {"FileEvidence"}
         command_evidence_types = {"CommandEvidence"}
         high_quality_types = {"FileEvidence", "ProcessEvidence", "UserEvidence"}
         medium_quality_types = {"NetworkEvidence", "PackageEvidence", "RegistryEvidence"}

@@ -278,9 +278,6 @@ class DNSSearchDomainCheck(AuditCheck):
         rc: dict[str, Any] = dns_data.get("resolv_conf", {})
         search_domains.extend(rc.get("search_domains", []))
 
-        rs: dict[str, Any] = dns_data.get("resolved_status", {})
-        mode: str | None = rs.get("mode")
-
         internal_domains = [
             sd for sd in search_domains
             if any(tld in sd for tld in self._internal_tlds)

@@ -68,7 +68,7 @@ class YamaPtraceScopeCheck(AuditCheck):
         params = self._get_data(collectors, "kernel_params")
         findings: list = []
         value = params.get("kernel.yama.ptrace_scope", "")
-        if value == "" or value == "0":
+        if value in {"", "0"}:
             findings.append(
                 self.finding(
                     finding_id="001",

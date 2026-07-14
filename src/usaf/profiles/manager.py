@@ -407,7 +407,7 @@ class ProfileManager:
     def _auto_detect(self, collector_data: dict[str, Any]) -> Profile:
         """Auto-detect the best profile match based on installed packages."""
         packages = self._get_installed_packages(collector_data)
-        best_profile = list(self.BUILTIN_PROFILES.values())[0]
+        best_profile = next(iter(self.BUILTIN_PROFILES.values()))
         best_score = 0.0
 
         for profile in self.BUILTIN_PROFILES.values():

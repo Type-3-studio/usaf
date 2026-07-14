@@ -192,7 +192,6 @@ class ServiceMissingBinaryCheck(AuditCheck):
 
         for svc in sys_data.get("services", []):
             unit_name: str = svc.get("name", "")
-            active: str = svc.get("active", "")
             short = _strip_svc_suffix(unit_name)
             if short in seen:
                 continue
@@ -298,7 +297,7 @@ class OrphanedTimerUnitsCheck(AuditCheck):
             timer_short = _strip_svc_suffix(timer_name)
             expected_svc = f"{timer_short}.service"
 
-            if expected_svc not in [s for s in sys_data.get("services", [])]:
+            if expected_svc not in list(sys_data.get("services", [])):
                 _path, content = _read_unit_file(timer_name)
                 if content:
                     target = self._find_timer_target(content)

@@ -125,10 +125,7 @@ def _scan_file_for_patterns(
 
 
 def _is_secret_filename(name: str) -> bool:
-    for g in _SECRET_FILE_GLOBS:
-        if Path(name).match(g):
-            return True
-    return False
+    return any(Path(name).match(g) for g in _SECRET_FILE_GLOBS)
 
 
 @register_collector
@@ -158,7 +155,7 @@ class SecretsCollector(BaseCollector):
             except PermissionError:
                 continue
 
-        for d, rec in _SECRET_DIRS:
+        for d, _rec in _SECRET_DIRS:
             scanned_dirs.append(d)
             d_path = Path(d)
             if not d_path.is_dir():

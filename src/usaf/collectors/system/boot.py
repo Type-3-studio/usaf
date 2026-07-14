@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import subprocess
 from pathlib import Path
 
@@ -70,13 +71,11 @@ class BootCollector(BaseCollector):
             result["efivars"] = True
         efi_dir = Path("/boot/efi/EFI")
         if efi_dir.is_dir():
-            try:
+            with contextlib.suppress(OSError):
                 result["boot_entries"] = [
                     str(p.relative_to(efi_dir))
                     for p in efi_dir.rglob("*.efi")
                 ]
-            except OSError:
-                pass
         return result
 
     def _get_grub_state(self) -> dict:
@@ -123,8 +122,6 @@ class BootCollector(BaseCollector):
         loader = Path("/boot/loader/entries")
         if loader.is_dir():
             result["type"] = "systemd-boot"
-            try:
+            with contextlib.suppress(OSError):
                 result["entries"] = [str(p) for p in loader.glob("*.conf")]
-            except OSError:
-                pass
         return result

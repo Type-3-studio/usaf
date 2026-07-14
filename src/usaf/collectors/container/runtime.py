@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import json
 import subprocess
 from pathlib import Path
@@ -56,10 +57,8 @@ class ContainerCollector(BaseCollector):
             )
             if r.returncode == 0 and r.stdout.strip():
                 for line in r.stdout.splitlines():
-                    try:
+                    with contextlib.suppress(json.JSONDecodeError):
                         containers.append(json.loads(line))
-                    except json.JSONDecodeError:
-                        pass
         except (OSError, subprocess.SubprocessError):
             pass
         return containers
@@ -161,10 +160,8 @@ class ContainerCollector(BaseCollector):
                 )
                 if r.returncode == 0 and r.stdout.strip():
                     for line in r.stdout.splitlines():
-                        try:
+                        with contextlib.suppress(json.JSONDecodeError):
                             result["containers"].append(json.loads(line))
-                        except json.JSONDecodeError:
-                            pass
             except (OSError, subprocess.SubprocessError):
                 pass
         return result

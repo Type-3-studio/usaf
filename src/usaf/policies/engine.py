@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 from pathlib import Path
 from typing import Any
 
@@ -38,10 +39,8 @@ class PolicyEngine:
         policies: list[Policy] = []
         for entry in sorted(dir_path.iterdir()):
             if entry.suffix in (".yaml", ".yml"):
-                try:
+                with contextlib.suppress(PolicyError):
                     policies.append(self.load(str(entry)))
-                except PolicyError:
-                    pass
         return policies
 
     @staticmethod
@@ -72,8 +71,7 @@ class PolicyEngine:
                         config.plugins.overrides[check_id] = PluginOverride(
                             severity=parsed_sev, enabled=None
                         )
-        if policy.ignore_patterns:
-            if hasattr(config, "ignore"):
+        if policy.ignore_patterns and hasattr(config, "ignore"):
                 existing = list(config.ignore) if config.ignore else []
                 config.ignore = existing + [
                     p for p in policy.ignore_patterns if p not in existing

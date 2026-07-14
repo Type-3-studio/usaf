@@ -375,8 +375,7 @@ class FirewallLoggingCheck(AuditCheck):
         ufw = fw.get("ufw", {})
         raw = ufw.get("raw", "")
 
-        if ufw.get("active", False) and raw:
-            if "Logging: off" in raw:
+        if ufw.get("active", False) and raw and "Logging: off" in raw:
                 findings.append(
                     self.finding(
                         finding_id="001",

@@ -100,9 +100,7 @@ class SSHBruteForceSurface(CorrelationRule):
         if isinstance(ev, NetworkEvidence) and ev.local_port == 22:
             return True
         local_port = getattr(ev, "local_port", None)
-        if local_port == 22:
-            return True
-        return False
+        return local_port == 22
 
     @staticmethod
     def _describe_ports(findings: list[Finding]) -> str:
@@ -112,7 +110,7 @@ class SSHBruteForceSurface(CorrelationRule):
             if ev is None:
                 continue
             addr = getattr(ev, "local_address", None)
-            if addr and addr != "0.0.0.0" and addr != "::":
+            if addr and addr not in {"0.0.0.0", "::"}:
                 interfaces.append(addr)
         if not interfaces:
             return "all network interfaces (0.0.0.0)"

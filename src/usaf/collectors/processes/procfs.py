@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 from pathlib import Path
 
 from usaf.collectors.base import BaseCollector
@@ -65,10 +66,8 @@ class ProcessCollector(BaseCollector):
             elif line.startswith("Threads:"):
                 info["threads"] = int(line.split()[1])
             elif line.startswith("VmRSS:"):
-                try:
+                with contextlib.suppress(ValueError, IndexError):
                     info["vm_rss_kb"] = int(line.split()[1])
-                except (ValueError, IndexError):
-                    pass
 
         try:
             cmdline = (proc_dir / "cmdline").read_bytes().replace(b"\x00", b" ").strip()

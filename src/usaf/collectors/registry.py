@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import importlib
 import pkgutil
 
@@ -67,10 +68,8 @@ class CollectorRegistry:
         for _info in pkgutil.walk_packages(
             pkg.__path__, prefix=package + ".", onerror=lambda _: None
         ):
-            try:
+            with contextlib.suppress(Exception):
                 importlib.import_module(_info.name)
-            except Exception:
-                pass
 
 
 collector_registry: CollectorRegistry = CollectorRegistry()

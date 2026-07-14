@@ -79,7 +79,7 @@ class PluginRegistry:
         return {
             cid: cls
             for cid, cls in self._checks.items()
-            if cls.category.value == category or cls.category == category
+            if category in (cls.category.value, cls.category)
         }
 
     def resolve_dependencies(self, check_ids: list[str] | None = None) -> list[str]:

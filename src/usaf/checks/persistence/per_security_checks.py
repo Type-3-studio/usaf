@@ -461,8 +461,8 @@ class ModuleLoadPersistenceCheck(AuditCheck):
                     except OSError:
                         continue
 
-                    modules = [l.strip() for l in text.splitlines()
-                               if l.strip() and not l.strip().startswith("#")]
+                    modules = [entry.strip() for entry in text.splitlines()
+                               if entry.strip() and not entry.strip().startswith("#")]
 
                     for modline in modules:
                         if modline.startswith("blacklist"):
@@ -532,7 +532,7 @@ class ShellInitPersistenceExtCheck(AuditCheck):
                 except OSError:
                     continue
 
-                if st.st_uid == uid or st.st_uid == 0:
+                if st.st_uid in (uid, 0):
                     continue
 
                 findings.append(

@@ -79,7 +79,7 @@ class KernelPtrRestrictCheck(AuditCheck):
         kptr = params.get("kernel.kptr_restrict", "")
         dmesg = params.get("kernel.dmesg_restrict", "")
 
-        if kptr != "2" and kptr != "1":
+        if kptr not in {"2", "1"}:
             findings.append(
                 self.finding(
                     finding_id="001",

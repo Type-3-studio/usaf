@@ -34,10 +34,7 @@ def load_config(path: str | Path | None = None) -> USAFConfig:
     """Load configuration from file, merging defaults and overrides."""
     config_data: dict[str, Any] = yaml.safe_load(DEFAULT_CONFIG_YAML) or {}
 
-    if path:
-        file_paths = [Path(path)]
-    else:
-        file_paths = find_config_files()
+    file_paths = [Path(path)] if path else find_config_files()
 
     for config_path in file_paths:
         try:

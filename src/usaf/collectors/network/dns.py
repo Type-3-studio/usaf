@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import subprocess
 from pathlib import Path
 
@@ -30,13 +31,11 @@ class DNSCollector(BaseCollector):
         }
         rp = Path("/etc/resolv.conf")
         if rp.is_symlink():
-            try:
+            with contextlib.suppress(OSError):
                 result["symlink_target"] = str(rp.readlink())
-            except OSError:
-                pass
         try:
-            for line in rp.read_text().splitlines():
-                line = line.strip()
+            for raw_line in rp.read_text().splitlines():
+                line = raw_line.strip()
                 if line.startswith("nameserver "):
                     result["nameservers"].append(line.split(None, 1)[1])
                 elif line.startswith("search "):
@@ -77,8 +76,8 @@ class DNSCollector(BaseCollector):
                 ["resolvectl", "status"],
                 capture_output=True, text=True, timeout=10, check=False,
             )
-            for line in r.stdout.splitlines():
-                line = line.strip()
+            for raw_line in r.stdout.splitlines():
+                line = raw_line.strip()
                 if "DNS Servers:" in line:
                     result["current_dns"] = line.split(":", 1)[1].strip().split()
                 elif "DNS Domain:" in line:
@@ -88,8 +87,8 @@ class DNSCollector(BaseCollector):
         config = Path("/etc/systemd/resolved.conf")
         if config.exists():
             try:
-                for line in config.read_text().splitlines():
-                    line = line.strip()
+                for raw_line in config.read_text().splitlines():
+                    line = raw_line.strip()
                     if line.startswith("DNS="):
                         result["dns_servers"] = line.split("=", 1)[1].split()
                     elif line.startswith("FallbackDNS="):
@@ -104,8 +103,8 @@ class DNSCollector(BaseCollector):
         try:
             stat = hp.stat()
             result["modified"] = stat.st_mtime
-            for line in hp.read_text().splitlines():
-                line = line.strip()
+            for raw_line in hp.read_text().splitlines():
+                line = raw_line.strip()
                 if line and not line.startswith("#"):
                     result["entries"].append(line)
         except OSError:

@@ -181,15 +181,9 @@ class SshPubkeyAuthOnlyCheck(AuditCheck):
         pubkey = _get_sshd_directive("PubkeyAuthentication", directives)
         password = _get_sshd_directive("PasswordAuthentication", directives)
 
-        if pubkey is None:
-            pubkey_val = "yes (default)"
-        else:
-            pubkey_val = pubkey
+        pubkey_val = "yes (default)" if pubkey is None else pubkey
 
-        if password is None:
-            password_val = "yes (default)"
-        else:
-            password_val = password
+        password_val = "yes (default)" if password is None else password
 
         issues: list[str] = []
         if pubkey is None or pubkey != "yes":

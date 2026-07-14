@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import subprocess
 from typing import Any
 
 from usaf.core.plugin import AuditCheck
@@ -75,11 +76,10 @@ class SelfSignedCertificatesCheck(AuditCheck):
 
     @staticmethod
     def _check_self_signed(path: str) -> str | None:
-        import subprocess
         try:
             result = subprocess.run(
                 ["openssl", "x509", "-in", path, "-noout", "-subject", "-issuer"],
-                capture_output=True, text=True, timeout=10,
+                capture_output=True, text=True, timeout=10, check=False,
             )
             if result.returncode != 0:
                 return None

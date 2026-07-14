@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import subprocess
 from pathlib import Path
 
@@ -99,7 +100,6 @@ class JournaldCollector(BaseCollector):
             )
             for line in r.stdout.splitlines():
                 if "archived" in line and "used" in line:
-                    import re
                     m = re.search(r"(\d+\.?\d*)\s*([KMGTP]?)", line)
                     if m:
                         result["disk_usage_bytes"] = line.strip()

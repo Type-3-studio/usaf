@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import base64
 import os
+from struct import unpack
 from typing import Any
 
 from usaf.core.plugin import AuditCheck
@@ -94,17 +96,15 @@ class WeakSSHKeysCheck(AuditCheck):
     def _get_rsa_key_size(path: str) -> int | None:
         try:
             with open(path) as f:
-                for line in f:
-                    line = line.strip()
+                for raw_line in f:
+                    line = raw_line.strip()
                     if line.startswith("-----BEGIN") and "PRIVATE KEY" in line:
                         continue
                     if line.startswith("AAAA"):
                         parts = line.split()
                         if len(parts) >= 2:
-                            import base64
                             try:
                                 decoded = base64.b64decode(parts[1])
-                                from struct import unpack
                                 pos = 0
                                 while pos < len(decoded):
                                     if pos + 4 > len(decoded):

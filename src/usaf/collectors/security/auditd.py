@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import subprocess
 from pathlib import Path
 
@@ -72,8 +73,8 @@ class AuditdCollector(BaseCollector):
                 capture_output=True, text=True, timeout=10, check=False,
             )
             if r.returncode == 0:
-                for line in r.stdout.splitlines():
-                    line = line.strip()
+                for raw_line in r.stdout.splitlines():
+                    line = raw_line.strip()
                     if line:
                         rules.append({"rule": line, "source": "auditctl"})
         except (OSError, subprocess.SubprocessError):
@@ -82,8 +83,8 @@ class AuditdCollector(BaseCollector):
         if rules_file.exists():
             try:
                 content = rules_file.read_text()
-                for line in content.splitlines():
-                    line = line.strip()
+                for raw_line in content.splitlines():
+                    line = raw_line.strip()
                     if line and not line.startswith("#"):
                         rules.append({"rule": line, "source": str(rules_file)})
             except OSError:
@@ -99,10 +100,8 @@ class AuditdCollector(BaseCollector):
         audit_log = Path("/var/log/audit/audit.log")
         if audit_log.exists():
             stats["log_exists"] = True
-            try:
+            with contextlib.suppress(OSError):
                 stats["log_size_bytes"] = audit_log.stat().st_size
-            except OSError:
-                pass
         log_dir = Path("/var/log/audit")
         if log_dir.is_dir():
             try:

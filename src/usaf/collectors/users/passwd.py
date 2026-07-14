@@ -130,8 +130,8 @@ class SudoCollector(BaseCollector):
         entries: list[dict[str, str | None]] = []
         for path_str in self._find_sudoers_files():
             try:
-                for line in Path(path_str).read_text().splitlines():
-                    line = line.strip()
+                for raw_line in Path(path_str).read_text().splitlines():
+                    line = raw_line.strip()
                     if not line or line.startswith("#"):
                         continue
                     entries.append(

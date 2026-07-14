@@ -38,8 +38,8 @@ class SystemdCollector(BaseCollector):
                 timeout=30,
                 check=False,
             )
-            for line in result.stdout.splitlines():
-                line = line.lstrip("\u25cf ").lstrip()
+            for raw_line in result.stdout.splitlines():
+                line = raw_line.lstrip("\u25cf ").lstrip()
                 parts = line.split(maxsplit=4)
                 if len(parts) >= 4:
                     units.append(
@@ -87,8 +87,8 @@ class CronCollector(BaseCollector):
     def _parse_crontab(self, path: str) -> list[dict[str, str | None]]:
         entries: list[dict[str, str | None]] = []
         try:
-            for line in Path(path).read_text().splitlines():
-                line = line.strip()
+            for raw_line in Path(path).read_text().splitlines():
+                line = raw_line.strip()
                 if not line or line.startswith("#"):
                     continue
                 entries.append(

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from typing import Any
 
 from usaf.core.plugin import AuditCheck
@@ -89,7 +90,6 @@ class ExposedSSHPrivateKeysCheck(AuditCheck):
 
     @staticmethod
     def _get_permission(path: str) -> str | None:
-        import os
         try:
             mode = os.stat(path).st_mode
             return oct(mode & 0o7777)

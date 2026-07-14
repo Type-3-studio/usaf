@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import re
+import subprocess
 from typing import Any
 
 from usaf.core.plugin import AuditCheck
@@ -75,12 +76,11 @@ class ExpiredCertificatesCheck(AuditCheck):
 
     @staticmethod
     def _check_expired(path: str) -> dict[str, str] | None:
-        import subprocess
         try:
             result = subprocess.run(
                 ["openssl", "x509", "-in", path, "-noout",
                  "-subject", "-issuer", "-enddate"],
-                capture_output=True, text=True, timeout=10,
+                capture_output=True, text=True, timeout=10, check=False,
             )
             if result.returncode != 0:
                 return None

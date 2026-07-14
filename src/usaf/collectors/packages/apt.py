@@ -92,8 +92,8 @@ class APTCollector(BaseCollector):
             for sources_file in sources_dir.rglob("*.list"):
                 if not sources_file.is_file():
                     continue
-                for line in sources_file.read_text().splitlines():
-                    line = line.strip()
+                for raw_line in sources_file.read_text().splitlines():
+                    line = raw_line.strip()
                     if not line or line.startswith("#"):
                         continue
                     if line.startswith("deb ") or line.startswith("deb-src "):

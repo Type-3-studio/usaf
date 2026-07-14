@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import stat as stat_module
+import subprocess
 from pathlib import Path
 
 from usaf.collectors.base import BaseCollector
@@ -135,7 +136,6 @@ class FilesystemCollector(BaseCollector):
         results: list[dict] = []
         for f in self._walk_files(self.CAPS_PATHS, max_files=20000):
             try:
-                import subprocess
                 r = subprocess.run(
                     ["getcap", str(f)],
                     capture_output=True, text=True, timeout=5, check=False,

@@ -639,7 +639,7 @@
 | `mypy` config | ✅ | strict mode |
 | Pre-commit hooks | ✅ | ruff, mypy (0 errors ✅), trailing whitespace, YAML/TOML check |
 | CI/CD | ✅ | GitHub Actions: ruff lint+format, mypy (0 errors ✅), pytest on push/PR |
-| Versioning | ✅ | 0.23.0 — semver |
+| Versioning | ✅ | 0.24.0 — semver |
 
 ---
 
@@ -1232,7 +1232,7 @@ parts:
 | Security (AppArmor/USB) | 10 | 10 | 10 |
 | Compromise | 15 | 15 | 15 |
 | Password | 9 | 9 | 10 |
-| **Total checks** | **382** | **382** | **~450** |
+| **Total checks** | **389** | **389** | **~450** |
 | **Correlation rules** | 19 | 19 | **50+** |
 
 ---
@@ -1362,13 +1362,14 @@ test_lab/                      # Phase 7a: Validation Lab
 
 | Metric | Current | Short-term (P7a) | Medium-term (P7c) | Long-term |
 |--------|---------|------------------|---------------------|-----------|
-| Checks | 240 | 240 | 240 | **450+** |
-| Collectors | 25 | 25 | 30 | 35 |
+| Checks | 389 | 389 | 389 | **450+** |
+| Collectors | 26 | 26 | 30 | 35 |
 | Correlation rules | 20 (16 Python + 4 YAML) | 20 | 40 | **50+** |
 | Attack scenarios | **8** | 8 | 16 | 20+ |
-| Unit tests | 1761 | 1,800+ | 2,000+ | 3,000+ |
-| Integration tests | 93+ | 150+ | 300+ | 500+ |
-| Validation scenarios | **0** | **5** | 10 | 20+ |
+| Unit tests | 1,782+ | 1,800+ | 2,000+ | 3,000+ |
+| Integration tests | 155+ | 160+ | 300+ | 500+ |
+| Golden tests | 80 | 80 | 100+ | 150+ |
+| Validation scenarios | **5** | **5** | 10 | 20+ |
 | Detection rate | N/A | **>90%** | >90% | >95% |
 | Test coverage (stmt) | 85% | 85% | 90% | 92%+ |
 | Test coverage (branch) | 82% | 82% | 88% | 90%+ |

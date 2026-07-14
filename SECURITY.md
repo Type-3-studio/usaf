@@ -16,5 +16,5 @@ USAF detects security misconfigurations, compromise indicators, and hardening ga
 
 | Version | Supported |
 |---------|-----------|
-| 0.3.x   | ✅ |
-| < 0.3   | ❌ |
+| 0.24.x  | ✅ |
+| < 0.24  | ❌ |

@@ -16,6 +16,7 @@ from usaf.collectors.manager import CollectorManager
 from usaf.collectors.registry import collector_registry
 from usaf.config.loader import load_config
 from usaf.core.exceptions import PluginDependencyError
+from usaf.core.progress import ScanProgress
 from usaf.core.registry import registry
 
 # Phase 2 components
@@ -159,7 +160,12 @@ class ScanRunner:
         except Exception as e:
             return name, {"_error": str(e)}
 
-    def run(self, check_ids: list[str] | None = None, verbose: bool = False) -> ScanResult:
+    def run(
+        self,
+        check_ids: list[str] | None = None,
+        verbose: bool = False,
+        show_progress: bool = True,
+    ) -> ScanResult:
         start_time = time.time()
         scan_start_dt = datetime.now(UTC)
         scan_id = str(uuid.uuid4())
@@ -175,12 +181,17 @@ class ScanRunner:
             configuration_file=self.config_path or str(self.config.general.scan_name),
         )
 
+        progress = ScanProgress() if show_progress else None
+
         if verbose:
             print("[*] Collecting system data...")
 
         # Phase 1: Collect data (parallel if config.general.parallel)
         collectors_data: dict[str, dict[str, Any]] = {}
         collector_names = self._resolve_collector_dependencies()
+
+        if progress:
+            progress.start_collecting(len(collector_names))
 
         if self.config.general.parallel and len(collector_names) > 1:
             if verbose:
@@ -206,6 +217,8 @@ class ScanRunner:
                         metadata.errors.append(f"Collector '{name}': {e}")
                         if verbose:
                             print(f"  [!] Collector '{name}' failed: {e}")
+                    if progress:
+                        progress.advance_collectors()
         else:
             for name in collector_names:
                 _, data = self._collect_single(name)
@@ -214,8 +227,13 @@ class ScanRunner:
                     metadata.errors.append(f"Collector '{name}': {data['_error']}")
                     if verbose:
                         print(f"  [!] Collector '{name}' failed: {data['_error']}")
+                if progress:
+                    progress.advance_collectors()
 
         metadata.collector_count = self.collector_manager.count
+
+        if progress:
+            progress.finish_collecting()
 
         if verbose:
             print("[*] Running security checks...")
@@ -227,6 +245,9 @@ class ScanRunner:
 
         metadata.total_checks = len(all_check_ids)
         metadata.enabled_checks = len(enabled_ids)
+
+        if progress:
+            progress.start_checks(len(execution_order))
 
         # Phase 3: Execute checks (parallel if config.general.parallel)
         results: list[CheckResult] = []
@@ -286,6 +307,8 @@ class ScanRunner:
                                 execution_time_ms=0.0,
                             )
                         )
+                    if progress:
+                        progress.advance_checks()
         else:
             for check_id in execution_order:
                 try:
@@ -320,6 +343,12 @@ class ScanRunner:
                             execution_time_ms=0.0,
                         )
                     )
+                if progress:
+                    progress.advance_checks()
+
+        if progress:
+            progress.finish_checks()
+            progress.set_spinner("Post-processing findings...")
 
         # Phase 3.5: Correlation — cross-check analysis
         all_findings = [f for r in results for f in r.findings]
@@ -390,6 +419,9 @@ class ScanRunner:
         # Phase 4: Build result
         metadata.end_time = datetime.now(UTC)
         metadata.duration_seconds = time.time() - start_time
+
+        if progress:
+            progress.stop()
 
         return ScanResult(
             metadata=metadata,

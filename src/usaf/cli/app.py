@@ -60,7 +60,11 @@ def scan(
     ] = "terminal",
     verbose: Annotated[
         bool,
-        typer.Option("--verbose", "-v", help="Verbose output (show progress and passed checks)"),
+        typer.Option("--verbose", "-v", help="Verbose output (show detailed progress and passed checks)"),
+    ] = False,
+    no_progress: Annotated[
+        bool,
+        typer.Option("--no-progress", help="Disable progress bar"),
     ] = False,
     show_passed: Annotated[
         bool,
@@ -94,7 +98,7 @@ def scan(
 ) -> None:
     """Run a security audit scan with optional Phase 2 features."""
     runner = ScanRunner(config_path=config)
-    result = runner.run(check_ids=checks, verbose=verbose)
+    result = runner.run(check_ids=checks, verbose=verbose, show_progress=not no_progress)
 
     # Baseline diff (P2-2) — triggered by --baseline-diff flag or config.baseline.compare
     should_compare = baseline_diff or runner.config.baseline.compare

@@ -94,7 +94,7 @@ class NetworkHookScriptsCheck(AuditCheck):
     depends = []
     tags = ["persistence", "network", "hooks", "trigger"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
 
         for hook_dir in NETWORK_HOOK_DIRS:
@@ -321,9 +321,6 @@ class SshAuthorizedKeysFileTamperCheck(AuditCheck):
         auth_dirs = ssh_data.get("authorized_keys_dirs", [])
         for entry in auth_dirs:
             path = entry.get("path", "")
-            user = entry.get("user", "")
-            perms = entry.get("permissions", "")
-            key_count = entry.get("key_count", 0)
             try:
                 if os.path.exists(path):
                     st = os.stat(path)

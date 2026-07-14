@@ -24,7 +24,7 @@ class AppArmorComplainModeCheck(AuditCheck):
     depends = []
     tags = ["security", "apparmor", "profiles", "hardening"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         if not self._apparmor_enabled():
@@ -120,7 +120,7 @@ class AppArmorProfileIntegrityCheck(AuditCheck):
     depends = []
     tags = ["security", "apparmor", "profiles", "integrity"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         if not os.path.isdir(APPARMOR_PROFILES_DIR):
@@ -268,7 +268,7 @@ class SeccompStatusCheck(AuditCheck):
     depends = []
     tags = ["security", "seccomp", "kernel", "hardening"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         seccomp_path = Path("/proc/sys/kernel/seccomp")
@@ -330,7 +330,7 @@ class LsmStackingCheck(AuditCheck):
     depends = []
     tags = ["security", "lsm", "apparmor", "audit"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         lsm_path = Path("/sys/kernel/security/lsm")
 
@@ -376,7 +376,7 @@ class AppArmorCacheStatusCheck(AuditCheck):
     depends = []
     tags = ["security", "apparmor", "cache", "performance"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         cache_dirs = [
             Path("/var/cache/apparmor"),
@@ -424,7 +424,7 @@ class ModuleLoadingRestrictionsCheck(AuditCheck):
     depends = []
     tags = ["security", "kernel", "modules", "hardening"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         mod_disabled = Path("/proc/sys/kernel/modules_disabled")

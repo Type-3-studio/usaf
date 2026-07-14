@@ -41,7 +41,7 @@ class KernelModuleLoadingCheck(AuditCheck):
     depends = []
     tags = ["kernel", "hardening", "module-loading"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
         value = self._read_sysctl("kernel.modules_disabled")
         if value == "1":
@@ -99,7 +99,7 @@ class DangerousKernelModulesCheck(AuditCheck):
     depends = []
     tags = ["kernel", "modules", "attack-surface", "hardening"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
         loaded = self._get_loaded_modules()
 

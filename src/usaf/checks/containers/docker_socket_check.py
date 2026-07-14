@@ -18,7 +18,7 @@ class DockerSocketCheck(AuditCheck):
     depends = []
     tags = ["containers", "docker", "permissions"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
         sock = Path("/var/run/docker.sock")
         if not sock.exists():

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import datetime
+import io
 from typing import Any
 
 from rich import box
 from rich.console import Console
+from rich.console import Console as RichConsole
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
@@ -49,10 +51,6 @@ class TerminalReporter(BaseReporter):
         self.console = Console()
 
     def generate(self, result: ScanResult, score: ScanScore | None = None, **kwargs: Any) -> str:
-        import io
-
-        from rich.console import Console as RichConsole
-
         buf = io.StringIO()
         c = RichConsole(file=buf, force_terminal=kwargs.get("color", True))
         verbose = kwargs.get("verbose", False)
@@ -81,7 +79,7 @@ class TerminalReporter(BaseReporter):
         self._print_checks_summary(self.console, result, kwargs.get("show_passed", False))
         self._print_footer(self.console, result)
 
-    def _print_header(self, console: Console, result: ScanResult, score: ScanScore | None) -> None:
+    def _print_header(self, console: Console, result: ScanResult, _score: ScanScore | None) -> None:
         console.print()
         title = Text("USAF - Ubuntu Security Audit Framework", style="bold cyan")
         console.print(Panel(title, width=60))
@@ -119,7 +117,7 @@ class TerminalReporter(BaseReporter):
         console.print(f"  {summary}")
         console.print()
 
-    def _print_findings(self, console: Console, result: ScanResult, verbose: bool) -> None:
+    def _print_findings(self, console: Console, result: ScanResult, _verbose: bool) -> None:
         if not result.findings:
             console.print("[bold green]✅ No findings. System is well-configured.[/]")
             console.print()
@@ -136,7 +134,6 @@ class TerminalReporter(BaseReporter):
             if not sev_findings:
                 continue
             color = _SEVERITY_COLORS[severity]
-            badge = _SEVERITY_BADGES[severity]
             console.print(f"[bold {color}]━━━ {severity.value} ({len(sev_findings)}) ━━━[/]")
             console.print()
             for finding in sev_findings:
@@ -145,7 +142,6 @@ class TerminalReporter(BaseReporter):
 
     def _print_finding(self, console: Console, finding: Finding) -> None:
         color = _SEVERITY_COLORS[finding.severity]
-        badge = _SEVERITY_BADGES[finding.severity]
 
         title = Text.assemble(
             (f"  [{color}]{finding.id}[/] ", ""),

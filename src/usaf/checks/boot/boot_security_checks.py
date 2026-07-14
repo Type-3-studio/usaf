@@ -20,7 +20,7 @@ class SbatStatusCheck(AuditCheck):
     depends = []
     tags = ["boot", "secure-boot", "sbat", "hardening"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         sbat_found = False
         sbat_dir = Path("/sys/firmware/efi/efivars")
@@ -170,7 +170,7 @@ class LatestKernelRunningCheck(AuditCheck):
         if not installed_versions:
             return findings
 
-        sorted_versions = sorted(installed_versions, key=lambda x: self._version_key(x), reverse=True)
+        sorted_versions = sorted(installed_versions, key=self._version_key, reverse=True)
         latest_version = sorted_versions[0]
 
         if running_release == latest_version:

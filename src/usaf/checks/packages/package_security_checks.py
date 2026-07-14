@@ -94,7 +94,7 @@ class SourceReposEnabledCheck(AuditCheck):
         if not source_repos:
             return findings
 
-        urls = sorted(set(r["url"] for r in source_repos if "url" in r))
+        urls = sorted({r["url"] for r in source_repos if "url" in r})
         findings.append(
             self.finding(
                 finding_id="001",
@@ -236,7 +236,7 @@ class HeldPackagesCheck(AuditCheck):
     depends = []
     tags = ["packages", "updates", "patching"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         held = self._get_held_packages()
 
@@ -388,7 +388,7 @@ class AutoRemovablePackagesCheck(AuditCheck):
     depends = []
     tags = ["packages", "cleanup", "maintenance"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         removable = self._get_auto_removable()
 
@@ -478,7 +478,7 @@ class ThirdPartyPackageCountCheck(AuditCheck):
         ]
 
         if len(non_standard_repos) > 2:
-            urls = sorted(set(r["url"] for r in non_standard_repos if "url" in r))
+            urls = sorted({r["url"] for r in non_standard_repos if "url" in r})
             findings.append(
                 self.finding(
                     finding_id="001",

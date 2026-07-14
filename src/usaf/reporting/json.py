@@ -14,7 +14,7 @@ class JSONReporter(BaseReporter):
     name = "json"
     description = "JSON-formatted report for CI/CD pipelines and automation"
 
-    def generate(self, result: ScanResult, score: ScanScore | None = None, **kwargs: Any) -> str:
+    def generate(self, result: ScanResult, score: ScanScore | None = None, **_kwargs: Any) -> str:
         output: dict[str, Any] = {
             "usaf_version": result.metadata.usaf_version or "unknown",
             "scan": {

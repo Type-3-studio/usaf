@@ -18,7 +18,7 @@ class AuditLogCheck(AuditCheck):
     depends = []
     tags = ["forensics", "auditing", "logging"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings = []
         log_dir = Path("/var/log/audit")
         log_file = log_dir / "audit.log"

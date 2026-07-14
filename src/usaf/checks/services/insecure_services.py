@@ -32,7 +32,7 @@ class InsecureServicesCheck(AuditCheck):
         "pure-ftpd.service": "FTP (use SFTP or SCP instead)",
     }
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings = []
         search_dirs = [
             Path("/etc/systemd/system"),

@@ -94,8 +94,7 @@ class UnexpectedPamModulesCheck(AuditCheck):
         for mod in modules:
             name = mod.get("name", "")
             path = mod.get("path", "")
-            if name and name not in KNOWN_PAM_MODULES:
-                if not any(kp in name for kp in KNOWN_PAM_MODULES):
+            if name and name not in KNOWN_PAM_MODULES and not any(kp in name for kp in KNOWN_PAM_MODULES):
                     unknown_modules.append(mod)
 
         for mod in unknown_modules:
@@ -190,7 +189,7 @@ class PamModuleModificationsCheck(AuditCheck):
     depends = ["pam"]
     tags = ["persistence", "pam", "authentication"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
 
         for pam_file in CRITICAL_PAM_FILES:
@@ -210,13 +209,12 @@ class PamModuleModificationsCheck(AuditCheck):
             modifications_detected = False
             details: list[str] = []
 
-            pam_auth = os.path.join(os.path.dirname(pam_file), os.path.basename(pam_file))
             base_path = pam_file.replace("/etc/pam.d/", "")
             if base_path in ("common-auth", "common-account", "common-session", "common-password"):
                 known_defaults = self._get_known_pam_defaults(base_path)
                 if known_defaults:
-                    for line in first_lines.split("\n"):
-                        line = line.strip()
+                    for raw_line in first_lines.split("\n"):
+                        line = raw_line.strip()
                         if line and not line.startswith("#"):
                             base_module = line.split()[-1] if line.split() else ""
                             if base_module and base_module not in known_defaults and "pam_" in line:
@@ -317,7 +315,7 @@ class UdevRulesPersistenceCheck(AuditCheck):
     depends = []
     tags = ["persistence", "udev", "device", "trigger"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
 
         udev_dirs = [
@@ -352,7 +350,6 @@ class UdevRulesPersistenceCheck(AuditCheck):
 
                 has_run = "RUN+" in content
                 has_program = "PROGRAM=" in content or "IMPORT{program}" in content
-                has_exec = "RUN+=" in content
 
                 if has_run or has_program:
                     suspicious = any(

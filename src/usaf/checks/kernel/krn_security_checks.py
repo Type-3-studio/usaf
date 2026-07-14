@@ -107,7 +107,7 @@ class KernelModuleBlacklistCheck(AuditCheck):
         "/etc/modprobe.d/",
     ]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         blacklisted: set[str] = set()
 

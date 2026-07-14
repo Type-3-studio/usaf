@@ -125,7 +125,7 @@ class SeverityContextEngine:
         return finding.severity, "SSH listening on unspecified address"
 
     def _evaluate_permission_context(
-        self, finding: Finding, collectors: dict[str, Any]
+        self, finding: Finding, _collectors: dict[str, Any]
     ) -> tuple[Severity, str]:
         path = ""
         ev = finding.evidence
@@ -160,7 +160,6 @@ class SeverityContextEngine:
         if isinstance(user_info, dict):
             uid = user_info.get("uid", 0)
             shell = user_info.get("shell", "")
-            home = user_info.get("home", "")
 
             # Service accounts (UID < 1000, no login shell)
             is_service = (
@@ -178,7 +177,7 @@ class SeverityContextEngine:
         return finding.severity, f"user context for {username}"
 
     def _evaluate_network_context(
-        self, finding: Finding, collectors: dict[str, Any]
+        self, finding: Finding, _collectors: dict[str, Any]
     ) -> tuple[Severity, str]:
         ev = finding.evidence
         if not ev or not isinstance(ev, NetworkEvidence):

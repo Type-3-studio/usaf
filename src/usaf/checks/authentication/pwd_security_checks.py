@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 from pathlib import Path
 from typing import Any
 
@@ -73,7 +74,7 @@ class PasswordReuseCheck(AuditCheck):
 
     MIN_REMEMBER = 5
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         remember = _get_pam_value("remember")
@@ -170,7 +171,7 @@ class PasswordMinAgeCheck(AuditCheck):
 
     MIN_DAYS = 7
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         min_days = _get_login_defs_value("PASS_MIN_DAYS")
@@ -226,7 +227,7 @@ class PasswordMaxAgeCheck(AuditCheck):
 
     MAX_DAYS = 90
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         max_days = _get_login_defs_value("PASS_MAX_DAYS")
@@ -289,7 +290,7 @@ class PasswordWarnAgeCheck(AuditCheck):
 
     MIN_WARN_DAYS = 7
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         warn_age = _get_login_defs_value("PASS_WARN_AGE")
@@ -345,7 +346,7 @@ class AccountLockoutCheck(AuditCheck):
     depends = []
     tags = ["passwords", "lockout", "authentication", "hardening"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         if not COMMON_AUTH.exists():
@@ -445,7 +446,7 @@ class PasswordHashAlgorithmCheck(AuditCheck):
     depends = []
     tags = ["passwords", "hashing", "authentication", "hardening"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         sha_modules = ["pam_unix.so", "pam_yescrypt.so"]
@@ -526,7 +527,7 @@ class PasswordQualityCheck(AuditCheck):
 
     PWQUALITY_CONF = Path("/etc/security/pwquality.conf")
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         if not self.PWQUALITY_CONF.exists():
@@ -625,10 +626,8 @@ class PasswordQualityCheck(AuditCheck):
                     continue
                 key, val = stripped.split("=", 1)
                 k = key.strip()
-                try:
+                with contextlib.suppress(ValueError, TypeError):
                     config[k] = int(val.strip())
-                except (ValueError, TypeError):
-                    pass
         except OSError:
             pass
         return config

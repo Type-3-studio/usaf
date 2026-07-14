@@ -87,7 +87,7 @@ class SysrqKeyCheck(AuditCheck):
     depends = []
     tags = ["kernel-hardening", "access-control"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         value = _read_sysctl("kernel.sysrq")
         if value is not None and value not in ("0", "4"):
@@ -116,7 +116,7 @@ class KexecDisabledCheck(AuditCheck):
     depends = []
     tags = ["kernel-hardening", "boot"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         value = _read_sysctl("kernel.kexec_load_disabled")
         if value is not None and value != "1":
@@ -145,7 +145,7 @@ class PerfEventParanoidCheck(AuditCheck):
     depends = []
     tags = ["kernel-hardening", "information-disclosure"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         value = _read_sysctl("kernel.perf_event_paranoid")
         if value is not None and value not in ("2", "3"):

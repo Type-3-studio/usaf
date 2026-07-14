@@ -73,7 +73,7 @@ class UnexpectedProfileScriptsCheck(AuditCheck):
     depends = []
     tags = ["persistence", "shell", "profile", "init"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
 
         if not os.path.isdir(PROFILE_D_DIR):
@@ -214,7 +214,7 @@ class ModifiedBashInitCheck(AuditCheck):
             ("/etc/profile", "System-wide profile"),
         ]
 
-        for fp, desc in system_bash_files:
+        for fp, _desc in system_bash_files:
             if not os.path.exists(fp):
                 continue
             try:
@@ -229,7 +229,6 @@ class ModifiedBashInitCheck(AuditCheck):
             ]
 
             inetd_style = "exec" in content and ("/dev/tcp/" in content or "nc " in content)
-            modifications_section = "if [ -f" not in content[:100] and len(content) > 500
 
             if suspicious_matches or inetd_style:
                 findings.append(
@@ -352,7 +351,7 @@ class ModifiedZshInitCheck(AuditCheck):
             ("/etc/zshrc", "Alternative zshrc"),
         ]
 
-        for fp, desc in system_zsh_files:
+        for fp, _desc in system_zsh_files:
             if not os.path.exists(fp):
                 continue
             try:

@@ -302,8 +302,7 @@ class SystemdPathUnitsCheck(AuditCheck):
     depends = ["systemd"]
     tags = ["persistence", "systemd", "path-units"]
 
-    def _run_check(self, collectors: dict) -> list:
-        systemd_data = self._get_data(collectors, "systemd")
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
 
         path_units_dirs = [

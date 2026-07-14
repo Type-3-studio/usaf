@@ -454,7 +454,7 @@ class ImmutableFileDriftCheck(AuditCheck):
         "/etc/crontab",
     ]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         for filepath in self.CRITICAL_FILES:

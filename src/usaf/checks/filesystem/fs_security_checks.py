@@ -34,7 +34,7 @@ class SensitiveFilePermissionsCheck(AuditCheck):
         {"path": "/etc/sudoers.d", "max_perms": 0o550, "owner": 0},
     ]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         for entry in self.SENSITIVE_FILES:
@@ -198,7 +198,7 @@ class WorldWritableStickyBitCheck(AuditCheck):
         "/dev/shm",
     ]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         for dirpath in self.CRITICAL_WW_DIRS:
             path = Path(dirpath)
@@ -540,7 +540,7 @@ class SystemBinaryOwnershipCheck(AuditCheck):
         "/usr/local/sbin",
     ]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         checked: set[str] = set()
 
@@ -635,7 +635,7 @@ class WorldWritableCronDirectoriesCheck(AuditCheck):
         "/etc/bashrc",
     ]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         for dirpath in self.SENSITIVE_SCRIPT_DIRS:

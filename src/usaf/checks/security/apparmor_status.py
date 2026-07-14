@@ -19,7 +19,7 @@ class AppArmorStatusCheck(AuditCheck):
     depends = []
     tags = ["security", "apparmor", "mandatory-access-control"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings = []
         enabled_path = Path("/sys/module/apparmor/parameters/enabled")
 
@@ -102,7 +102,7 @@ class AppArmorServiceCoverageCheck(AuditCheck):
     depends = []
     tags = ["security", "apparmor", "services", "mandatory-access-control"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
 
         if not _is_apparmor_enforcing():

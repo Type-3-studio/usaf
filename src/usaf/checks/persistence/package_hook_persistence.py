@@ -61,7 +61,7 @@ class AptHookPersistenceCheck(AuditCheck):
     depends = ["apt"]
     tags = ["persistence", "apt", "hooks", "package"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
 
         for hook_dir in APT_HOOK_DIRS:
@@ -145,7 +145,7 @@ class DpkgHookPersistenceCheck(AuditCheck):
     depends = []
     tags = ["persistence", "dpkg", "hooks", "package"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
 
         for hook_dir in DPKG_HOOK_DIRS:

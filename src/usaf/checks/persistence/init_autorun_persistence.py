@@ -173,7 +173,7 @@ class RcLocalScriptCheck(AuditCheck):
     depends = []
     tags = ["persistence", "rc-local", "init", "boot"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
 
         if not os.path.exists(RC_LOCAL):
@@ -189,7 +189,7 @@ class RcLocalScriptCheck(AuditCheck):
         is_executable = os.access(RC_LOCAL, os.X_OK)
         suspicious_matches = [p for p in SUSPICIOUS_INIT_PATTERNS if p in content]
         lines = content.strip().split("\n")
-        non_comment_lines = [l for l in lines if l.strip() and not l.strip().startswith("#")]
+        non_comment_lines = [entry for entry in lines if entry.strip() and not entry.strip().startswith("#")]
         has_exit_0 = "exit 0" in content
 
         if not has_exit_0 or len(non_comment_lines) > 2 or suspicious_matches:
@@ -246,7 +246,7 @@ class InitScriptPersistenceCheck(AuditCheck):
     depends = []
     tags = ["persistence", "init-d", "init", "boot"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
 
         if not os.path.isdir(INIT_D_DIR):
@@ -332,7 +332,7 @@ class LoginLogoutHooksCheck(AuditCheck):
     depends = ["users"]
     tags = ["persistence", "login", "logout", "hooks"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
 
         login_hook_files = [
@@ -354,8 +354,8 @@ class LoginLogoutHooksCheck(AuditCheck):
             for suspicious in ["trap ", "EXIT", "SIGINT", "SIGTERM"]:
                 if suspicious in content:
                     lines_containing = [
-                        l.strip() for l in content.split("\n")
-                        if suspicious.lower() in l.lower()
+                        entry.strip() for entry in content.split("\n")
+                        if suspicious.lower() in entry.lower()
                     ]
                     if lines_containing:
                         findings.append(
@@ -505,7 +505,7 @@ class XdgAutostartCheck(AuditCheck):
     depends = ["users"]
     tags = ["persistence", "xdg", "autostart", "gui"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
 
         xdg_autostart_dirs = [
@@ -538,8 +538,6 @@ class XdgAutostartCheck(AuditCheck):
                 suspicious_matches = [p for p in SUSPICIOUS_INIT_PATTERNS if p in content]
                 has_exec = "Exec=" in content
                 has_hidden = "Hidden=true" in content
-                only_show_in = "OnlyShowIn=" in content
-                not_show_in = "NotShowIn=" in content
 
                 findings.append(
                     self.finding(

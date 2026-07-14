@@ -304,7 +304,7 @@ class ComplianceFramework:
         )
 
     def report_gap_analysis(
-        self, framework_id: str, result: ScanResult
+        self, framework_id: str, _result: ScanResult
     ) -> dict[str, list[dict[str, str]]]:
         """Identify gaps where CIS/NIST controls have no check coverage."""
         controls = self._get_controls_for_framework(framework_id)

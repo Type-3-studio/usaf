@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import datetime
 from pathlib import Path
 from typing import Any
@@ -32,13 +33,11 @@ class DockerTCPExposureCheck(AuditCheck):
 
         if docker.get("installed") and docker.get("running"):
             import subprocess
-            try:
+            with contextlib.suppress(OSError, subprocess.SubprocessError):
                 r = subprocess.run(
                     ["docker", "info", "--format", "{{.HostRoot}}"],
                     capture_output=True, text=True, timeout=10, check=False,
                 )
-            except (OSError, subprocess.SubprocessError):
-                pass
 
             try:
                 r = subprocess.run(
@@ -306,7 +305,7 @@ class RootContainersCheck(AuditCheck):
         containers = PrivilegedContainersCheck._get_containers(collectors)
         for c in containers:
             user = c.get("user", "")
-            if not user or user == "" or user == "0" or user == "root":
+            if not user or user in {"", "0", "root"}:
                 findings.append(
                     self.finding(
                         finding_id="001",
@@ -431,7 +430,7 @@ class DockerDaemonSecurityCheck(AuditCheck):
         "iptables": ("true", "iptables management", "Ensures Docker manages iptables rules"),
     }
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
         config = self._read_daemon_config()
         if config is None:
@@ -537,7 +536,7 @@ class UnsignedImagesCheck(AuditCheck):
         import os
         dct_enabled = os.environ.get("DOCKER_CONTENT_TRUST") == "1"
 
-        image_count = len(set(c.get("image", "") for c in containers if c.get("image")))
+        image_count = len({c.get("image", "") for c in containers if c.get("image")})
         if image_count == 0:
             return findings
 

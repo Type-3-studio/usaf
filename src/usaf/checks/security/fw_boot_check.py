@@ -21,7 +21,7 @@ class FirewallServiceBootCheck(AuditCheck):
 
     FW_SERVICES: list[str] = ["ufw", "nftables", "iptables"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         for svc in self.FW_SERVICES:

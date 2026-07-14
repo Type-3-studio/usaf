@@ -399,7 +399,7 @@ class LogFilePermissionsCheck(AuditCheck):
         "/var/log/audit",
     ]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         for log_dir in self._LOG_DIRS:

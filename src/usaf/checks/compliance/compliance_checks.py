@@ -43,7 +43,7 @@ class LoginBannerCheck(AuditCheck):
     depends = []
     tags = ["compliance", "legal", "banner"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         for path_str in ("/etc/issue", "/etc/issue.net"):
             p = Path(path_str)
@@ -172,7 +172,7 @@ class TimeSyncCheck(AuditCheck):
     depends = []
     tags = ["compliance", "time", "audit"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         timesync_active = self._check_service("systemd-timesyncd")
         chrony_active = self._check_service("chrony")
@@ -230,7 +230,7 @@ class FileIntegrityToolCheck(AuditCheck):
         "samhain": "Samhain",
     }
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         installed: list[str] = []
 
@@ -282,7 +282,7 @@ class GrubPasswordCheck(AuditCheck):
     depends = []
     tags = ["compliance", "boot", "access-control"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         grub_cfg = Path("/boot/grub/grub.cfg")
 
@@ -322,14 +322,14 @@ class RestrictedRootLoginCheck(AuditCheck):
     depends = []
     tags = ["compliance", "authentication", "access-control"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         securetty = Path("/etc/securetty")
 
         if securetty.exists():
             try:
                 lines = securetty.read_text().splitlines()
-                active = [l.strip() for l in lines if l.strip() and not l.strip().startswith("#")]
+                active = [entry.strip() for entry in lines if entry.strip() and not entry.strip().startswith("#")]
                 if len(active) > 2:
                     findings.append(self.finding(
                         finding_id="001", title=f"Root login allowed on {len(active)} ttys",
@@ -360,7 +360,7 @@ class AuditdServiceCheck(AuditCheck):
     depends = []
     tags = ["compliance", "audit", "logging"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         active = self._check_active("auditd")
         enabled = self._check_enabled("auditd")

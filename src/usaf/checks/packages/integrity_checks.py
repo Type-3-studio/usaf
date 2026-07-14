@@ -51,7 +51,7 @@ class ModifiedPackageFilesCheck(AuditCheck):
     depends = []
     tags = ["packages", "integrity", "tampering"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings = []
         try:
             result = subprocess.run(
@@ -314,7 +314,7 @@ class BrokenPackageSignaturesCheck(AuditCheck):
     depends = []
     tags = ["packages", "integrity", "signatures"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
 
         trusted_gpg_dir = Path("/etc/apt/trusted.gpg.d")
@@ -426,7 +426,7 @@ class ExpiredRepoKeysCheck(AuditCheck):
     depends = []
     tags = ["packages", "repositories", "keys"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
         try:
             result = subprocess.run(

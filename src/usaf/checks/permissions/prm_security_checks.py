@@ -265,7 +265,7 @@ class WeakDefaultUmaskCheck(AuditCheck):
         "/etc/zsh/zshenv",
     ]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         found_umask: str | None = None
         source: str | None = None
@@ -376,7 +376,7 @@ class CriticalDirectoryOwnershipCheck(AuditCheck):
         "/boot",
     ]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         for dirpath in self.CRITICAL_DIRS:

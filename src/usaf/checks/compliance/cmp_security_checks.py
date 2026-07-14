@@ -217,9 +217,8 @@ class DhcpClientCheck(AuditCheck):
     depends = ["interfaces"]
     tags = ["compliance", "cis", "dhcp", "network"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
-        iface_data = self._get_data(collectors, "interfaces")
 
         dhcp_client_found = False
         try:
@@ -466,7 +465,7 @@ class CronDaemonCheck(AuditCheck):
         "/etc/at.allow",
     ]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
 
         for filepath in self.CRON_FILES:
@@ -517,7 +516,7 @@ class SshProtocolComplianceCheck(AuditCheck):
     depends = []
     tags = ["compliance", "cis", "ssh", "hardening"]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         sshd_config = Path("/etc/ssh/sshd_config")
 

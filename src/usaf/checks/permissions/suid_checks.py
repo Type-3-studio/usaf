@@ -245,7 +245,7 @@ class UnexpectedSUIDCheck(AuditCheck):
 
         return findings
 
-    def _load_config_allowlist(self, collectors: dict[str, Any] | None = None) -> set[str]:
+    def _load_config_allowlist(self, _collectors: dict[str, Any] | None = None) -> set[str]:
         """Load user-defined SUID allowlist from configuration."""
         if self._config is None:
             return set()
@@ -346,7 +346,7 @@ class WorldWritableFilesCheck(AuditCheck):
         "/etc/fstab",
     ]
 
-    def _run_check(self, collectors: dict[str, Any]) -> list:
+    def _run_check(self, _collectors: dict[str, Any]) -> list:
         findings: list = []
         for path_str in self.CRITICAL_PATHS:
             path = Path(path_str)

@@ -312,7 +312,7 @@ def baseline_list() -> None:
 
 @app.command()
 def list_checks(
-    config: Annotated[
+    _config: Annotated[
         str | None,
         typer.Option("--config", "-c", help="Path to configuration file"),
     ] = None,
@@ -324,7 +324,6 @@ def list_checks(
     """List all available security checks."""
     from usaf.core.registry import registry
 
-    runner = ScanRunner(config_path=config)
     all_ids = registry.get_all_ids()
     all_instances = registry.get_all_instances()
 
@@ -343,7 +342,6 @@ def list_checks(
     print(f"\nAvailable Checks ({len(all_ids)}):")
     print("=" * 80)
     for cid in sorted(all_ids):
-        cls = registry.get_class(cid)
         instance = all_instances.get(cid)
         sev = instance.severity.value if instance else "N/A"
         cat = instance.category.value if instance else "N/A"

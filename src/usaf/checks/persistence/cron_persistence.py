@@ -1,3 +1,4 @@
+import contextlib
 import os
 
 from usaf.core.plugin import AuditCheck
@@ -79,8 +80,8 @@ class CronAnomalyCheck(AuditCheck):
         suspicious_lines: list[dict] = []
         for entry in all_entries:
             content = str(entry.get("content", ""))
-            for line in content.split("\n"):
-                line = line.strip()
+            for raw_line in content.split("\n"):
+                line = raw_line.strip()
                 if not line or line.startswith("#"):
                     continue
                 for pattern in SUSPICIOUS_CRON_PATTERNS:
@@ -206,14 +207,12 @@ class AnacronJobCheck(AuditCheck):
 
         spool_files: list[str] = []
         if os.path.isdir(ANACRON_SPOOL):
-            try:
+            with contextlib.suppress(OSError, PermissionError):
                 spool_files = os.listdir(ANACRON_SPOOL)
-            except (OSError, PermissionError):
-                pass
 
         suspicious_lines: list[str] = []
-        for line in all_content.split("\n"):
-            line = line.strip()
+        for raw_line in all_content.split("\n"):
+            line = raw_line.strip()
             if not line or line.startswith("#"):
                 continue
             parts = line.split()
@@ -282,15 +281,13 @@ class AtJobCheck(AuditCheck):
     depends = ["cron"]
     tags = ["persistence", "at", "scheduled-tasks"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
 
         at_spool_entries: list[str] = []
         if os.path.isdir(AT_SPOOL_DIR):
-            try:
+            with contextlib.suppress(OSError, PermissionError):
                 at_spool_entries = os.listdir(AT_SPOOL_DIR)
-            except (OSError, PermissionError):
-                pass
 
         at_allow_exists = os.path.exists(AT_ALLOW)
         at_deny_exists = os.path.exists(AT_DENY)

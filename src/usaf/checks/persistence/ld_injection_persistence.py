@@ -118,7 +118,7 @@ class LdSoPreloadCheck(AuditCheck):
     depends = []
     tags = ["persistence", "ld-preload", "rootkit", "injection"]
 
-    def _run_check(self, collectors: dict) -> list:
+    def _run_check(self, _collectors: dict) -> list:
         findings: list = []
 
         if not os.path.exists("/etc/ld.so.preload"):

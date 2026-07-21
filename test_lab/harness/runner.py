@@ -36,7 +36,7 @@ class USAFRunner:
     def run_scan(self, checks: list[str] | None = None) -> dict[str, Any]:
         check_filter = " ".join(checks) if checks else ""
         cmd = (
-            f"sudo env PATH=$PATH usaf scan --format json --no-progress {check_filter} 2>&1"
+            f"sudo python3 -m usaf.cli.app scan --format json --no-progress {check_filter} 2>&1"
         )
         raw = self.provisioner.ssh_execute(cmd)
 

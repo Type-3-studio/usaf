@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 from test_lab.scenarios.base import BaseScenario, ExpectedFinding, ExpectedFindings
-from test_lab.scenarios.registry import ScenarioRegistry
 
 
-@ScenarioRegistry.register
 class ContainerEscape(BaseScenario):
     name = "container-escape"
     description = "A Docker host with exposed socket, privileged containers, host namespace sharing, and old unsigned images"
@@ -37,21 +35,3 @@ class ContainerEscape(BaseScenario):
             ],
             notes="Docker container escape scenario covering all CTN checks",
         )
-
-    def get_vagrantfile_content(self) -> str:
-        return """Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/jammy64"
-  config.vm.hostname = "container-escape"
-  config.vm.network "private_network", type: "dhcp"
-  config.vm.provider "virtualbox" do |vb|
-    vb.memory = "4096"
-    vb.cpus = 2
-    vb.name = "usaf-container-escape"
-  end
-  config.vm.synced_folder "../../shared", "/vagrant/shared"
-  config.vm.provision "shell", path: "provision.sh"
-end
-"""
-
-    def get_provision_commands(self) -> list[str]:
-        return ["bash /vagrant/shared/vulnerabilities/docker_exposure.sh"]

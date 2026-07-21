@@ -5,14 +5,14 @@ set -e
 echo "[*] Configuring secret exposure vulnerabilities..."
 
 # SECR-101: AWS keys in various locations
-cat > /home/vagrant/.aws/credentials << 'AWS'
+cat > /home/ubuntu/.aws/credentials << 'AWS'
 [default]
 aws_access_key_id = AKIAXXXXXXXXXXXXXX
 aws_secret_access_key = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 AWS
 
-mkdir -p /home/vagrant/.aws
-chmod 600 /home/vagrant/.aws/credentials
+mkdir -p /home/ubuntu/.aws
+chmod 600 /home/ubuntu/.aws/credentials
 
 # AWS key in config file
 cat > /opt/app/config.ini << 'INI'
@@ -39,9 +39,9 @@ API_KEYS = {
 PYTHON
 
 # SECR-301: Exposed SSH private key
-mkdir -p /home/vagrant/.ssh
-chmod 700 /home/vagrant/.ssh
-cat > /home/vagrant/.ssh/id_rsa << 'KEY'
+mkdir -p /home/ubuntu/.ssh
+chmod 700 /home/ubuntu/.ssh
+cat > /home/ubuntu/.ssh/id_rsa << 'KEY'
 -----BEGIN OPENSSH PRIVATE KEY-----
 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
 NhAAAAAwEAAQAAAQEA6NF8ix3g3H8zBKE/dBG3BqH8vZgL/TM7S1E7OQ+LzJQfVhCgYx
@@ -49,15 +49,15 @@ R5QzYHJx5M8EdPQ0FqJRHqJqXJUkJEcbRGFGcBK6uQHQEh/SC/L4mSq7gCwI4gAAgCkF
 Sf2prmNQJRz3C8WJwLkQcJo1YB6ZtK4gGQi5xCyA1sGJIQj8C8I7YJ0mBZ8QSUqHc3U
 -----END OPENSSH PRIVATE KEY-----
 KEY
-chmod 600 /home/vagrant/.ssh/id_rsa
+chmod 600 /home/ubuntu/.ssh/id_rsa
 
 # SECR-302: Weak SSH key type (DSA)
-cat > /home/vagrant/.ssh/id_dsa << 'KEY2'
+cat > /home/ubuntu/.ssh/id_dsa << 'KEY2'
 -----BEGIN DSA PRIVATE KEY-----
 MIIBvAIBAAKBgQC8l3g6WqZgM1EdqGZqJQJmFfz6WrGh4K9SqGqY3H8XQgD1Lg
 -----END DSA PRIVATE KEY-----
 KEY2
-chmod 600 /home/vagrant/.ssh/id_dsa
+chmod 600 /home/ubuntu/.ssh/id_dsa
 
 # SECR-401: Database credentials in config
 cat > /opt/app/database.yml << 'DBYML'
@@ -88,8 +88,8 @@ echo "glpat-xxxxxxxxxxxxxxxxxxxx" > /opt/app/.gitlab_token
 echo "FAKE-SLACK-TOKEN-FOR-TESTING-ONLY" > /opt/app/.slack_token
 
 # SECR-605: Docker credentials
-mkdir -p /home/vagrant/.docker
-cat > /home/vagrant/.docker/config.json << 'DOCKERCFG'
+mkdir -p /home/ubuntu/.docker
+cat > /home/ubuntu/.docker/config.json << 'DOCKERCFG'
 {
   "auths": {
     "https://index.docker.io/v1/": {

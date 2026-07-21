@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 from test_lab.scenarios.base import BaseScenario, ExpectedFinding, ExpectedFindings
-from test_lab.scenarios.registry import ScenarioRegistry
 
 
-@ScenarioRegistry.register
 class SecretsExposed(BaseScenario):
     name = "secrets-exposed"
     description = "A host with cloud credentials, API tokens, SSH keys, database credentials, and secrets in source code"
@@ -31,21 +29,3 @@ class SecretsExposed(BaseScenario):
             ],
             notes="Credential exposure scenario covering all SECR check categories",
         )
-
-    def get_vagrantfile_content(self) -> str:
-        return """Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/jammy64"
-  config.vm.hostname = "secrets-exposed"
-  config.vm.network "private_network", type: "dhcp"
-  config.vm.provider "virtualbox" do |vb|
-    vb.memory = "1024"
-    vb.cpus = 1
-    vb.name = "usaf-secrets-exposed"
-  end
-  config.vm.synced_folder "../../shared", "/vagrant/shared"
-  config.vm.provision "shell", path: "provision.sh"
-end
-"""
-
-    def get_provision_commands(self) -> list[str]:
-        return ["bash /vagrant/shared/vulnerabilities/secret_injection.sh"]

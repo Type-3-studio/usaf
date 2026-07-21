@@ -18,15 +18,16 @@ import sys
 import time
 from pathlib import Path
 
-# Ensure test_lab package is importable
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from test_lab.harness.provisioner import VagrantProvisioner
+from test_lab.harness.provisioner import LibvirtProvisioner
 from test_lab.harness.reporter import print_gap_report, print_validation_summary
 from test_lab.harness.runner import USAFRunner
-from test_lab.harness.validator import FindingsValidator
+from test_lab.harness.validator import FindingsValidator, ValidationResult
 from test_lab.scenarios.expected_schema import load_expected_yaml
 from test_lab.scenarios.registry import ScenarioRegistry
+
+LAB_ROOT = Path(__file__).resolve().parent
 
 
 def cmd_list() -> None:
@@ -39,22 +40,31 @@ def cmd_list() -> None:
     print()
 
 
+def _make_provisioner(scenario) -> LibvirtProvisioner:
+    return LibvirtProvisioner(scenario.scenario_dir, scenario.name, LAB_ROOT)
+
+
 def cmd_provision(scenario_name: str) -> None:
     ScenarioRegistry.discover()
     scenario_cls = ScenarioRegistry.get(scenario_name)
     scenario = scenario_cls()
     print(f"\nProvisioning scenario: {scenario_name}")
     print("=" * 60)
-    provisioner = VagrantProvisioner(scenario.scenario_dir, scenario_name)
-    success = provisioner.up()
-    if success:
+    provisioner = _make_provisioner(scenario)
+    ok = provisioner.up()
+    if not ok:
+        print(f"\n  [!] Failed to create VM for '{scenario_name}'")
+        sys.exit(1)
+    ok = provisioner.provision()
+    if ok:
         print(f"\n  [+] Scenario '{scenario_name}' provisioned")
     else:
-        print(f"\n  [!] Failed to provision '{scenario_name}'")
+        print(f"\n  [!] Provisioning failed for '{scenario_name}'")
         sys.exit(1)
 
 
-def cmd_validate(scenario_name: str) -> None:
+def cmd_validate(scenario_name: str) -> ValidationResult | None:
+
     ScenarioRegistry.discover()
     scenario_cls = ScenarioRegistry.get(scenario_name)
     scenario = scenario_cls()
@@ -62,7 +72,6 @@ def cmd_validate(scenario_name: str) -> None:
     print(f"\nValidating scenario: {scenario_name}")
     print("=" * 60)
 
-    # Load expected findings
     expected_yaml = scenario.expected_yaml
     if not expected_yaml.exists():
         print(f"  [!] Expected findings file not found: {expected_yaml}")
@@ -70,19 +79,18 @@ def cmd_validate(scenario_name: str) -> None:
         sys.exit(1)
 
     expected = load_expected_yaml(expected_yaml)
-
-    # Run scan
-    provisioner = VagrantProvisioner(scenario.scenario_dir, scenario_name)
+    provisioner = _make_provisioner(scenario)
     runner = USAFRunner(provisioner)
 
     print("  [+] Installing/running USAF scan on VM...")
-    runner.install_usaf()
+    if not runner.install_usaf():
+        print("  [!] USAF install failed.")
+        return ValidationResult(scenario_name)
     scan_result = runner.run_scan()
     findings = runner.get_findings(scan_result)
 
     print(f"  [+] Found {len(findings)} total findings from {scan_result.get('check_count', 0)} checks")
 
-    # Validate
     validator = FindingsValidator(expected)
     result = validator.validate(findings)
 
@@ -90,26 +98,39 @@ def cmd_validate(scenario_name: str) -> None:
     return result
 
 
-def cmd_run(scenario_name: str) -> None:
+def cmd_run(scenario_name: str) -> ValidationResult | None:
+
     ScenarioRegistry.discover()
     scenario_cls = ScenarioRegistry.get(scenario_name)
     scenario = scenario_cls()
 
     print(f"\nFull run: {scenario_name}")
     print("=" * 60)
-    print("  Phase 1: Provision VM")
-    provisioner = VagrantProvisioner(scenario.scenario_dir, scenario_name)
-    provisioner.up()
 
-    print("\n  Phase 2: Install USAF and scan")
+    print("  Phase 1: Create VM")
+    provisioner = _make_provisioner(scenario)
+    if not provisioner.up():
+        print("  [!] Failed to create VM")
+        sys.exit(1)
+
+    print("\n  Phase 2: Provision vulnerabilities")
+    if not provisioner.provision():
+        print("  [!] Provisioning failed")
+        sys.exit(1)
+
+    print("\n  Phase 3: Install USAF and scan")
     runner = USAFRunner(provisioner)
-    runner.install_usaf()
+    if not runner.install_usaf():
+        print("  [!] USAF install failed. Cleaning up.")
+        provisioner.destroy()
+        sys.exit(1)
     scan_result = runner.run_scan()
     findings = runner.get_findings(scan_result)
     print(f"  Found {len(findings)} findings")
 
-    print("\n  Phase 3: Validate against expected findings")
+    print("\n  Phase 4: Validate against expected findings")
     expected_yaml = scenario.expected_yaml
+    result = None
     if expected_yaml.exists():
         expected = load_expected_yaml(expected_yaml)
         validator = FindingsValidator(expected)
@@ -118,9 +139,8 @@ def cmd_run(scenario_name: str) -> None:
     else:
         print(f"  [!] No expected.yaml at {expected_yaml}")
         print("  [!] Run with findings as baseline to create expected.yaml")
-        result = None
 
-    print("\n  Phase 4: Cleanup")
+    print("\n  Phase 5: Cleanup")
     provisioner.destroy()
     print("  Done")
     return result
@@ -131,7 +151,7 @@ def cmd_destroy(scenario_name: str) -> None:
     scenario_cls = ScenarioRegistry.get(scenario_name)
     scenario = scenario_cls()
     print(f"\nDestroying scenario: {scenario_name}")
-    provisioner = VagrantProvisioner(scenario.scenario_dir, scenario_name)
+    provisioner = _make_provisioner(scenario)
     provisioner.destroy()
     print(f"  [+] Scenario '{scenario_name}' destroyed")
 
@@ -139,7 +159,7 @@ def cmd_destroy(scenario_name: str) -> None:
 def cmd_run_all() -> None:
     ScenarioRegistry.discover()
     names = ScenarioRegistry.list_names()
-    results: list[tuple[str, any]] = []
+    results: list[tuple[str, ValidationResult]] = []
 
     for name in names:
         print(f"\n{'#' * 60}")
@@ -160,7 +180,7 @@ def cmd_install(scenario_name: str) -> None:
     ScenarioRegistry.discover()
     scenario_cls = ScenarioRegistry.get(scenario_name)
     scenario = scenario_cls()
-    provisioner = VagrantProvisioner(scenario.scenario_dir, scenario_name)
+    provisioner = _make_provisioner(scenario)
     runner = USAFRunner(provisioner)
     runner.install_usaf()
 

@@ -31,7 +31,6 @@ class ExpectedFindings:
 class BaseScenario(ABC):
     name: str = ""
     description: str = ""
-    vm_box: str = "ubuntu/jammy64"
     vm_memory: int = 2048
     vm_cpus: int = 2
 
@@ -56,17 +55,5 @@ class BaseScenario(ABC):
         return self.scenario_dir / "provision.sh"
 
     @property
-    def vagrantfile(self) -> Path:
-        return self.scenario_dir / "Vagrantfile"
-
-    @property
     def expected_yaml(self) -> Path:
         return self.scenario_dir / "expected.yaml"
-
-    @abstractmethod
-    def get_vagrantfile_content(self) -> str:
-        ...
-
-    @abstractmethod
-    def get_provision_commands(self) -> list[str]:
-        ...

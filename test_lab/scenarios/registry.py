@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib
 import pkgutil
+from contextlib import suppress
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -40,12 +41,10 @@ class ScenarioRegistry:
     def discover(cls) -> None:
         import test_lab.scenarios as scenarios_pkg
 
-        for importer, modname, ispkg in pkgutil.iter_modules(
+        for _importer, modname, ispkg in pkgutil.iter_modules(
             scenarios_pkg.__path__
         ):
             if ispkg and modname not in ("__init__",):
                 full_module = f"test_lab.scenarios.{modname}.scenario"
-                try:
+                with suppress(ModuleNotFoundError):
                     importlib.import_module(full_module)
-                except ModuleNotFoundError:
-                    pass

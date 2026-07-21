@@ -19,6 +19,9 @@ expected_findings:
   - check_id: SSH-105
     severity: MEDIUM
     title_contains: ClientAlive
+  - check_id: SSH-107
+    severity: MEDIUM
+    title_contains: Environment
 
   # SSH Algorithms
   - check_id: SSH-201
@@ -80,6 +83,9 @@ expected_findings:
   - check_id: FW-202
     severity: MEDIUM
     title_contains: Rules
+  - check_id: FW-203
+    severity: MEDIUM
+    title_contains: IPv6
   - check_id: FW-205
     severity: LOW
     title_contains: Outgoing
@@ -103,6 +109,9 @@ expected_findings:
   - check_id: NET-401
     severity: MEDIUM
     title_contains: Sysctl
+  - check_id: NET-402
+    severity: MEDIUM
+    title_contains: IPv6
 
   # Users
   - check_id: USR-101

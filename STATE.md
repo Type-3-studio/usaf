@@ -639,7 +639,7 @@
 | `mypy` config | ✅ | strict mode |
 | Pre-commit hooks | ✅ | ruff, mypy (0 errors ✅), trailing whitespace, YAML/TOML check |
 | CI/CD | ✅ | GitHub Actions: ruff lint+format, mypy (0 errors ✅), pytest on push/PR |
-| Versioning | ✅ | 0.24.0 — semver |
+| Versioning | ✅ | 0.25.0 — semver |
 
 ---
 
@@ -1028,19 +1028,29 @@ registered in pipeline, all tested. **Status: ✅ COMPLETE**
 
 ---
 
-### Phase 7a: Validation Lab — Known-Vulnerable VM Testing 🔴
+### Phase 7a: Validation Lab — Known-Vulnerable VM Testing ✅
 
 **Goal:** Build reproducible, known-vulnerable Ubuntu VMs to validate USAF detection accuracy and close false-negative gaps through iterative fix cycles.
 
+**Completed (2026-07-21):**
+- ✅ Switched from Vagrant+VirtualBox to **KVM/libvirt + cloud-init** (Ubuntu-native virtualization)
+- ✅ `LibvirtProvisioner` — VM lifecycle via `virt-install`, cloud-init seed ISOs, `virsh` management
+- ✅ All 5 scenarios fully implemented: `insecure-server`, `backdoored-host`, `container-escape`, `secrets-exposed`, `desktop-insecure`
+- ✅ 11 reusable vulnerability scripts (638 lines total) covering SSH, kernel, users, firewall, SUID, LD_PRELOAD, cron, systemd, Docker, secrets
+- ✅ Validation harness: provisioner, SSH runner (fragile JSON fixed), findings validator, gap reporter
+- ✅ `expected.yaml` manifests aligned with `scenario.py` for all 5 scenarios (9 missing check IDs added)
+- ✅ Dead code removed (`get_vagrantfile_content`, `get_provision_commands`, Vagrantfile templates)
+- ✅ CLI: `python3 run.py list | provision | validate | run | destroy | run-all`
+
 #### Approach
 1. Define composite vulnerability scenarios (realistic VM profiles with 10–20 vulns each)
-2. Provision VMs via **Vagrant + VirtualBox** with shell-provisioned vulnerabilities
-3. Run USAF scan against each VM (local or SSH mode)
+2. Provision VMs via **KVM/libvirt** with cloud-init + SSH-provisioned vulnerabilities
+3. Run USAF scan against each VM via SSH
 4. Compare actual findings to an **expected findings manifest** (YAML)
 5. Report gaps: false negatives (missed vulns), false positives (noise)
 6. Fix checks to close gaps → revalidate → iterate
 
-#### Composite Scenarios (5 planned)
+#### Composite Scenarios (5 complete)
 
 | Scenario | Vulnerabilities (~15 per VM) | Targets |
 |----------|------------------------------|---------|
@@ -1059,9 +1069,9 @@ test_lab/
 │   ├── __init__.py
 │   ├── registry.py             # Scenario registry (discover + register)
 │   ├── base.py                 # BaseScenario ABC
-│   ├── expected_schema.py      # Pydantic model for expected findings YAML
+│   ├── expected_schema.py      # YAML loading for expected findings
 │   ├── insecure_server/        # Scenario 1
-│   │   ├── scenario.py         # Scenario definition + Vagrantfile
+│   │   ├── scenario.py         # Scenario definition
 │   │   ├── provision.sh        # ~15 vuln setup commands
 │   │   └── expected.yaml       # Expected findings manifest
 │   ├── backdoored_host/        # Scenario 2
@@ -1074,22 +1084,23 @@ test_lab/
 │       └── ...
 ├── harness/
 │   ├── __init__.py
-│   ├── provisioner.py          # Vagrant lifecycle (up, provision, destroy, ssh-config)
+│   ├── provisioner.py          # KVM/libvirt lifecycle (up, provision, destroy, ssh)
 │   ├── runner.py               # USAF scan execution (via SSH)
 │   ├── validator.py            # Compare actual findings vs expected manifest
 │   └── reporter.py             # Gap analysis: false negatives, false positives, detection rate
 └── shared/
-    ├── vulnerabilities/        # Reusable shell snippets for common vulns
-    │   ├── ssh_misconfig.sh
-    │   ├── kernel_weak_params.sh
-    │   ├── user_misconfigs.sh
-    │   ├── suid_backdoor.sh
-    │   ├── cron_persistence.sh
-    │   ├── systemd_trojan.sh
-    │   ├── docker_exposure.sh
-    │   ├── secret_injection.sh
-    │   └── ...
-    └── scenarios/              # Base Vagrantfile template + utility functions
+    └── vulnerabilities/        # Reusable shell snippets for common vulns
+        ├── ssh_misconfig.sh
+        ├── kernel_weak_params.sh
+        ├── user_misconfigs.sh
+        ├── suid_backdoor.sh
+        ├── cron_persistence.sh
+        ├── systemd_trojan.sh
+        ├── docker_exposure.sh
+        ├── secret_injection.sh
+        ├── ld_preload_injection.sh
+        ├── firewall_off.sh
+        └── network_suspicious.sh
 ```
 
 #### Validation Metrics
@@ -1100,16 +1111,16 @@ test_lab/
 | False negatives per scenario | < 3 |
 | False positives per scenario | < 5 |
 | Iteration cycles to close gaps | ≤ 2 per missing finding |
-| Scenario provision time | < 5 min |
+| VM provision time | < 3 min |
 
 #### Required tooling
 
 ```bash
-sudo apt install vagrant virtualbox
-vagrant plugin install vagrant-scp  # optional: copy files to VM
+sudo apt install qemu-system-x86 libvirt-daemon-system virt-install cloud-image-utils
+sudo adduser $USER libvirt
 ```
 
-**Exit criteria:** 5 composite scenarios with >90% detection rate, gap analysis tooling, iterative fixes applied. **Status: 🔴 NOT STARTED**
+**Exit criteria:** 5 composite scenarios with >90% detection rate, gap analysis tooling, iterative fixes applied. **Status: ✅ COMPLETE (framework), needs iterative detection tuning**
 
 ---
 
@@ -1154,7 +1165,7 @@ parts:
   usaf:
     plugin: python
     source: https://github.com/Type-3-studio/usaf.git
-    source-tag: v0.24.0
+    source-tag: v0.25.0
     python-packages:
       - typer>=0.15
       - rich>=13.0
@@ -1509,29 +1520,56 @@ test_lab/                      # Phase 7a: Validation Lab
 
 ---
 
-### v0.24.0 — Phase 7a: Validation Lab Framework (2026-07-12)
+### v0.25.0 — Phase 7a: KVM Validation Lab + Snap Prep (2026-07-21)
 
-**Phase 7a — Validation Lab:**
-- Created `test-lab/` framework with 5 composite vulnerability scenarios:
-  - `insecure-server`: 15+ vulns across SSH, kernel, firewall, users, network
-  - `backdoored-host`: 15+ persistence mechanisms (SUID, cron, systemd, LD_PRELOAD)
-  - `container-escape`: 10+ Docker misconfigurations (privileged, host namespace, socket)
-  - `secrets-exposed`: 12+ credential exposure types (AWS, GitHub, SSH keys, tokens)
-  - `desktop-insecure`: 10+ legacy services, weak auth, no firewall
-- Built validation harness: `provisioner.py` (Vagrant lifecycle), `runner.py` (USAF scan via SSH), `validator.py` (findings comparison), `reporter.py` (gap analysis)
-- Created 9 reusable vulnerability shell scripts in `shared/vulnerabilities/`
-- Scenarios auto-register via `ScenarioRegistry` with `pkgutil` discovery
-- Expected findings defined in both Python and YAML formats
-- Detection rate target: >90% per scenario
-- CLI: `python run.py list | provision | validate | run | destroy | run-all`
-- Also documented Phase 7b (Snap Store Publishing) roadmap in STATE.md
+**Phase 7a — Validation Lab (KVM/libvirt rewrite):**
+- Switched from Vagrant+VirtualBox to **KVM/libvirt + cloud-init** (Ubuntu native)
+- Rewrote `provisioner.py` → `LibvirtProvisioner` using `virt-install`, cloud-init seed ISOs, `virsh`
+- All 5 scenarios fully implemented; 11 shared vulnerability scripts (638 total lines)
+- Fixed 9 expected-finding mismatches across `insecure-server` and `backdoored-host`
+- Removed dead code: `get_vagrantfile_content()`, `get_provision_commands()`, Vagrant templates
+- Hardened `runner.py` JSON parsing (regex fallback for stderr contamination)
+- Added explicit `provision()` step between VM creation and USAF install
+- Updated docs: KVM prerequisites, Ubuntu 24.04 Noble cloud images
+
+**Problems encountered and resolved during implementation:**
+
+1. **`qemu-kvm` is a virtual package** — on newer Ubuntu releases (26.04+) it requires explicit selection of `qemu-system-x86` or `qemu-system-x86-hwe`. Fixed: documented `qemu-system-x86` as the concrete package.
+
+2. **`cloud-localds --version` not supported** — tool exits with code 1 when given `--version`. The dep checker used `subprocess.run([cmd, "--version"], check=True)` which falsely flagged it as missing. Fixed: switched to `shutil.which()` which just verifies the binary exists in PATH.
+
+3. **`cloud-localds --filesystem vfat` requires `mtools`** — the vfat filesystem mode needs `mcopy` from the `mtools` package, which isn't installed by default. Fixed: removed `--filesystem vfat`, falling back to default iso9660 which works without extra deps.
+
+4. **Permission denied on `/var/lib/libvirt/images/`** — writing qcow2 disks and running `virt-install` requires root. Fixed: added `sudo=True` parameter to `_run()` method, applied to all `virsh`, `virt-install`, and `qemu-img` calls.
+
+5. **libvirt-qemu user can't access backing files in user home** — qcow2 overlay disks with backing files in `~/.cache/usaf-lab/` are inaccessible to the `libvirt-qemu` system user (uid:64055, gid:991). Fixed: copy the base cloud image to `/var/lib/libvirt/images/noble-server-cloudimg-amd64.img` and use that as the backing file.
+
+6. **Stale qcow2 overlays from failed runs** — when `virt-install` fails midway, the overlay disk remains with a backing file pointer to an old (possibly deleted) path. Re-running `up()` skips creation because the file exists. Fixed: always delete and re-create the overlay disk in `up()`.
+
+7. **Partial `virt-install` leaves orphan domains** — a failed `virt-install` may create a libvirt domain that is shut off. Next `up()` call sees `_vm_exists() == True` and tries to `virsh start` it, which fails. Fixed: `up()` now calls `destroy()` first if the VM exists but isn't running with a valid IP.
+
+8. **SSH `StrictHostKeyChecking` warnings contaminate JSON output** — when SCP first connects to a new VM, `ssh` prints "Warning: Permanently added 'X' (ED25519) to the list of known hosts." to stderr. The `2>&1` merge contaminated JSON parsing. Fixed: use `--output` file-based approach or suppress stderr with `2>/dev/null` where appropriate.
+
+9. **Cloud-init not ready when IP is available** — after `virt-install`, the VM gets a DHCP IP before cloud-init finishes package installation. Early SSH connections fail or return partial state. Fixed: added `_wait_for_cloud_init()` that polls `cloud-init status` with retry.
+
+10. **`sudo usaf: command not found`** — `pip install -e .` puts `usaf` in `/usr/local/bin/` but `sudo` has a restricted `secure_path` that doesn't include it. Fixed: use `sudo env PATH=$PATH usaf` to pass the user's PATH through sudo.
+
+11. **`/opt/` requires root for write** — uploading vulnerability scripts to `/opt/usaf-lab/` via SCP failed because the `ubuntu` user can't create directories there. Fixed: `provision()` now does `sudo mkdir -p && sudo chown ubuntu:ubuntu` before uploading, and `scp_to()` uses `sudo mkdir -p` for the parent directory.
+
+12. **`pip3 install` dependency pre-install step was fragile** — pre-installing `typer rich pydantic...` separately failed on version conflicts. Fixed: removed the separate pip install step; `pip install -e .` handles all dependencies via `pyproject.toml`.
+
+13. **Temp file permission conflicts** — writing user-data to `/tmp/usaf-<scenario>-user-data` used the same filename across runs, causing PermissionError when a previous run left root-owned files. Fixed: always write new temp files (no reuse).
+
+14. **`subprocess.run()` `check` parameter conflict** — `ssh_execute()` passed `check=check` to `_run()`, which forwarded it to `subprocess.run(cmd, check=False, **kw)`, causing "multiple values for keyword argument 'check'". Fixed: moved `check=False` into the `kw` dict before `**kwargs` update.
+
+15. **`usaf scan --format json` outputs only to stdout** — no stderr output means `2>&1` is harmless but `2>/dev/null` suppresses everything. Fixed: use `2>&1` to merge streams, parse JSON from combined output.
 
 **Infrastructure:**
-- **Tests**: 1942 passed (unchanged, new test-lab is integration validation, not unit tests)
+- **Tests**: 1942 passed (unchanged)
 - **mypy --strict**: 0 new errors
 - **ruff**: 0 new errors (pre-existing only)
-- **Version**: 0.24.0
-- **Requires**: `vagrant + virtualbox` for VM provisioning
+- **Version**: 0.25.0
+- **Requires**: `qemu-system-x86 libvirt-daemon-system virt-install cloud-image-utils` for VM provisioning
 
 ---
 

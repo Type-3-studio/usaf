@@ -315,6 +315,93 @@ The framework is designed for these future additions without core changes:
 - **Plugin marketplace**: Community check repository
 - **Real-time monitoring**: Inotify/fanotify collectors
 
+## Validation Lab (`test_lab/`)
+
+The validation lab (`test_lab/`) provisions KVM VMs with known vulnerabilities, runs USAF scans, and compares findings against expected manifests. Useful for iteratively improving detection rates.
+
+### Quick Start
+
+```bash
+cd test_lab
+# List scenarios
+python3 run.py list
+# Full run (create VM → inject vulns → scan → validate → destroy)
+python3 run.py run insecure-server
+# Step by step
+python3 run.py provision insecure-server   # create VM + apply vulns
+python3 run.py validate insecure-server    # install USAF + scan + compare
+python3 run.py destroy insecure-server     # cleanup
+```
+
+### Prerequisites
+
+```bash
+sudo apt install qemu-system-x86 libvirt-daemon-system virt-install cloud-image-utils
+sudo adduser $USER libvirt
+# Log out and back in for group change to take effect
+```
+
+### Architecture
+
+```
+test_lab/
+├── run.py                     # CLI entry point
+├── harness/
+│   ├── provisioner.py         # KVM/libvirt lifecycle (up, provision, destroy, ssh/scp)
+│   ├── runner.py              # USAF installation + scan execution (via SSH)
+│   ├── validator.py           # Compare findings vs expected.yaml
+│   └── reporter.py            # Gap analysis (false negatives, false positives, detection rate)
+├── scenarios/                 # 5 composite vulnerability profiles
+│   ├── base.py                # BaseScenario ABC with auto-registration
+│   ├── registry.py            # Auto-discover scenarios via pkgutil
+│   ├── expected_schema.py     # YAML loader for expected findings manifest
+│   ├── insecure_server/       # Weak SSH, kernel, firewall, users, packages
+│   ├── backdoored_host/       # SUID, cron, LD_PRELOAD, systemd persistence, reverse shell
+│   ├── container_escape/      # Docker socket, privileged containers, host namespace
+│   ├── secrets_exposed/       # Cloud creds, SSH keys, tokens, DB passwords
+│   └── desktop_insecure/      # Legacy services, weak auth, world-writable PATH
+└── shared/vulnerabilities/    # 11 reusable shell scripts for injecting vulns
+```
+
+### Known Friction Points (for agents)
+
+When iterating on the validation lab, watch out for:
+
+1. **Scenarios run `sudo usaf scan`** — USAF needs root to read `/etc/shadow`, `/proc/*`, run `systemctl`. The scan command uses `sudo env PATH=$PATH usaf scan` because sudo has a restricted `secure_path`.
+
+2. **The scan is slow** — running all 389 checks can take several minutes on the VM. The `ssh_execute()` method has no command timeout (only `ConnectTimeout=10` for TCP), so it waits. There is no progress indicator during scan.
+
+3. **`expected.yaml` must match `scenario.py`** — if you add a new expected finding to `scenario.py`, add it to `expected.yaml` too (with `title_contains` for matching). The validator uses `check_id` + optional `title_contains` to match findings.
+
+4. **Vulnerability scripts symlink to `/vagrant/shared/`** — the provisioner creates `ln -sf /opt/usaf-lab/vulnerabilities /vagrant/shared/vulnerabilities`. All `provision.sh` scripts reference `$SHARED=/vagrant/shared/vulnerabilities`. If you change the upload path, update both.
+
+5. **`destroy()` always cleans up** — `up()` calls `destroy()` if a domain exists but isn't running with a valid IP. This handles partial `virt-install` failures, but means you can't resume a half-provisioned VM.
+
+6. **SSH key generated at first run** — `~/.ssh/usaf-lab-key` is generated once and reused. If you delete it, a new one is created but existing VMs with the old key become unreachable.
+
+7. **Cloud image cached in `~/.cache/usaf-lab/`** — the 600MB Ubuntu 24.04 cloud image is downloaded once. Delete it to force a fresh download. A copy is kept in `/var/lib/libvirt/images/` for qemu access.
+
+8. **The `_run()` method uses `**kwargs`** — be careful not to pass `check=` as a kwarg because `subprocess.run()` receives it twice (once from `_run`'s default `check=False`, once from `**kwargs`). Use `sudo=True` instead of adding sudo to the command list.
+
+### Adding a New Scenario
+
+1. Create `scenarios/<name>/` directory with `__init__.py`
+2. Write `scenarios/<name>/scenario.py` with a class extending `BaseScenario`
+3. Write `scenarios/<name>/provision.sh` that applies vulnerabilities (uses `$SHARED` variable to reference shared scripts)
+4. Write `scenarios/<name>/expected.yaml` with the list of check IDs USAF should detect
+5. The scenario auto-registers via `BaseScenario.__init_subclass__()`
+
+### Iteration Cycle
+
+```bash
+# 1. Run the scenario
+python3 run.py run <scenario>
+# 2. Check the gap report for missed findings
+# 3. Fix the check in src/usaf/checks/
+# 4. Re-run to validate the fix improved detection rate
+# 5. Repeat until >90% detection rate
+```
+
 ## STATE.md — Mandatory Update Rule
 
 **Every agent that modifies the codebase MUST update STATE.md to match reality.**

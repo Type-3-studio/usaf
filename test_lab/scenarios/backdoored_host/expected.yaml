@@ -57,3 +57,16 @@ expected_findings:
 
   - check_id: NET-302
     title_contains: Hosts
+
+  - check_id: COM-101
+    title_contains: Process
+  - check_id: COM-205
+    title_contains: Cmdline
+  - check_id: COM-206
+    title_contains: Misleading
+  - check_id: COM-207
+    title_contains: Root
+  - check_id: COM-301
+    title_contains: Connection
+  - check_id: COM-302
+    title_contains: Reverse Shell
